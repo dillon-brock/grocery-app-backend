@@ -16,3 +16,8 @@ export type HashedSignUpData = {
   passwordHash: string;
   username: string;
 }
+
+export type UserSignInData = {
+  email: string;
+  password: string;
+};

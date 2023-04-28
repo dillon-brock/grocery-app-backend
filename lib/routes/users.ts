@@ -6,7 +6,12 @@ export default Router()
     try {
       const { email, password, username } = req.body;
       const newUser = await UserService.create({ email, password, username });
-      res.json(newUser);
+      const token = await UserService.signIn({ email, password });
+      res.status(200).json({ 
+        message: 'Signed up and logged in successfully',
+        user: newUser,
+        token
+      });
     } catch (e) {
       next(e);
     }
