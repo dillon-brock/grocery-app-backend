@@ -1,5 +1,7 @@
+import { type Request, type Response, type NextFunction } from "express";
+
 // eslint-disable-next-line no-unused-vars
-module.exports = (err, req, res, next) => {
+export default (err: any, req: Request, res: Response, next: NextFunction) => {
   const status = err.status || 500;
 
   res.status(status);
