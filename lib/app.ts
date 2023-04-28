@@ -2,11 +2,15 @@ import express from 'express';
 import usersRouter from './routes/users.js';
 import notFoundMiddleWare from './middleware/not-found.js';
 import errorMiddleware from './middleware/error.js';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 // Built in middleware
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
 
 // App routes
 app.use('/users', usersRouter);
