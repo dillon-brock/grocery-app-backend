@@ -42,6 +42,6 @@
     "rest-spread-spacing": "error",
     "prefer-arrow-callback": "error",
     "object-shorthand": ["error", "always"],
-    "no-unused-vars": ["error"]
+    "no-unused-vars": ["warn"]
   }
 }

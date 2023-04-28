@@ -1,5 +1,5 @@
 import pool from "../../sql/pool";
-import { ErrorWithStatus, InsertionError } from "../types/errorTypes";
+import { InsertionError } from "../types/errorTypes";
 import { HashedSignUpData, UserFromDatabase } from "../types/userTypes";
 
 export class User {

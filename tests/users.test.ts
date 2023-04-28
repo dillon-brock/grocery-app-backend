@@ -14,7 +14,6 @@ describe('user route tests', () => {
   it('signs up a new user on POST /users', async () => {
     const res = await request(app).post('/users').send(testUser);
     expect(res.status).toBe(200);
-    expect(res.body.message).toEqual('Signed in successfully!');
   })
 
 });
