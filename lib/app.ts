@@ -1,7 +1,7 @@
 import express from 'express';
-import usersRouter from './routes/users';
-import notFoundMiddleWare from './middleware/not-found';
-import errorMiddleware from './middleware/error';
+import usersRouter from './routes/users.js';
+import notFoundMiddleWare from './middleware/not-found.js';
+import errorMiddleware from './middleware/error.js';
 
 const app = express();
 

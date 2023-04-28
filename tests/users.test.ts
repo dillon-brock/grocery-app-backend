@@ -1,7 +1,7 @@
 /* @jest-environment node */
-import { setupDb } from './utils';
+import { setupDb } from './utils.js';
 import request from 'supertest';
-import app from '../lib/app';
+import app from '../lib/app.js';
 
 const testUser = {
   email: 'test@user.com',

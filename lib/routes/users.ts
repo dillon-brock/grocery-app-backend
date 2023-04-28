@@ -1,5 +1,5 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
-import { UserService } from '../services/UserService';
+import { UserService } from '../services/UserService.js';
 
 export default Router()
   .post('/', async (req: Request, res: Response, next: NextFunction) => {

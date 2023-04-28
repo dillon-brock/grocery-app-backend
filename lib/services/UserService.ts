@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UserSignInData, UserSignUpData } from '../types/userTypes';
-import { User } from '../models/User';
-import { ErrorWithStatus } from '../types/errorTypes';
+import { UserSignInData, UserSignUpData } from '../types/userTypes.js';
+import { User } from '../models/User.js';
+import { ErrorWithStatus } from '../types/errorTypes.js';
 
 export class UserService {
   static async create({ email, username, password }: UserSignUpData): Promise<User> {

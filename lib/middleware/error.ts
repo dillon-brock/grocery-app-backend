@@ -1,4 +1,4 @@
-import { type Request, type Response, type NextFunction } from "express";
+import { type Request, type Response, type NextFunction } from 'express';
 
 // eslint-disable-next-line no-unused-vars
 export default (err: any, req: Request, res: Response, next: NextFunction) => {

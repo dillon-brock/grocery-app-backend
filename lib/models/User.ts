@@ -1,6 +1,6 @@
-import pool from "../../sql/pool";
-import { InsertionError } from "../types/errorTypes";
-import { HashedSignUpData, UserFromDatabase } from "../types/userTypes";
+import pool from "../../sql/pool.js";
+import { InsertionError } from "../types/errorTypes.js";
+import { HashedSignUpData, UserFromDatabase } from "../types/userTypes.js";
 
 export class User {
   id: string;
