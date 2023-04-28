@@ -1,7 +1,9 @@
 {
   "parserOptions": {
     "ecmaVersion": "latest",
-    "requireConfigFile": false
+    "requireConfigFile": false,
+    "sourceType": "module",
+    "allowImportExportEverywhere": true
   },
   "env": {
     "es6": true,

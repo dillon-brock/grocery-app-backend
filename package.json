@@ -19,9 +19,6 @@
     "db:seed:test": "env-cmd -f ./.env.test cross-var psql -f ./sql/setup.sql",
     "heroku:setup": "heroku pg:psql -f ./sql/setup.sql"
   },
-  "jest": {
-    "testEnvironment": "node"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -32,11 +29,12 @@
     "@types/supertest": "2.0.12",
     "dotenv": "^16.0.3",
     "eslint": "^8.17.0",
-    "jest": "^29.0.0",
+    "jest": "^29.5.0",
     "nodemon": "^2.0.16",
     "prettier": "^2.6.2",
     "supertest": "^6.2.3",
     "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {

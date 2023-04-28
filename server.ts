@@ -1,5 +1,5 @@
-const app = require('./lib/app');
-const pool = require('./sql/pool');
+import app from './lib/app';
+import pool from './sql/pool';
 
 const PORT = process.env.PORT || 7890;
 

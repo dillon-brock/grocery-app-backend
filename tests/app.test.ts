@@ -1,4 +1,5 @@
-const { setupDb } = require('./utils');
+/* @jest-environment node */
+import { setupDb } from './utils';
 // const request = require('supertest');
 // const app = require('../lib/app');
 

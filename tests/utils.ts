@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import pool from '../sql/pool.js';
+import pool from '../sql/pool';
 const sql = readFileSync('./sql/setup.sql', 'utf-8');
 
 function setupDb() {
@@ -12,6 +12,4 @@ function closeAll() {
 
 afterAll(closeAll);
 
-module.exports = {
-  setupDb,
-};
+export { setupDb };

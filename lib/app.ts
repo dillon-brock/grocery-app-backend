@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 
 const app = express();
 
@@ -12,4 +12,4 @@ app.use(express.json());
 app.use(require('./middleware/not-found'));
 app.use(require('./middleware/error'));
 
-module.exports = app;
+export default app;

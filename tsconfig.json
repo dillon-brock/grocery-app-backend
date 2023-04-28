@@ -1,29 +1,40 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-
-    /* Modules */    
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "module": "es2022",
-    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    
-    /* Type Checking */
-    "strict": true,      
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "es2022",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "outDir": "./dist/",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "classnameTransform": "camelCase",
+          "customMatcher": "\\.module\\.css$",
+          "customRenderer": null,
+          "dotenvOptions": {},
+          "postcssOptions": {},
+          "rendererOptions": {}
+        }
+      }
+    ],
+    "resolveJsonModule": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
-    "strictPropertyInitialization": true,                          
-    "skipLibCheck": true,
-    "noImplicitAny": true,
-    "useUnknownInCatchVariables": true,
-
+    "strictPropertyInitialization": true,
+    "target": "es2022",
     "types": [
       "jest",
       "ts-jest",
-    ]
+    ],
+    "useUnknownInCatchVariables": true
   },
   "ts-node": {
     "files": true
