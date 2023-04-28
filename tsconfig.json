@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+
+    /* Modules */    
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "module": "es2022",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    
+    /* Type Checking */
+    "strict": true,      
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,                          
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "useUnknownInCatchVariables": true,
+
+    "types": [
+      "jest",
+      "ts-jest",
+    ]
+  },
+  "ts-node": {
+    "files": true
+  }
+}
