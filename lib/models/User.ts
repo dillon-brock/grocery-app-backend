@@ -1,4 +1,6 @@
-import { UserFromDatabase } from "../types/userTypes";
+import pool from "../../sql/pool";
+import { ErrorWithStatus, InsertionError } from "../types/errorTypes";
+import { HashedSignUpData, UserFromDatabase } from "../types/userTypes";
 
 export class User {
   id: string;
@@ -11,5 +13,19 @@ export class User {
     this.email = row.email;
     this.#passwordHash = row.password_hash;
     this.username = row.username;
+  }
+
+  static async insert({ email, passwordHash, username}: HashedSignUpData) {
+
+    const { rows } = await pool.query(
+      `INSERT INTO users (email, password_hash, username)
+      VALUES ($1, $2, $3)
+      RETURNING *`,
+      [email, passwordHash, username]
+    );
+
+    if (!rows[0]) throw new InsertionError('users');
+
+    return new User(rows[0]);
   }
 }
