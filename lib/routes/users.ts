@@ -6,7 +6,7 @@ export default Router()
     try {
       const { email, password, username } = req.body;
       const newUser = await UserService.create({ email, password, username });
-      const token = await UserService.signIn({ email, password });
+      const { token } = await UserService.signIn({ email, password });
       res.status(200).json({ 
         message: 'Signed up and logged in successfully',
         user: newUser,
@@ -15,4 +15,18 @@ export default Router()
     } catch (e) {
       next(e);
     }
+  })
+  .post('/sessions', async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+    try {
+      const { token, user } = await UserService.signIn({ email, password });
+      res.status(200).json({
+        message: 'Signed in successfully',
+        user,
+        token
+      });
+    } catch (e) {
+      next(e);
+    }
   });
+

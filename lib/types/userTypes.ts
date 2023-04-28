@@ -1,3 +1,5 @@
+import { User } from '../models/User.js';
+
 export type UserFromDatabase = {
   id: string;
   email: string;
@@ -21,3 +23,8 @@ export type UserSignInData = {
   email: string;
   password: string;
 };
+
+export type SignInResponse = {
+  token: string;
+  user: User;
+}

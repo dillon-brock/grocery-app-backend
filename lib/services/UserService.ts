@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UserSignInData, UserSignUpData } from '../types/userTypes.js';
+import { SignInResponse, UserSignInData, UserSignUpData } from '../types/userTypes.js';
 import { User } from '../models/User.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
 
@@ -28,7 +28,7 @@ export class UserService {
     return user;
   }
 
-  static async signIn({ email, password }: UserSignInData): Promise<string> {
+  static async signIn({ email, password }: UserSignInData): Promise<SignInResponse> {
     
     const user = await User.findByEmail(email);
     if (!user) throw new ErrorWithStatus('Invalid email', 401);
@@ -39,7 +39,7 @@ export class UserService {
       expiresIn: '1 day',
     });
 
-    return token;
+    return { token, user };
 
   }
 }
