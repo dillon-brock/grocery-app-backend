@@ -38,10 +38,24 @@ export default Router()
   })
   .get('/me', checkForUser, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const user = await User.findByEmail(req.user.email);
-      res.json(user);
+      if (!req.user) {
+        res.json({ user: null })
+      }
+      else {
+        const user = await User.findByEmail(req.user.email);
+        res.json(user);
+      }
     } catch (e) {
       next(e);
     }
-  });
+  })
+  .delete('/sessions', async (req: Request, res: Response) => {
+    res
+      .clearCookie(process.env.COOKIE_NAME, {
+        httpOnly: false,
+        maxAge: ONE_DAY_IN_MS,
+      })
+      .status(200)
+      .json({ message: 'Signed out successfully' });
+  })
 

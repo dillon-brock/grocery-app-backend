@@ -31,13 +31,23 @@ describe('user route tests', () => {
     const agent = request.agent(app);
     await agent.post('/users').send(testUser);
     const res = await agent.get('/users/me');
-    console.log(res.body);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       id: expect.any(String),
       email: testUser.email,
       username: testUser.username
     })
+  })
+
+  it('logs out user at DELETE /users/sessions', async () => {
+    const agent = request.agent(app);
+    await agent.post('/users').send(testUser);
+    const res = await agent.delete('/users/sessions');
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Signed out successfully');
+    const getUserRes = await agent.get('/users/me');
+    expect(getUserRes.status).toBe(200);
+    expect(getUserRes.body).toEqual({ user: null });
   })
 
 });
