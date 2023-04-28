@@ -27,4 +27,16 @@ describe('user route tests', () => {
     expect(res.body.message).toEqual('Signed in successfully');
   })
 
+  it('gets current user at GET /users/me', async () => {
+    const agent = request.agent(app);
+    await agent.post('/users').send(testUser);
+    const res = await agent.get('/users/me');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      email: testUser.email,
+      username: testUser.username
+    })
+  })
+
 });

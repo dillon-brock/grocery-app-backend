@@ -1,5 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
+import { AuthenticatedRequest } from '../../types.js';
+import authenticate from '../middleware/authenticate.js';
 
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -32,5 +34,8 @@ export default Router()
     } catch (e) {
       next(e);
     }
+  })
+  .get('/me', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    
   });
 
