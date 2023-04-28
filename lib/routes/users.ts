@@ -1,17 +1,20 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
 
+const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
+
 export default Router()
   .post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password, username } = req.body;
-      const newUser = await UserService.create({ email, password, username });
-      const { token } = await UserService.signIn({ email, password });
-      res.status(200).json({ 
-        message: 'Signed up and logged in successfully',
-        user: newUser,
-        token
-      });
+      await UserService.create({ email, password, username });
+      const token = await UserService.signIn({ email, password });
+      res.status(200)
+        .cookie(process.env.COOKIE_NAME, token, {
+          httpOnly: false,
+          maxAge: ONE_DAY_IN_MS
+        })
+        .json({ message: 'Signed up and logged in successfully' });
     } catch (e) {
       next(e);
     }
@@ -19,12 +22,13 @@ export default Router()
   .post('/sessions', async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     try {
-      const { token, user } = await UserService.signIn({ email, password });
-      res.status(200).json({
-        message: 'Signed in successfully',
-        user,
-        token
-      });
+      const token = await UserService.signIn({ email, password });
+      res.status(200)
+        .cookie(process.env.COOKIE_NAME, token, {
+          httpOnly: false,
+          maxAge: ONE_DAY_IN_MS
+        })
+        .json({ message: 'Signed in successfully' });
     } catch (e) {
       next(e);
     }

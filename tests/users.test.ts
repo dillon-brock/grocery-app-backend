@@ -17,7 +17,6 @@ describe('user route tests', () => {
     const res = await request(app).post('/users').send(testUser);
     expect(res.status).toBe(200);
     expect(res.body.message).toEqual('Signed up and logged in successfully');
-    expect(res.body.token).toEqual(expect.any(String));
   });
 
   it('signs in existing user on POST /users/sessions', async () => {
@@ -26,7 +25,6 @@ describe('user route tests', () => {
       .send({ email: testUser.email, password: testUser.password });
     expect(res.status).toBe(200);
     expect(res.body.message).toEqual('Signed in successfully');
-    expect(res.body.token).toEqual(expect.any(String));
   })
 
 });
