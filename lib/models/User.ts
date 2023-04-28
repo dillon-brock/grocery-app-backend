@@ -1,6 +1,6 @@
-import pool from "../../sql/pool.js";
-import { InsertionError } from "../types/errorTypes.js";
-import { HashedSignUpData, UserFromDatabase } from "../types/userTypes.js";
+import pool from '../../sql/pool.js';
+import { InsertionError } from '../types/errorTypes.js';
+import { HashedSignUpData, UserFromDatabase } from '../types/userTypes.js';
 
 export class User {
   id: string;
@@ -15,7 +15,7 @@ export class User {
     this.username = row.username;
   }
 
-  static async insert({ email, passwordHash, username}: HashedSignUpData) {
+  static async insert({ email, passwordHash, username }: HashedSignUpData) {
 
     const { rows } = await pool.query(
       `INSERT INTO users (email, password_hash, username)

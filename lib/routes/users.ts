@@ -1,7 +1,8 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
 import { AuthenticatedRequest } from '../../types.js';
-import authenticate from '../middleware/authenticate.js';
+import checkForUser from '../middleware/checkForUser.js';
+import { User } from '../models/User.js';
 
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -35,7 +36,12 @@ export default Router()
       next(e);
     }
   })
-  .get('/me', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    
+  .get('/me', checkForUser, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const user = await User.findByEmail(req.user.email);
+      res.json(user);
+    } catch (e) {
+      next(e);
+    }
   });
 

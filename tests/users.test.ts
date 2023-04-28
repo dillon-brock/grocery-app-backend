@@ -31,6 +31,7 @@ describe('user route tests', () => {
     const agent = request.agent(app);
     await agent.post('/users').send(testUser);
     const res = await agent.get('/users/me');
+    console.log(res.body);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       id: expect.any(String),

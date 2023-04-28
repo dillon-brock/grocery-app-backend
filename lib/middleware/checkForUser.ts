@@ -11,6 +11,7 @@ export default async (req: AuthenticatedRequest, res: Response, next: NextFuncti
       const user: jwt.JwtPayload | string = jwt.verify(cookie, process.env.JWT_SECRET);
       if (typeof user == 'string') throw new ErrorWithStatus('User cannot be verified', 500);
       else req.user = user;
+      next();
     }
   } catch (e) {
     next(e);
