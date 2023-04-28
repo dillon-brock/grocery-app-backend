@@ -3,8 +3,7 @@ import { setupDb } from './utils';
 // const request = require('supertest');
 // const app = require('../lib/app');
 
-describe('backend-express-template routes', () => {
+describe('user route tests', () => {
   beforeEach(setupDb);
-
   
 });
