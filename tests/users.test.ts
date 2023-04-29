@@ -16,7 +16,10 @@ describe('user route tests', () => {
   it('signs up a new user on POST /users', async () => {
     const res = await request(app).post('/users').send(testUser);
     expect(res.status).toBe(200);
-    expect(res.body.message).toEqual('Signed up and logged in successfully');
+    expect(res.body).toEqual({
+      message: 'Signed up and logged in successfully',
+      token: expect.any(String)
+    });
   });
 
   it('signs in existing user on POST /users/sessions', async () => {
@@ -24,30 +27,27 @@ describe('user route tests', () => {
     const res = await request(app).post('/users/sessions')
       .send({ email: testUser.email, password: testUser.password });
     expect(res.status).toBe(200);
-    expect(res.body.message).toEqual('Signed in successfully');
+    expect(res.body).toEqual({
+      message: 'Signed in successfully',
+      token: expect.any(String)
+    });
   })
 
   it('gets current user at GET /users/me', async () => {
     const agent = request.agent(app);
-    await agent.post('/users').send(testUser);
-    const res = await agent.get('/users/me');
+    const signUpRes = await agent.post('/users').send(testUser);
+    const { token } = signUpRes.body;
+    const res = await agent
+      .get('/users/me')
+      .set('Authorization', `Bearer ${token}`);
+    console.log(res.body);
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({
+    expect(res.body.message).toEqual('Current user found');
+    expect(res.body.user).toEqual({
       id: expect.any(String),
       email: testUser.email,
       username: testUser.username
     })
-  })
-
-  it('logs out user at DELETE /users/sessions', async () => {
-    const agent = request.agent(app);
-    await agent.post('/users').send(testUser);
-    const res = await agent.delete('/users/sessions');
-    expect(res.status).toBe(200);
-    expect(res.body.message).toBe('Signed out successfully');
-    const getUserRes = await agent.get('/users/me');
-    expect(getUserRes.status).toBe(200);
-    expect(getUserRes.body).toEqual({ user: null });
   })
 
 });
