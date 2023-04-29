@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
 import { AuthenticatedRequest } from '../../types.js';
-import checkForUser from '../middleware/checkForUser.js';
+import authenticate from '../middleware/authenticate.js';
 import { User } from '../models/User.js';
 
 export default Router()
@@ -29,7 +29,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/me', checkForUser, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  .get('/me', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         res.json({ user: null, message: 'No current user' });

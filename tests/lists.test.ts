@@ -1,4 +1,4 @@
-import { setupDb } from './utils';
+import { setupDb } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 

@@ -1,6 +1,6 @@
-import pool from '../../sql/pool';
-import { InsertionError } from '../types/errorTypes';
-import { ListFromDatabase, ListRows } from '../types/listTypes';
+import pool from '../../sql/pool.js';
+import { InsertionError } from '../types/errorTypes.js';
+import { ListFromDatabase, ListRows } from '../types/listTypes.js';
 
 export class List {
   id: string;
