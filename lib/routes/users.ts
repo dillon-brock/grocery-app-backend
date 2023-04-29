@@ -4,8 +4,6 @@ import { AuthenticatedRequest } from '../../types.js';
 import checkForUser from '../middleware/checkForUser.js';
 import { User } from '../models/User.js';
 
-const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
-
 export default Router()
   .post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -13,11 +11,10 @@ export default Router()
       await UserService.create({ email, password, username });
       const token = await UserService.signIn({ email, password });
       res.status(200)
-        .cookie(process.env.COOKIE_NAME, token, {
-          httpOnly: false,
-          maxAge: ONE_DAY_IN_MS
-        })
-        .json({ message: 'Signed up and logged in successfully' });
+        .json({ 
+          message: 'Signed up and logged in successfully', 
+          token 
+        });
     } catch (e) {
       next(e);
     }
@@ -27,11 +24,7 @@ export default Router()
     try {
       const token = await UserService.signIn({ email, password });
       res.status(200)
-        .cookie(process.env.COOKIE_NAME, token, {
-          httpOnly: false,
-          maxAge: ONE_DAY_IN_MS
-        })
-        .json({ message: 'Signed in successfully' });
+        .json({ message: 'Signed in successfully', token });
     } catch (e) {
       next(e);
     }
@@ -39,23 +32,14 @@ export default Router()
   .get('/me', checkForUser, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        res.json({ user: null })
+        res.json({ user: null, message: 'No current user' });
       }
       else {
         const user = await User.findByEmail(req.user.email);
-        res.json(user);
+        res.json({ user, message: 'Current user found' });
       }
     } catch (e) {
       next(e);
     }
-  })
-  .delete('/sessions', async (req: Request, res: Response) => {
-    res
-      .clearCookie(process.env.COOKIE_NAME, {
-        httpOnly: false,
-        maxAge: ONE_DAY_IN_MS,
-      })
-      .status(200)
-      .json({ message: 'Signed out successfully' });
-  })
+  });
 
