@@ -49,7 +49,10 @@ describe('list route tests', () => {
       .set('Authorization', `Bearer ${token}`);
     const listId = listPostRes.body.list.id;
 
-    const res = await agent.get(`/lists/${listId}`);
+    const res = await agent
+      .get(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`);
+
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List found',

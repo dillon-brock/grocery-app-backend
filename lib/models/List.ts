@@ -23,4 +23,15 @@ export class List {
     if (!rows[0]) throw new InsertionError('lists');
     return new List(rows[0]);
   }
+
+  static async findById(id: string): Promise<List | null> {
+
+    const { rows }: ListRows = await pool.query(
+      `SELECT * FROM lists
+      WHERE id = $1`, [id]
+    );
+
+    if (!rows[0]) return null;
+    return new List(rows[0]);
+  }
 }
