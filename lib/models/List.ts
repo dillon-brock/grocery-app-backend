@@ -1,6 +1,7 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/errorTypes.js';
-import { ListFromDatabase, ListRows } from '../types/listTypes.js';
+import { CoalescedListItem } from '../types/listItemTypes.js';
+import { ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/listTypes.js';
 
 export class List {
   id: string;
@@ -33,5 +34,37 @@ export class List {
 
     if (!rows[0]) return null;
     return new List(rows[0]);
+  }
+}
+
+
+export class ListWithItems extends List {
+  items: CoalescedListItem[];
+
+  constructor(row: ListWithItemsFromDatabase) {
+    const { id, owner_id } = row;
+    super({ id, owner_id });
+    this.items = row.items;
+  }
+
+  static async findById(id: string): Promise<ListWithItems | null> {
+
+    const { rows } = await pool.query(
+      `SELECT lists.*,
+      COALESCE(
+        json_agg(json_build_object(
+          'id', list_items.id,
+          'bought', list_items.bought,
+          'quantity', list_items.quantity
+        )) FILTER (WHERE list_items.id IS NOT NULL), '[]'
+      ) as items from lists
+      LEFT JOIN list_items ON list_items.list_id = lists.id
+      WHERE lists.id = $1
+      GROUP BY lists.id`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    else return new ListWithItems(rows[0]);
   }
 }

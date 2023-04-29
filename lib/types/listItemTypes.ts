@@ -13,3 +13,9 @@ export type NewListItemData = {
 export type ListItemRows = {
   rows: ListItemFromDatabase[];
 };
+
+export type CoalescedListItem = {
+  id: string;
+  bought: boolean;
+  quantity: number;
+}
