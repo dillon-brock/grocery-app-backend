@@ -17,13 +17,15 @@ export default Router()
     }
   })
   .get('/:id', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    {
+    try {
       if (!req.params.id) throw new ErrorWithStatus('Not found', 404);
       const list = await List.findById(req.params.id);
       res.json({
         message: 'List found',
         list
       });
+    } catch (e) {
+      next(e);
     }
   });
 
