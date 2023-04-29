@@ -1,6 +1,6 @@
 import pool from '../../sql/pool';
 import { InsertionError } from '../types/errorTypes';
-import { ListFromDatabase } from '../types/listTypes';
+import { ListFromDatabase, ListRows } from '../types/listTypes';
 
 export class List {
   id: string;
@@ -11,9 +11,9 @@ export class List {
     this.ownerId = row.owner_id;
   }
 
-  static async create(ownerId: string) {
+  static async create(ownerId: string): Promise<List> {
 
-    const { rows } = await pool.query(
+    const { rows }: ListRows = await pool.query(
       `INSERT INTO lists (owner_id)
       VALUES ($1)
       RETURNING *`,
