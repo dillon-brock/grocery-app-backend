@@ -4,8 +4,6 @@ import { AuthenticatedRequest } from '../../types.js';
 import checkForUser from '../middleware/checkForUser.js';
 import { User } from '../models/User.js';
 
-const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
-
 export default Router()
   .post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -34,7 +32,7 @@ export default Router()
   .get('/me', checkForUser, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        res.json({ user: null, message: 'No current user' })
+        res.json({ user: null, message: 'No current user' });
       }
       else {
         const user = await User.findByEmail(req.user.email);
