@@ -27,7 +27,7 @@ const signUpAndGetInfo = async () => {
 describe('list item routes tests', () => {
   beforeEach(setupDb);
 
-  test('it adds an item to a list at POST /items', async () => {
+  test('it adds an item to a list at POST /list-items', async () => {
     const { agent, token } = await signUpAndGetInfo();
 
     const newListRes = await agent
@@ -37,7 +37,7 @@ describe('list item routes tests', () => {
     const listId = newListRes.body.list.id;
     
     const res = await agent
-      .post('/items')
+      .post('/list-items')
       .set('Authorization', `Bearer ${token}`)
       .send({ ...testItem, listId });
     
