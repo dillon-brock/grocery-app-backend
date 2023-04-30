@@ -1,5 +1,5 @@
 import { type NextFunction, type Response } from 'express';
-import { AuthenticatedRequest } from '../../types.js';
+import { AuthenticatedRequest } from '../types/global.js';
 import jwt from 'jsonwebtoken';
 import { ErrorWithStatus } from '../types/errorTypes.js';
 

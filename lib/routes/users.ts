@@ -1,6 +1,6 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
-import { AuthenticatedRequest } from '../../types.js';
+import { AuthenticatedRequest } from '../types/global.js';
 import authenticate from '../middleware/authenticate.js';
 import { User } from '../models/User.js';
 

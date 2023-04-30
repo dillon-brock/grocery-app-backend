@@ -22,3 +22,9 @@ export type CoalescedListItem = {
   item: string;
   quantity: number;
 }
+
+export type ListItemUpdateData = {
+  item?: string;
+  bought?: boolean;
+  quantity?: string;
+}
