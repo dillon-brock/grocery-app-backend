@@ -19,6 +19,16 @@ const signUpAndGetInfo = async () => {
   return { agent, token, user };
 };
 
+async function createList(agent: request.SuperAgentTest, token: string): Promise<string> {
+  
+  const newListRes = await agent
+    .post('/lists')
+    .set('Authorization', `Bearer ${token}`);
+  
+  return newListRes.body.list.id;
+
+}
+
 describe('list route tests', () => {
   beforeEach(setupDb);
 
@@ -56,6 +66,24 @@ describe('list route tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List found',
+      list: expect.objectContaining({
+        id: expect.any(String),
+        ownerId: user.id
+      })
+    });
+  });
+
+  it('deletes list at DELETE /lists/:id', async () => {
+    const { agent, token, user } = await signUpAndGetInfo();
+    const listId = createList(agent, token);
+
+    const res = await agent
+      .delete(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'List deleted successfully',
       list: expect.objectContaining({
         id: expect.any(String),
         ownerId: user.id
