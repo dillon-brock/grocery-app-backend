@@ -54,4 +54,17 @@ export class ListItem {
     if (!rows[0]) return null;
     return new ListItem(rows[0]);
   }
+
+  async delete(): Promise<ListItem> {
+
+    const { rows }: ListItemRows = await pool.query(
+      `DELETE FROM list_items
+      WHERE id = $1
+      RETURNING *`,
+      [this.id]
+    );
+
+    if (!rows[0]) throw new Error('error');
+    return new ListItem(rows[0]);
+  }
 }

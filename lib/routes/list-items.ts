@@ -2,7 +2,7 @@ import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
-import { AuthenticatedReqBody, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
 import { ListItemUpdateData, NewListItemData } from '../types/listItemTypes.js';
 
 export default Router()
@@ -21,11 +21,24 @@ export default Router()
     res: Response, next: NextFunction) => {
     try {
       const item = await ListItem.findById(req.params.id);
-      if (!item) throw new ErrorWithStatus('Not found', 404);
-      const updatedList = await item.update(req.body);
+      if (!item) throw new ErrorWithStatus('Item not found', 404);
+      const updatedItem = await item.update(req.body);
       res.json({
         message: 'Item updated successfully',
-        item: updatedList
+        item: updatedItem
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
+    try {
+      const item = await ListItem.findById(req.params.id);
+      if (!item) throw new ErrorWithStatus('Item not found', 404);
+      const deletedItem = await item.delete();
+      res.json({
+        message: 'Item deleted successfully',
+        item: deletedItem
       });
     } catch (e) {
       next(e);
