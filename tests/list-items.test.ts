@@ -84,4 +84,19 @@ describe('list item routes tests', () => {
       })
     });
   });
+
+  it('deletes a item at DELETE /list-items/:id', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const res = await agent
+      .delete(`/list-items/${newItemId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: 'Item deleted successfully'
+    }));
+  });
 });
