@@ -2,11 +2,11 @@ import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
-import { AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
-import { ListItemUpdateData } from '../types/listItemTypes.js';
+import { AuthenticatedReqBody, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import { ListItemUpdateData, NewListItemData } from '../types/listItemTypes.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  .post('/', authenticate, async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
     try {
       const { listId, quantity, item } = req.body;
       const newItem = await ListItem.create({ listId, quantity, item });

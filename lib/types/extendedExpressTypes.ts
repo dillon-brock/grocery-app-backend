@@ -17,3 +17,16 @@ export interface TypedAuthenticatedRequest<T, U extends ParamsDictionary> extend
   body: T,
   params: U
 }
+
+export interface RequestWithBody<T> extends Request {
+  body: T
+}
+
+export interface RequestWithParams<T extends ParamsDictionary> extends Request {
+  params: T
+}
+
+export interface TypedRequest<T, U extends ParamsDictionary> extends Request {
+  body: T,
+  params: U
+}
