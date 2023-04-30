@@ -1,8 +1,9 @@
 import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedRequest } from '../types/global.js';
 import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
+import { AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import { ListItemUpdateData } from '../types/listItemTypes.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -15,12 +16,17 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  .put('/:id', authenticate, async (
+    req: TypedAuthenticatedRequest<ListItemUpdateData, {id: string}>, 
+    res: Response, next: NextFunction) => {
     try {
-      if (!req.params.id) throw new ErrorWithStatus('Invalid params', 404);
       const item = await ListItem.findById(req.params.id);
       if (!item) throw new ErrorWithStatus('Not found', 404);
-
+      const updatedList = await item.update(req.body);
+      res.json({
+        message: 'Item updated successfully',
+        item: updatedList
+      });
     } catch (e) {
       next(e);
     }
