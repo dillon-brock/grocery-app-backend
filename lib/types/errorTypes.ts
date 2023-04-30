@@ -23,3 +23,15 @@ export class InsertionError extends DatabaseError {
     super(table, `Error occurred with insertion into ${table}`);
   }
 }
+
+export class UpdateError extends DatabaseError {
+  constructor(table: string) {
+    super(table, `Error occurred with update on ${table}`);
+  }
+}
+
+export class DeletionError extends DatabaseError {
+  constructor(table: string) {
+    super(table, `Error occurred deleting element from ${table}`);
+  }
+}

@@ -1,11 +1,12 @@
-import { Router, type Request, type Response, type NextFunction } from 'express';
+import { Router, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
-import { AuthenticatedRequest } from '../../types.js';
-import checkForUser from '../middleware/checkForUser.js';
+import authenticate from '../middleware/authenticate.js';
 import { User } from '../models/User.js';
+import { AuthenticatedRequest, RequestWithBody } from '../types/extendedExpressTypes.js';
+import { UserSignInData, UserSignUpData } from '../types/userTypes.js';
 
 export default Router()
-  .post('/', async (req: Request, res: Response, next: NextFunction) => {
+  .post('/', async (req: RequestWithBody<UserSignUpData>, res: Response, next: NextFunction) => {
     try {
       const { email, password, username } = req.body;
       await UserService.create({ email, password, username });
@@ -19,17 +20,16 @@ export default Router()
       next(e);
     }
   })
-  .post('/sessions', async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+  .post('/sessions', async (req: RequestWithBody<UserSignInData>, res: Response, next: NextFunction) => {
     try {
-      const token = await UserService.signIn({ email, password });
+      const token = await UserService.signIn({ ...req.body });
       res.status(200)
         .json({ message: 'Signed in successfully', token });
     } catch (e) {
       next(e);
     }
   })
-  .get('/me', checkForUser, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  .get('/me', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         res.json({ user: null, message: 'No current user' });

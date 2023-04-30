@@ -30,7 +30,8 @@ CREATE TABLE users_lists (
 CREATE TABLE list_items (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   list_id BIGINT NOT NULL,
+  item VARCHAR NOT NULL,
   bought BOOLEAN NOT NULL DEFAULT FALSE,
-  quantity VARCHAR,
+  quantity INT,
   FOREIGN KEY (list_id) REFERENCES lists(id)
 );

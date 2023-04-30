@@ -8,7 +8,7 @@ const testUser = {
   email: 'test@user.com',
   password: '123456',
   username: 'test_user'
-}
+};
 
 describe('user route tests', () => {
   beforeEach(setupDb);
@@ -31,7 +31,7 @@ describe('user route tests', () => {
       message: 'Signed in successfully',
       token: expect.any(String)
     });
-  })
+  });
 
   it('gets current user at GET /users/me', async () => {
     const agent = request.agent(app);
@@ -40,14 +40,12 @@ describe('user route tests', () => {
     const res = await agent
       .get('/users/me')
       .set('Authorization', `Bearer ${token}`);
-    console.log(res.body);
     expect(res.status).toBe(200);
     expect(res.body.message).toEqual('Current user found');
     expect(res.body.user).toEqual({
       id: expect.any(String),
       email: testUser.email,
       username: testUser.username
-    })
-  })
-
+    });
+  });
 });
