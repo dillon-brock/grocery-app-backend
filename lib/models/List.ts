@@ -1,5 +1,5 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/errorTypes.js';
+import { DeletionError, InsertionError } from '../types/errorTypes.js';
 import { CoalescedListItem } from '../types/listItemTypes.js';
 import { ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/listTypes.js';
 
@@ -34,6 +34,22 @@ export class List {
 
     if (!rows[0]) return null;
     return new List(rows[0]);
+  }
+
+  async delete(): Promise<List> {
+
+    await pool.query('DELETE FROM list_items WHERE list_id = $1', [this.id]);
+
+    const { rows }: ListRows = await pool.query(
+      `DELETE FROM lists
+      WHERE id = $1
+      RETURNING *`,
+      [this.id]
+    );
+
+    if (!rows[0]) throw new DeletionError('lists');
+    return new List(rows[0]);
+    
   }
 }
 

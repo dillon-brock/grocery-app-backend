@@ -29,3 +29,9 @@ export class UpdateError extends DatabaseError {
     super(table, `Error occurred with update on ${table}`);
   }
 }
+
+export class DeletionError extends DatabaseError {
+  constructor(table: string) {
+    super(table, `Error occurred deleting element from ${table}`);
+  }
+}

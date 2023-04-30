@@ -75,7 +75,7 @@ describe('list route tests', () => {
 
   it('deletes list at DELETE /lists/:id', async () => {
     const { agent, token, user } = await signUpAndGetInfo();
-    const listId = createList(agent, token);
+    const listId = await createList(agent, token);
 
     const res = await agent
       .delete(`/lists/${listId}`)
