@@ -1,10 +1,9 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import { AuthenticatedReqParams } from '../types/extendedExpressTypes.js';
 import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
-import { ListItemUpdateData } from '../types/listItemTypes.js';
 
-export default async (req: TypedAuthenticatedRequest<ListItemUpdateData, {id: string}>, res: Response, next: NextFunction) => {
+export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
   try {
     const userId = req.user.id;
     const listItem = await ListItem.findById(req.params.id);

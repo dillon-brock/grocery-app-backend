@@ -4,7 +4,7 @@ import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
 import { ListItemUpdateData, NewListItemData } from '../types/listItemTypes.js';
-import authorizeItemUpdate from '../middleware/authorize-item-update.js';
+import authorizeItemAccess from '../middleware/authorize-item-access.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
@@ -17,7 +17,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeItemUpdate], async (
+  .put('/:id', [authenticate, authorizeItemAccess], async (
     req: TypedAuthenticatedRequest<ListItemUpdateData, {id: string}>, 
     res: Response, next: NextFunction) => {
     try {
@@ -31,7 +31,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, authorizeItemAccess], async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
     try {
       const item = await ListItem.findById(req.params.id);
       if (!item) throw new ErrorWithStatus('Item not found', 404);
