@@ -139,6 +139,8 @@ describe('GET /lists tests', () => {
 
 
 describe('GET /lists/:id tests', () => {
+  beforeEach(setupDb);
+
   it('serves a list with items at GET /lists/:id', async () => {
     
     const { agent, user, token } = await signUpAndGetInfo();
@@ -229,6 +231,8 @@ describe('GET /lists/:id tests', () => {
 
 
 describe('DELETE /lists/:id tests', () => {
+  beforeEach(setupDb);
+
   it('deletes list at DELETE /lists/:id', async () => {
     const { agent, token, user } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
