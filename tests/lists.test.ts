@@ -49,6 +49,33 @@ describe('POST /lists tests', () => {
       } 
     });
   });
+
+  it ('gives 401 error for unauthenticated users', async () => {
+    const res = await request(app).post('/lists');
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({
+      status: 401,
+      message: 'You must be signed in to continue'
+    });
+  });
+
+  it('gives 401 error for user with improper token format', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const res = await agent
+      .post('/lists')
+      .set('Authorization', `${token}`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('Invalid token');
+  });
+
+  it('gives 500 error for user with invalid token', async () => {
+    const res = await request(app)
+      .post('/lists')
+      .set('Authorization', 'Bearer bad-token');
+    
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe('jwt malformed');
+  });
 });
 
 describe('GET /lists tests', () => {

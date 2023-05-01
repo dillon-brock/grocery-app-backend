@@ -28,8 +28,7 @@ export default async (req: AuthenticatedRequest, res: Response, next: NextFuncti
         if (e instanceof Error) message = e.message;
         throw new ErrorWithStatus(message, 500);
       }
-      if (typeof decodedToken == 'string') throw new ErrorWithStatus('User cannot be verified', 500);
-      else req.user = decodedToken;
+      req.user = decodedToken;
       next();
     }
   } catch (e) {
