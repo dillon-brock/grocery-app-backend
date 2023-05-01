@@ -1,3 +1,5 @@
+import { ListItem } from '../models/ListItem.js';
+
 export type ListItemFromDatabase = {
   id: string;
   list_id: string;
@@ -27,4 +29,9 @@ export type ListItemUpdateData = {
   item?: string;
   bought?: boolean;
   quantity?: string;
+}
+
+export type ItemUpdateReqBody = {
+  updateData: ListItemUpdateData;
+  listItem: ListItem;
 }
