@@ -120,6 +120,8 @@ describe('POST /list-items tests', () => {
 });
 
 describe('PUT /list-items/:id tests', () => {
+  beforeEach(setupDb);
+
   test('it updates an item at PUT /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
@@ -186,6 +188,8 @@ describe('PUT /list-items/:id tests', () => {
 
 
 describe('DELETE /list-items/:id tests', () => {
+  beforeEach(setupDb);
+
   it('deletes a item at DELETE /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);

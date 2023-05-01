@@ -9,13 +9,15 @@ export class UserService {
     if (email.length <= 6) {
       throw new ErrorWithStatus('Invalid email', 400);
     }
+    const userWithEmail: User | null = await User.findByEmail(email);
+    if (userWithEmail) throw new ErrorWithStatus('Email already exists', 409);
 
     if (password.length < 6) {
       throw new ErrorWithStatus('Password must be at least 6 characters long', 400);
     }
 
-    const existingUser: User | null = await User.findByUsername(username);
-    if (existingUser) throw new ErrorWithStatus('Username already exists', 409);
+    const userWithUsername: User | null = await User.findByUsername(username);
+    if (userWithUsername) throw new ErrorWithStatus('Username already exists', 409);
 
     const passwordHash: string = await bcrypt.hash(
       password,

@@ -10,6 +10,12 @@ const testUser = {
   username: 'test_user'
 };
 
+const testUser2 = {
+  email: 'test2@user.com',
+  password: 'password',
+  username: 'second_user'
+};
+
 describe('POST /users (sign up) tests', () => {
   beforeEach(setupDb);
 
@@ -21,9 +27,33 @@ describe('POST /users (sign up) tests', () => {
       token: expect.any(String)
     });
   });
+
+  it('gives a 409 error if user with username already exists', async () => {
+    const agent = request.agent(app);
+    await agent.post('/users').send(testUser);
+    const res = await agent
+      .post('/users')
+      .send({ ...testUser2, username: testUser.username });
+    
+    expect(res.status).toBe(409);
+    expect(res.body.message).toEqual('Username already exists');
+  });
+
+  it('gives a 409 error if user with email already exists', async () => {
+    const agent = request.agent(app);
+    await agent.post('/users').send(testUser);
+    const res = await agent
+      .post('/users')
+      .send({ ...testUser2, email: testUser.email });
+
+    expect(res.status).toBe(409);
+    expect(res.body.message).toEqual('Email already exists');
+  });
 });
 
 describe('POST /users/sessions (sign in) tests', () => {
+  beforeEach(setupDb);
+
   it('signs in existing user on POST /users/sessions', async () => {
     await UserService.create({ ...testUser });
     const res = await request(app).post('/users/sessions')
@@ -37,6 +67,8 @@ describe('POST /users/sessions (sign in) tests', () => {
 });
 
 describe('GET /users/me tests', () => {
+  beforeEach(setupDb);
+
   it('gets current user at GET /users/me', async () => {
     const agent = request.agent(app);
     const signUpRes = await agent.post('/users').send(testUser);
