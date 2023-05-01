@@ -5,9 +5,10 @@ import { ErrorWithStatus } from '../types/errorTypes.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
 import { ListItemUpdateData, NewListItemData } from '../types/listItemTypes.js';
 import authorizeItemAccess from '../middleware/authorize-item-access.js';
+import authorizeAddItem from '../middleware/authorize-add-item.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
+  .post('/', [authenticate, authorizeAddItem], async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
     try {
       const { listId, quantity, item } = req.body;
       const newItem = await ListItem.create({ listId, quantity, item });

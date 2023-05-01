@@ -60,8 +60,8 @@ export class List {
 
     if (!rows[0]) throw new DeletionError('lists');
     return new List(rows[0]);
-    
   }
+
 }
 
 
