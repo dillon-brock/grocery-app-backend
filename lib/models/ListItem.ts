@@ -67,4 +67,16 @@ export class ListItem {
     if (!rows[0]) throw new Error('error');
     return new ListItem(rows[0]);
   }
+
+  async getOwnerId(): Promise<string> {
+
+    const { rows } = await pool.query(
+      `SELECT lists.owner_id AS owner_id FROM list_items
+      INNER JOIN lists ON lists.id = list_items.list_id
+      WHERE list_items.id = $1`,
+      [this.id]
+    );
+
+    return rows[0].owner_id;
+  }
 }

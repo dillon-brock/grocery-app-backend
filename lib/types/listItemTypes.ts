@@ -28,3 +28,4 @@ export type ListItemUpdateData = {
   bought?: boolean;
   quantity?: string;
 }
+

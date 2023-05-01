@@ -1,8 +1,8 @@
 import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { List } from '../models/List.js';
-import { AuthenticatedRequest, AuthenticatedReqParams } from '../types/extendedExpressTypes.js';
-import { ErrorWithStatus } from '../types/errorTypes.js';
+import { AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import findListAndAuthorize from '../middleware/find-list-and-authorize.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -16,10 +16,9 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
+  .get('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: List}, { id: string }>, res: Response, next: NextFunction) => {
     try {
-      const list = await List.findById(req.params.id);
-      if (!list) throw new ErrorWithStatus('List not found', 404);
+      const { list } = req.body;
       res.json({
         message: 'List found',
         list
@@ -28,10 +27,9 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: List }, { id: string }>, res: Response, next: NextFunction) => {
     try {
-      const list = await List.findById(req.params.id);
-      if (!list) throw new ErrorWithStatus('List not found', 404);
+      const { list } = req.body;
       const deletedList: List = await list.delete();
       res.json({
         message: 'List deleted successfully',
