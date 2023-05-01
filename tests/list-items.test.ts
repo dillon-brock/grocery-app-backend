@@ -139,6 +139,30 @@ describe('PUT /list-items/:id tests', () => {
       })
     });
   });
+
+  test('gives a 404 error for nonexistent item', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const res = await agent
+      .put('/list-items/38942')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ bought: true });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('List item not found');
+  });
+
+  test('gives 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const res = await agent
+      .put(`/list-items/${newItemId}`)
+      .send({ bought: true });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
 });
 
 
