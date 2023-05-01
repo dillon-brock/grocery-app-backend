@@ -89,7 +89,32 @@ describe('POST /list-items tests', () => {
     
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to add items to this list');
+  });
 
+  test('gives a 404 error for nonexistent list', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const res = await agent
+      .post('/list-items')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testItem, listId: '2398' });
+    
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('List not found');
+  });
+
+  test('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const newListRes = await agent
+      .post('/lists')
+      .set('Authorization', `Bearer ${token}`);
+    const listId = newListRes.body.list.id;
+
+    const res = await agent
+      .post('/list-items')
+      .send({ ...testItem, listId });
+    
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
   });
 
 });
