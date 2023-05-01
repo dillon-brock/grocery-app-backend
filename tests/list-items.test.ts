@@ -196,8 +196,40 @@ describe('DELETE /list-items/:id tests', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: 'Item deleted successfully'
-    }));
+    expect(res.body).toEqual({
+      message: 'Item deleted successfully',
+      listItem: expect.objectContaining({
+        ...testItem
+      })
+    });
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const secondUserRes = await agent
+      .post('/users')
+      .send(testUser2);
+    const { token: token2 } = secondUserRes.body;
+
+    const res = await agent
+      .delete(`/list-items/${newItemId}`)
+      .set('Authorization', `Bearer ${token2}`);
+    
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to access this item');
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const res = await agent.delete(`/list-items/${newItemId}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });

@@ -34,12 +34,12 @@ export default Router()
   })
   .delete('/:id', [authenticate, authorizeItemAccess], async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
     try {
-      const item = await ListItem.findById(req.params.id);
-      if (!item) throw new ErrorWithStatus('Item not found', 404);
-      const deletedItem = await item.delete();
+      const listItem = await ListItem.findById(req.params.id);
+      if (!listItem) throw new ErrorWithStatus('Item not found', 404);
+      const deletedItem = await listItem.delete();
       res.json({
         message: 'Item deleted successfully',
-        item: deletedItem
+        listItem: deletedItem
       });
     } catch (e) {
       next(e);
