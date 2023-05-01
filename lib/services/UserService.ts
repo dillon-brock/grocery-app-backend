@@ -36,9 +36,9 @@ export class UserService {
   static async signIn({ email, password }: UserSignInData): Promise<string> {
     
     const user = await User.findByEmail(email);
-    if (!user) throw new ErrorWithStatus('Invalid email', 401);
+    if (!user) throw new ErrorWithStatus('Invalid email', 400);
     if (!bcrypt.compareSync(password, user.passwordHash))
-      throw new ErrorWithStatus('Invalid password', 401);
+      throw new ErrorWithStatus('Invalid password', 400);
 
     const token = jwt.sign({ ...user }, process.env.JWT_SECRET, {
       expiresIn: '1 day',
