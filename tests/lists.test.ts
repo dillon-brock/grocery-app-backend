@@ -8,6 +8,12 @@ const testUser = {
   username: 'test_user'
 };
 
+const testUser2 = {
+  email: 'test2@user.com',
+  password: 'password',
+  username: 'second_user'
+};
+
 const signUpAndGetInfo = async () => {
   const agent = request.agent(app);
 
@@ -197,6 +203,25 @@ describe('GET /lists/:id tests', () => {
     
     expect(res.status).toBe(500);
     expect(res.body.message).toBe('jwt malformed');
+  });
+
+  
+  // authorization errors
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const secondUserRes = await agent
+      .post('/users')
+      .send(testUser2);
+
+    const { token: token2 } = secondUserRes.body;
+    const res = await agent
+      .get(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toBe('You are not authorized to access this list');
   });
 });
 
