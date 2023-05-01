@@ -59,6 +59,9 @@ describe('list route tests', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: 'User\'s lists found',
+    }));
     expect(res.body.lists[0])
       .toEqual(expect.objectContaining({
         id: newListId,

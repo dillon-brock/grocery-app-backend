@@ -36,6 +36,17 @@ export class List {
     return new List(rows[0]);
   }
 
+  static async findAllByOwnerId(ownerId: string): Promise<List[]> {
+    
+    const { rows }: ListRows = await pool.query(
+      `SELECT * FROM lists
+      WHERE owner_id = $1`,
+      [ownerId]
+    );
+
+    return rows.map(row => new List(row));
+  }
+
   async delete(): Promise<List> {
 
     await pool.query('DELETE FROM list_items WHERE list_id = $1', [this.id]);
