@@ -6,10 +6,16 @@ import { ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/
 export class List {
   id: string;
   ownerId: string;
+  title: string | null;
+  createdAt: string;
+  updatedAt: string;
 
   constructor(row: ListFromDatabase) {
     this.id = row.id;
     this.ownerId = row.owner_id;
+    this.title = row.title;
+    this.createdAt = row.created_at;
+    this.updatedAt = row.updated_at;
   }
 
   static async create(ownerId: string): Promise<List> {
@@ -69,8 +75,8 @@ export class ListWithItems extends List {
   items: CoalescedListItem[];
 
   constructor(row: ListWithItemsFromDatabase) {
-    const { id, owner_id } = row;
-    super({ id, owner_id });
+    const { id, owner_id, title, created_at, updated_at } = row;
+    super({ id, owner_id, title, created_at, updated_at });
     this.items = row.items;
   }
 

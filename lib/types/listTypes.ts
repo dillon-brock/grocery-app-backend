@@ -3,6 +3,9 @@ import { CoalescedListItem } from './listItemTypes.js';
 export interface ListFromDatabase {
   id: string;
   owner_id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ListRows {
