@@ -163,6 +163,25 @@ describe('PUT /list-items/:id tests', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
+
+  test('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const secondUserRes = await agent
+      .post('/users')
+      .send(testUser2);
+    const { token: token2 } = secondUserRes.body;
+
+    const res = await agent
+      .put(`/list-items/${newItemId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ bought: true });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to access this item');
+  });
 });
 
 
