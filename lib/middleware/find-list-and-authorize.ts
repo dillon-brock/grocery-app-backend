@@ -17,6 +17,8 @@ export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, 
       throw new ErrorWithStatus('You are not authorized to access this list', 403);
     }
 
+    req.body.list = list;
+
     next();
   } catch (e) {
     next(e);
