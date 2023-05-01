@@ -114,4 +114,13 @@ describe('GET /users/me tests', () => {
       username: testUser.username
     });
   });
+
+  it('returns null when no user is signed in', async () => {
+    const res = await request(app).get('/users/me');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'No current user',
+      user: null
+    });
+  });
 });
