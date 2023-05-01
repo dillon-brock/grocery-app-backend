@@ -8,6 +8,12 @@ const testUser = {
   username: 'test_user'
 };
 
+const testUser2 = {
+  email: 'test2@user.com',
+  password: 'password',
+  username: 'second_user'
+};
+
 const testItem = {
   item: 'bananas',
   quantity: 3,
@@ -62,6 +68,28 @@ describe('POST /list-items tests', () => {
       message: 'Item added successfully',
       item: expect.objectContaining({ ...testItem })
     });
+  });
+
+  test('gives a 403 error for unauthorized user adding element to list', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const newListRes = await agent
+      .post('/lists')
+      .set('Authorization', `Bearer ${token}`);
+    const listId = newListRes.body.list.id;
+
+    const secondUserRes = await agent
+      .post('/users')
+      .send(testUser2);
+    
+    const { token: token2 } = secondUserRes.body;
+    const res = await agent
+      .post('/list-items')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ ...testItem, listId });
+    
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to add items to this list');
+
   });
 
 });
