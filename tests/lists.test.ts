@@ -29,6 +29,7 @@ async function createList(agent: request.SuperAgentTest, token: string): Promise
 
 }
 
+
 describe('POST /lists tests', () => {
   beforeEach(setupDb);
 
@@ -78,6 +79,9 @@ describe('POST /lists tests', () => {
   });
 });
 
+
+
+
 describe('GET /lists tests', () => {
   beforeEach(setupDb);
 
@@ -123,8 +127,9 @@ describe('GET /lists tests', () => {
     expect(res.status).toBe(500);
     expect(res.body.message).toBe('jwt malformed');
   });
-
 });
+
+
 
 
 describe('GET /lists/:id tests', () => {
@@ -147,6 +152,19 @@ describe('GET /lists/:id tests', () => {
     });
   });
 
+  it('gives a 404 error for nonexistent list id', async () => {
+
+    const { agent, token } = await signUpAndGetInfo();
+
+    const res = await agent
+      .get('/lists/1001')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe('List not found');
+  });
+
+  // authentication errors
   it('gives a 401 error for unauthenticated user', async () => {
 
     const { agent, token } = await signUpAndGetInfo();
@@ -181,6 +199,8 @@ describe('GET /lists/:id tests', () => {
     expect(res.body.message).toBe('jwt malformed');
   });
 });
+
+
 
 
 describe('DELETE /lists/:id tests', () => {
