@@ -89,7 +89,7 @@ export class ListWithItems extends List {
           'id', list_items.id,
           'bought', list_items.bought,
           'quantity', list_items.quantity,
-          'item', list_items.item,
+          'item', list_items.item
         )) FILTER (WHERE list_items.id IS NOT NULL), '[]'
       ) as items from lists
       LEFT JOIN list_items ON list_items.list_id = lists.id

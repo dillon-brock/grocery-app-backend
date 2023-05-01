@@ -1,4 +1,4 @@
-import { List } from '../models/List.js';
+import { List, ListWithItems } from '../models/List.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
 import { AuthenticatedReqParams } from '../types/extendedExpressTypes.js';
 import { Response, NextFunction } from 'express-serve-static-core';
@@ -10,7 +10,11 @@ export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, 
       throw new ErrorWithStatus('You must be signed in to continue', 401);
     }
 
-    const list = await List.findById(req.params.id);
+    let list: List | null;
+    if (req.method == 'GET') {
+      list = await ListWithItems.findById(req.params.id);
+    }
+    else list = await List.findById(req.params.id);
     if (!list) throw new ErrorWithStatus('List not found', 404);
 
     if (list.ownerId != userId) {

@@ -159,7 +159,8 @@ describe('GET /lists/:id tests', () => {
       message: 'List found',
       list: expect.objectContaining({
         id: expect.any(String),
-        ownerId: user.id
+        ownerId: user.id,
+        items: expect.any(Array)
       })
     });
   });
@@ -248,10 +249,13 @@ describe('DELETE /lists/:id tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List deleted successfully',
-      list: expect.objectContaining({
+      list: {
         id: expect.any(String),
-        ownerId: user.id
-      })
+        ownerId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String),
+        title: null
+      }
     });
   });
 
