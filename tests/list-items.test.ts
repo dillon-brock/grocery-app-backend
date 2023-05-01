@@ -45,7 +45,7 @@ async function getNewItemId(agent: request.SuperAgentTest, token: string, listId
 
 }
 
-describe('list item routes tests', () => {
+describe('POST /list-items tests', () => {
   beforeEach(setupDb);
 
   test('it adds an item to a list at POST /list-items', async () => {
@@ -62,19 +62,20 @@ describe('list item routes tests', () => {
       message: 'Item added successfully',
       item: expect.objectContaining({ ...testItem })
     });
-
   });
+});
 
+describe('PUT /list-items/:id tests', () => {
   test('it updates an item at PUT /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
     const newItemId = await getNewItemId(agent, token, listId);
-
+  
     const res = await agent
       .put(`/list-items/${newItemId}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ bought: true });
-
+  
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item updated successfully',
@@ -84,7 +85,10 @@ describe('list item routes tests', () => {
       })
     });
   });
+});
 
+
+describe('DELETE /list-items/:id tests', () => {
   it('deletes a item at DELETE /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);

@@ -10,7 +10,7 @@ const testUser = {
   username: 'test_user'
 };
 
-describe('user route tests', () => {
+describe('POST /users (sign up) tests', () => {
   beforeEach(setupDb);
 
   it('signs up a new user on POST /users', async () => {
@@ -21,7 +21,9 @@ describe('user route tests', () => {
       token: expect.any(String)
     });
   });
+});
 
+describe('POST /users/sessions (sign in) tests', () => {
   it('signs in existing user on POST /users/sessions', async () => {
     await UserService.create({ ...testUser });
     const res = await request(app).post('/users/sessions')
@@ -32,7 +34,9 @@ describe('user route tests', () => {
       token: expect.any(String)
     });
   });
+});
 
+describe('GET /users/me tests', () => {
   it('gets current user at GET /users/me', async () => {
     const agent = request.agent(app);
     const signUpRes = await agent.post('/users').send(testUser);

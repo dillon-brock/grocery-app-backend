@@ -29,7 +29,7 @@ async function createList(agent: request.SuperAgentTest, token: string): Promise
 
 }
 
-describe('list route tests', () => {
+describe('POST /lists tests', () => {
   beforeEach(setupDb);
 
   it('creates a new list on POST /lists', async () => {
@@ -49,15 +49,19 @@ describe('list route tests', () => {
       } 
     });
   });
+});
+
+describe('GET /lists tests', () => {
+  beforeEach(setupDb);
 
   it('serves all current users lists at GET /lists', async () => {
     const { agent, token, user } = await signUpAndGetInfo();
     const newListId = await createList(agent, token);
-
+  
     const res = await agent
       .get('/lists')
       .set('Authorization', `Bearer ${token}`);
-
+  
     expect(res.status).toBe(200);
     expect(res.body).toEqual(expect.objectContaining({
       message: 'User\'s lists found',
@@ -68,16 +72,19 @@ describe('list route tests', () => {
         ownerId: user.id
       }));
   });
+});
 
+
+describe('GET /lists/:id tests', () => {
   it('serves a list with items at GET /lists/:id', async () => {
     
     const { agent, user, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
-
+  
     const res = await agent
       .get(`/lists/${listId}`)
       .set('Authorization', `Bearer ${token}`);
-
+  
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List found',
@@ -87,15 +94,18 @@ describe('list route tests', () => {
       })
     });
   });
+});
 
+
+describe('DELETE /lists/:id tests', () => {
   it('deletes list at DELETE /lists/:id', async () => {
     const { agent, token, user } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
-
+  
     const res = await agent
       .delete(`/lists/${listId}`)
       .set('Authorization', `Bearer ${token}`);
-
+  
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List deleted successfully',
