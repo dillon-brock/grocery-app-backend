@@ -3,6 +3,7 @@ import authenticate from '../middleware/authenticate.js';
 import { List } from '../models/List.js';
 import { AuthenticatedRequest, AuthenticatedReqParams } from '../types/extendedExpressTypes.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
+import listAuthorization from '../middleware/list-authorization.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -16,7 +17,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
+  .get('/:id', [authenticate, listAuthorization], async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
     try {
       const list = await List.findById(req.params.id);
       if (!list) throw new ErrorWithStatus('List not found', 404);
@@ -28,7 +29,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, listAuthorization], async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
     try {
       const list = await List.findById(req.params.id);
       if (!list) throw new ErrorWithStatus('List not found', 404);
