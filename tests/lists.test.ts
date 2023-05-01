@@ -99,6 +99,31 @@ describe('GET /lists tests', () => {
         ownerId: user.id
       }));
   });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const res = await request(app).get('/lists');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives 401 error for user with improper token format', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const res = await agent
+      .get('/lists')
+      .set('Authorization', `${token}`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('Invalid token');
+  });
+
+  it('gives 500 error for user with invalid token', async () => {
+    const res = await request(app)
+      .get('/lists')
+      .set('Authorization', 'Bearer bad-token');
+    
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe('jwt malformed');
+  });
+
 });
 
 
