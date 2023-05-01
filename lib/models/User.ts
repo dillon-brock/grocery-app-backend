@@ -44,4 +44,16 @@ export class User {
   get passwordHash(): string {
     return this.#passwordHash;
   }
+
+  static async findByUsername(username: string): Promise<User | null> {
+
+    const { rows } = await pool.query(
+      `SELECT * FROM users
+      WHERE username = $1`,
+      [username]
+    );
+
+    if (!rows[0]) return null;
+    return new User(rows[0]);
+  }
 }

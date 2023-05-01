@@ -7,12 +7,15 @@ import { ErrorWithStatus } from '../types/errorTypes.js';
 export class UserService {
   static async create({ email, username, password }: UserSignUpData): Promise<User> {
     if (email.length <= 6) {
-      throw new Error('Invalid email');
+      throw new ErrorWithStatus('Invalid email', 400);
     }
 
     if (password.length < 6) {
-      throw new Error('Password must be at least 6 characters long');
+      throw new ErrorWithStatus('Password must be at least 6 characters long', 400);
     }
+
+    const existingUser: User | null = await User.findByUsername(username);
+    if (existingUser) throw new ErrorWithStatus('Username already exists', 409);
 
     const passwordHash: string = await bcrypt.hash(
       password,
