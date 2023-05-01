@@ -4,6 +4,7 @@ import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/errorTypes.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
 import { ListItemUpdateData, NewListItemData } from '../types/listItemTypes.js';
+import authorizeItemUpdate from '../middleware/authorize-item-update.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
@@ -16,13 +17,12 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (
+  .put('/:id', [authenticate, authorizeItemUpdate], async (
     req: TypedAuthenticatedRequest<ListItemUpdateData, {id: string}>, 
     res: Response, next: NextFunction) => {
     try {
-      const item = await ListItem.findById(req.params.id);
-      if (!item) throw new ErrorWithStatus('Item not found', 404);
-      const updatedItem = await item.update(req.body);
+      const listItem = await ListItem.findById(req.params.id);
+      const updatedItem = await listItem?.update(req.body);
       res.json({
         message: 'Item updated successfully',
         item: updatedItem
