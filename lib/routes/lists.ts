@@ -1,13 +1,14 @@
 import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { List } from '../models/List.js';
-import { AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
 import findListAndAuthorize from '../middleware/find-list-and-authorize.js';
+import { NewListData } from '../types/listTypes.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  .post('/', authenticate, async (req: AuthenticatedReqBody<NewListData>, res: Response, next: NextFunction) => {
     try {
-      const newList: List = await List.create(req.user.id);
+      const newList: List = await List.create({ ...req.body, ownerId: req.user.id });
       res.json({ 
         message: 'List successfully created',
         list: newList

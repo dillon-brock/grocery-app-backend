@@ -19,3 +19,11 @@ export interface ListWithItemsFromDatabase extends ListFromDatabase {
 export type ListWithItemsRows = {
   rows: ListWithItemsFromDatabase;
 }
+
+export interface NewListData {
+  title: string
+}
+
+export interface CreateListParams extends NewListData {
+  ownerId: string;
+}

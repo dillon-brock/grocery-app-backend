@@ -45,14 +45,18 @@ describe('POST /lists tests', () => {
 
     const res = await agent
       .post('/lists')
-      .set('Authorization', `Breaker ${token}`);
+      .set('Authorization', `Breaker ${token}`)
+      .send({ title: 'Test List' });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ 
       message: 'List successfully created', 
       list: {
         id: expect.any(String),
-        ownerId: user.id
+        ownerId: user.id,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        title: 'Test List'
       } 
     });
   });

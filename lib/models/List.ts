@@ -1,7 +1,7 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/errorTypes.js';
 import { CoalescedListItem } from '../types/listItemTypes.js';
-import { ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/listTypes.js';
+import { CreateListParams, ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/listTypes.js';
 
 export class List {
   id: string;
@@ -18,13 +18,13 @@ export class List {
     this.updatedAt = row.updated_at;
   }
 
-  static async create(ownerId: string): Promise<List> {
+  static async create({ title, ownerId }: CreateListParams): Promise<List> {
 
     const { rows }: ListRows = await pool.query(
-      `INSERT INTO lists (owner_id)
-      VALUES ($1)
+      `INSERT INTO lists (title, owner_id)
+      VALUES ($1, $2)
       RETURNING *`,
-      [ownerId]
+      [title, ownerId]
     );
 
     if (!rows[0]) throw new InsertionError('lists');
