@@ -16,6 +16,17 @@ export default Router()
       next(e);
     }
   })
+  .get('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const lists: List[] = await List.findAllByOwnerId(req.user.id);
+      res.json({
+        message: 'User\'s lists found',
+        lists
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
   .get('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: List}, { id: string }>, res: Response, next: NextFunction) => {
     try {
       const { list } = req.body;
