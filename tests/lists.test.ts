@@ -50,14 +50,26 @@ describe('list route tests', () => {
     });
   });
 
+  it('serves all current users lists at GET /lists', async () => {
+    const { agent, token, user } = await signUpAndGetInfo();
+    const newListId = await createList(agent, token);
+
+    const res = await agent
+      .get('/lists')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.lists[0])
+      .toEqual(expect.objectContaining({
+        id: newListId,
+        ownerId: user.id
+      }));
+  });
+
   it('serves a list with items at GET /lists/:id', async () => {
     
     const { agent, user, token } = await signUpAndGetInfo();
-
-    const listPostRes = await agent
-      .post('/lists')
-      .set('Authorization', `Bearer ${token}`);
-    const listId = listPostRes.body.list.id;
+    const listId = await createList(agent, token);
 
     const res = await agent
       .get(`/lists/${listId}`)
