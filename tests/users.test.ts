@@ -49,6 +49,15 @@ describe('POST /users (sign up) tests', () => {
     expect(res.status).toBe(409);
     expect(res.body.message).toEqual('Email already exists');
   });
+
+  it('gives a 400 error if password is too short', async () => {
+    const res = await request(app)
+      .post('/users')
+      .send({ ...testUser, password: 'bad' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Password must be at least 6 characters long');
+  });
 });
 
 describe('POST /users/sessions (sign in) tests', () => {
