@@ -91,4 +91,18 @@ describe('POST /users-lists (share list) tests', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('User not found');
   });
+
+  it('gives a 403 error for user unauthorized to share list', async () => {
+    const { agent, userId, listId } = await signUpAndGetListShareData();
+    const secondSignUpRes = await agent.post('/users')
+      .send(testUser2);
+    const { token: token2 } = secondSignUpRes.body;
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ listId, userId, editable: true });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to share this list');
+  });
 });
