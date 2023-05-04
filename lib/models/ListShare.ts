@@ -1,5 +1,5 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/error.js';
+import { DeletionError, InsertionError } from '../types/error.js';
 import { ListRows } from '../types/list.js';
 import { UserRows } from '../types/user.js';
 import { ListShareFromDatabase, ListShareRows, NewListShareData } from '../types/userList.js';
@@ -54,5 +54,18 @@ export class ListShare {
     );
 
     return rows.map(row => new User(row));
+  }
+
+  static async deleteById(id: string): Promise<ListShare> {
+    
+    const { rows }: ListShareRows = await pool.query(
+      `DELETE FROM list_shares
+      WHERE id = $1
+      RETURNING *`,
+      [id]
+    );
+
+    if (!rows[0]) throw new DeletionError('list_shares');
+    return new ListShare(rows[0]);
   }
 }

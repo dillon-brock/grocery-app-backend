@@ -119,16 +119,19 @@ type PostListData = {
   sharedUserId: string;
   listId: string;
   token: string;
+  shareId: string;
 }
 
 async function signUpAndShareList(): Promise<PostListData> {
   const { agent, userId, listId, token } = await signUpAndGetListShareData(); 
 
-  await agent.post('/list-shares')
+  const shareRes = await agent.post('/list-shares')
     .set('Authorization', `Bearer ${token}`)
     .send({ listId, userId, editable: true });
 
-  return { agent, sharedUserId: userId, token, listId };
+  const shareId = shareRes.body.shareData.id;
+
+  return { agent, sharedUserId: userId, token, listId, shareId };
 }
 
 
@@ -242,5 +245,26 @@ describe('GET /list-shares/users tests', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('List not found');
+  });
+});
+
+describe('DELETE /list-shares test', () => {
+  beforeEach(setupDb);
+
+  it('deletes list share (stops sharing list) at DELETE /list-shares/:id', async () => {
+    const { agent, token, shareId, sharedUserId } = await signUpAndShareList();
+
+    const res = await agent
+      .delete(`/list-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Stopped sharing list successfully',
+      deletedShareData: expect.objectContaining({
+        id: shareId,
+        userId: sharedUserId
+      })
+    });
   });
 });

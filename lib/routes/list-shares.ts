@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AuthenticatedReqBody, AuthenticatedReqQuery } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery } from '../types/extendedExpress.js';
 import { NewListShareData } from '../types/userList.js';
 import { NextFunction, Response } from 'express-serve-static-core';
 import { ListShare } from '../models/ListShare.js';
@@ -42,6 +42,17 @@ export default Router()
       res.json({
         message: 'Shared users found successfully',
         users
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .delete('/:id', async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
+    try {
+      const deletedShare = await ListShare.deleteById(req.params.id);
+      res.json({
+        message: 'Stopped sharing list successfully',
+        deletedShareData: deletedShare
       });
     } catch (e) {
       next(e);
