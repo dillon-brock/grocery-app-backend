@@ -159,4 +159,14 @@ describe('GET /list-shares/lists tests', () => {
       updatedAt: expect.any(String)
     });
   });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, sharedUserId } = await signUpAndPostList();
+
+    const res = await agent
+      .get(`/list-shares/lists?userId=${sharedUserId}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
 });

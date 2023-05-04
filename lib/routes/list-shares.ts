@@ -23,7 +23,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/lists', async (req: AuthenticatedReqQuery<{ userId: string }>, res: Response, next: NextFunction) => {
+  .get('/lists', authenticate, async (req: AuthenticatedReqQuery<{ userId: string }>, res: Response, next: NextFunction) => {
     try {
       const sharedLists = await ListShare.findListsByUserId(req.query.userId);
       res.json({
