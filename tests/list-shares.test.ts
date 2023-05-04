@@ -80,4 +80,15 @@ describe('POST /users-lists (share list) tests', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('List not found');
   });
+
+  it('gives a 404 error for nonexistent user', async () => {
+    const { agent, token, listId } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: '39492', editable: true });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe('User not found');
+  });
 });
