@@ -7,6 +7,7 @@ import authenticate from '../middleware/authenticate.js';
 import { ErrorWithStatus } from '../types/error.js';
 import { User } from '../models/User.js';
 import authorizeListShare from '../middleware/authorization/list-share.js';
+import authorizeGetSharedLists from '../middleware/authorization/get-shared-lists.js';
 
 export default Router()
   .post('/', [authenticate, authorizeListShare], async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {
@@ -23,7 +24,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/lists', authenticate, async (req: AuthenticatedReqQuery<{ userId: string }>, res: Response, next: NextFunction) => {
+  .get('/lists', [authenticate, authorizeGetSharedLists], async (req: AuthenticatedReqQuery<{ userId: string }>, res: Response, next: NextFunction) => {
     try {
       const sharedLists = await ListShare.findListsByUserId(req.query.userId);
       res.json({

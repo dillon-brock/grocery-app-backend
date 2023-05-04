@@ -28,6 +28,7 @@ export default async (req: AuthenticatedRequest, res: Response, next: NextFuncti
         if (e instanceof Error) message = e.message;
         throw new ErrorWithStatus(message, 500);
       }
+
       req.user = decodedToken;
       next();
     }
