@@ -30,16 +30,18 @@ describe('POST /users-lists (share list) tests', () => {
       .set('Authorization', `Bearer ${token}`);
     const { list } = newListRes.body;
 
-    const res = await agent.post('/users-lists')
+    const res = await agent.post('/list-shares')
       .set('Authorization', `Bearer ${token}`)
-      .send({ listId: list.id, userId: otherUser.id });
+      .send({ listId: list.id, userId: otherUser.id, editable: true });
+      
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List shared successfully',
       shareData: {
         id: expect.any(String),
         userId: otherUser.id,
-        listId: list.id
+        listId: list.id,
+        editable: true
       }
     });
   });

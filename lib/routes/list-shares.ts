@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { AuthenticatedReqBody } from '../types/extendedExpress.js';
-import { NewUserListData } from '../types/userList.js';
+import { NewListShareData } from '../types/userList.js';
 import { NextFunction, Response } from 'express-serve-static-core';
-import { UserList } from '../models/UserList.js';
+import { ListShare } from '../models/ListShare.js';
 
 export default Router()
-  .post('/', async (req: AuthenticatedReqBody<NewUserListData>, res: Response, next: NextFunction) => {
+  .post('/', async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {
     try {
-      const shareData = await UserList.create(req.body);
+      const shareData = await ListShare.create(req.body);
       res.json({ 
         message: 'List shared successfully', 
         shareData
