@@ -4,15 +4,13 @@ import { NewListShareData } from '../types/userList.js';
 import { NextFunction, Response } from 'express-serve-static-core';
 import { ListShare } from '../models/ListShare.js';
 import authenticate from '../middleware/authenticate.js';
-import { List } from '../models/List.js';
 import { ErrorWithStatus } from '../types/error.js';
 import { User } from '../models/User.js';
+import authorizeListShare from '../middleware/authorize-list-share.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {
+  .post('/', [authenticate, authorizeListShare], async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {
     try {
-      const list = await List.findById(req.body.listId);
-      if (!list) throw new ErrorWithStatus('List not found', 404);
       const otherUser = await User.findById(req.body.userId);
       if (!otherUser) throw new ErrorWithStatus('User not found', 404);
       const shareData = await ListShare.create(req.body);

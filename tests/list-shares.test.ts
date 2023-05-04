@@ -17,6 +17,12 @@ const testUser2 = {
   username: 'second_user'
 };
 
+const testUser3 = {
+  email: 'third@user.com',
+  password: 'password',
+  username: 'third_user'
+};
+
 type ListShareRouteData = {
   listId: string;
   userId: string;
@@ -94,8 +100,7 @@ describe('POST /users-lists (share list) tests', () => {
 
   it('gives a 403 error for user unauthorized to share list', async () => {
     const { agent, userId, listId } = await signUpAndGetListShareData();
-    const secondSignUpRes = await agent.post('/users')
-      .send(testUser2);
+    const secondSignUpRes = await agent.post('/users').send(testUser3);
     const { token: token2 } = secondSignUpRes.body;
 
     const res = await agent.post('/list-shares')
