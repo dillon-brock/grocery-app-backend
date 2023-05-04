@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AuthenticatedReqBody } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqQuery } from '../types/extendedExpress.js';
 import { NewListShareData } from '../types/userList.js';
 import { NextFunction, Response } from 'express-serve-static-core';
 import { ListShare } from '../models/ListShare.js';
@@ -20,6 +20,17 @@ export default Router()
       });
     } 
     catch (e) {
+      next(e);
+    }
+  })
+  .get('/lists', async (req: AuthenticatedReqQuery<{ userId: string }>, res: Response, next: NextFunction) => {
+    try {
+      const sharedLists = await ListShare.findListsByUserId(req.query.userId);
+      res.json({
+        message: 'Shared lists found',
+        sharedLists
+      });
+    } catch (e) {
       next(e);
     }
   });

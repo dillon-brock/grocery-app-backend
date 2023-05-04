@@ -1,6 +1,8 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
+import { ListRows } from '../types/list.js';
 import { ListShareFromDatabase, ListShareRows, NewListShareData } from '../types/userList.js';
+import { List } from './List.js';
 
 export class ListShare {
   id: string;
@@ -26,5 +28,17 @@ export class ListShare {
 
     if (!rows[0]) throw new InsertionError('users_lists');
     return new ListShare(rows[0]);
+  }
+
+  static async findListsByUserId(userId: string): Promise<List[]> {
+
+    const { rows }: ListRows = await pool.query(
+      `SELECT lists.* FROM list_shares
+      INNER JOIN lists ON lists.id = list_shares.list_id
+      WHERE list_shares.user_id = $1`,
+      [userId]
+    );
+
+    return rows.map(row => new List(row));
   }
 }

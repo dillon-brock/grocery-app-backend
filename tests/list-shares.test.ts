@@ -142,7 +142,7 @@ describe('GET /list-shares/lists tests', () => {
       .send(testUser2);
     const { token } = signInRes.body;
 
-    const sharedList = List.findById(listId);
+    const sharedList = await List.findById(listId);
 
     const res = await agent
       .get(`/list-shares/lists?userId=${sharedUserId}`)
@@ -151,8 +151,12 @@ describe('GET /list-shares/lists tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Shared lists found',
-      lists: expect.any(Array)
+      sharedLists: expect.any(Array)
     });
-    expect(res.body.lists[0]).toEqual({ ...sharedList });
+    expect(res.body.sharedLists[0]).toEqual({ 
+      ...sharedList,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
+    });
   });
 });
