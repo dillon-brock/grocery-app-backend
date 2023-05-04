@@ -2,7 +2,7 @@ import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { List, ListWithItems } from '../models/List.js';
 import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpress.js';
-import findListAndAuthorize from '../middleware/find-list-and-authorize.js';
+import findListAndAuthorize from '../middleware/authorization/find-list-and-authorize.js';
 import { NewListData } from '../types/list.js';
 
 export default Router()

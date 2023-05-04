@@ -6,7 +6,7 @@ import { ListShare } from '../models/ListShare.js';
 import authenticate from '../middleware/authenticate.js';
 import { ErrorWithStatus } from '../types/error.js';
 import { User } from '../models/User.js';
-import authorizeListShare from '../middleware/authorize-list-share.js';
+import authorizeListShare from '../middleware/authorization/list-share.js';
 
 export default Router()
   .post('/', [authenticate, authorizeListShare], async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {

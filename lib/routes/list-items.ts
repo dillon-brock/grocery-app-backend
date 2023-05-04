@@ -4,8 +4,8 @@ import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/error.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest } from '../types/extendedExpress.js';
 import { ListItemUpdateData, NewListItemData } from '../types/listItem.js';
-import authorizeItemAccess from '../middleware/authorize-item-access.js';
-import authorizeAddItem from '../middleware/authorize-add-item.js';
+import authorizeItemAccess from '../middleware/authorization/item-access.js';
+import authorizeAddItem from '../middleware/authorization/add-item.js';
 
 export default Router()
   .post('/', [authenticate, authorizeAddItem], async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {

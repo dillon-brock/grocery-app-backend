@@ -4,6 +4,7 @@ import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
 import { User } from '../lib/models/User.js';
+import { List } from '../lib/models/List.js';
 
 const testUser = {
   email: 'test@user.com',
@@ -44,10 +45,10 @@ async function signUpAndGetListShareData(): Promise<ListShareRouteData> {
   return { listId: list.id, userId: otherUser.id, token, agent };
 }
 
-describe('POST /users-lists (share list) tests', () => {
+describe('POST /list-shares (share list) tests', () => {
   beforeEach(setupDb);
 
-  it('shares a list with a non-owner user at POST /users-lists', async () => {
+  it('shares a list with a non-owner user at POST /list-shares', async () => {
     const { listId, userId, token, agent } = await signUpAndGetListShareData();
 
     const res = await agent.post('/list-shares')
@@ -109,5 +110,49 @@ describe('POST /users-lists (share list) tests', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to share this list');
+  });
+});
+
+
+type PostListData = {
+  agent: request.SuperAgentTest;
+  sharedUserId: string;
+  listId: string;
+}
+
+async function signUpAndPostList(): Promise<PostListData> {
+  const { agent, userId, listId, token } = await signUpAndGetListShareData();
+
+  await agent.post('/list-shares')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ listId, userId, editable: true });
+
+  return { agent, sharedUserId: userId, listId };
+}
+
+
+describe('GET /list-shares/lists tests', () => {
+  beforeEach(setupDb);
+
+  it('gets lists shared with user at GET /list-shares/lists', async () => {
+    const { agent, sharedUserId, listId } = await signUpAndPostList();
+
+    const signInRes = await agent
+      .post('/users/sessions')
+      .send(testUser2);
+    const { token } = signInRes.body;
+
+    const sharedList = List.findById(listId);
+
+    const res = await agent
+      .get(`/list-shares/lists?userId=${sharedUserId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Shared lists found',
+      lists: expect.any(Array)
+    });
+    expect(res.body.lists[0]).toEqual({ ...sharedList });
   });
 });
