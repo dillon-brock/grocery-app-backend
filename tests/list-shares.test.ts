@@ -118,16 +118,17 @@ type PostListData = {
   agent: request.SuperAgentTest;
   sharedUserId: string;
   listId: string;
+  token: string;
 }
 
-async function signUpAndPostList(): Promise<PostListData> {
-  const { agent, userId, listId, token } = await signUpAndGetListShareData();
+async function signUpAndShareList(): Promise<PostListData> {
+  const { agent, userId, listId, token } = await signUpAndGetListShareData(); 
 
   await agent.post('/list-shares')
     .set('Authorization', `Bearer ${token}`)
     .send({ listId, userId, editable: true });
 
-  return { agent, sharedUserId: userId, listId };
+  return { agent, sharedUserId: userId, token, listId };
 }
 
 
@@ -135,7 +136,7 @@ describe('GET /list-shares/lists tests', () => {
   beforeEach(setupDb);
 
   it('gets lists shared with user at GET /list-shares/lists', async () => {
-    const { agent, sharedUserId, listId } = await signUpAndPostList();
+    const { agent, sharedUserId, listId } = await signUpAndShareList();
 
     const signInRes = await agent
       .post('/users/sessions')
@@ -161,7 +162,7 @@ describe('GET /list-shares/lists tests', () => {
   });
 
   it('gives a 401 error for unauthenticated user', async () => {
-    const { agent, sharedUserId } = await signUpAndPostList();
+    const { agent, sharedUserId } = await signUpAndShareList();
 
     const res = await agent
       .get(`/list-shares/lists?userId=${sharedUserId}`);
@@ -171,7 +172,7 @@ describe('GET /list-shares/lists tests', () => {
   });
 
   it('gives 403 error for unauthorized user', async () => {
-    const { agent, sharedUserId } = await signUpAndPostList();
+    const { agent, sharedUserId } = await signUpAndShareList();
 
     const signUpRes = await agent.post('/users')
       .send(testUser3);
@@ -183,5 +184,28 @@ describe('GET /list-shares/lists tests', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to view this information');
+  });
+});
+
+describe('GET /list-shares/users tests', () => {
+  beforeEach(setupDb);
+
+  it('gets users with whom list is shared at GET /list-shares/users', async () => {
+    const { agent, listId, token, sharedUserId } = await signUpAndShareList();
+
+    const sharedUser = await User.findById(sharedUserId);
+
+    const res = await agent
+      .get(`/list-shares/users?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Shared users found successfully',
+      users: expect.any(Array)
+    });
+    expect(res.body[0]).toEqual({
+      ...sharedUser
+    });
   });
 });
