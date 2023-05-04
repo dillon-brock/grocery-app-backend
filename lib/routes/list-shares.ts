@@ -34,4 +34,15 @@ export default Router()
     } catch (e) {
       next(e);
     }
+  })
+  .get('/users', async (req: AuthenticatedReqQuery<{ listId: string }>, res: Response, next: NextFunction) => {
+    try {
+      const users = await ListShare.findUsersByListId(req.query.listId);
+      res.json({
+        message: 'Shared users found successfully',
+        users
+      });
+    } catch (e) {
+      next(e);
+    }
   });

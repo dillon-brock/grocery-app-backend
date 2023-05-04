@@ -7,6 +7,10 @@ export type UserFromDatabase = {
   username: string;
 }
 
+export type UserRows = {
+  rows: UserFromDatabase[];
+}
+
 export type UserSignUpData = {
   email: string;
   password: string;

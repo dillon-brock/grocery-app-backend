@@ -204,7 +204,7 @@ describe('GET /list-shares/users tests', () => {
       message: 'Shared users found successfully',
       users: expect.any(Array)
     });
-    expect(res.body[0]).toEqual({
+    expect(res.body.users[0]).toEqual({
       ...sharedUser
     });
   });

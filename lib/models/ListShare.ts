@@ -1,8 +1,10 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
 import { ListRows } from '../types/list.js';
+import { UserRows } from '../types/user.js';
 import { ListShareFromDatabase, ListShareRows, NewListShareData } from '../types/userList.js';
 import { List } from './List.js';
+import { User } from './User.js';
 
 export class ListShare {
   id: string;
@@ -40,5 +42,17 @@ export class ListShare {
     );
 
     return rows.map(row => new List(row));
+  }
+
+  static async findUsersByListId(listId: string): Promise<User[]> {
+
+    const { rows }: UserRows = await pool.query(
+      `SELECT users.* FROM list_shares
+      INNER JOIN users ON users.id = list_shares.user_id
+      WHERE list_shares.list_id = $1`,
+      [listId]
+    );
+
+    return rows.map(row => new User(row));
   }
 }

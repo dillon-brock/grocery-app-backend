@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
-import { HashedSignUpData, UserFromDatabase } from '../types/user.js';
+import { HashedSignUpData, UserFromDatabase, UserRows } from '../types/user.js';
 
 export class User {
   id: string;
@@ -17,7 +17,7 @@ export class User {
 
   static async insert({ email, passwordHash, username }: HashedSignUpData) {
 
-    const { rows } = await pool.query(
+    const { rows }: UserRows = await pool.query(
       `INSERT INTO users (email, password_hash, username)
       VALUES ($1, $2, $3)
       RETURNING *`,
@@ -31,7 +31,7 @@ export class User {
 
   static async findByEmail(email: string) {
 
-    const { rows } = await pool.query(
+    const { rows }: UserRows = await pool.query(
       `SELECT * FROM users
       WHERE email = $1`,
       [email]
@@ -47,7 +47,7 @@ export class User {
 
   static async findByUsername(username: string): Promise<User | null> {
 
-    const { rows } = await pool.query(
+    const { rows }: UserRows = await pool.query(
       `SELECT * FROM users
       WHERE username = $1`,
       [username]
@@ -59,7 +59,7 @@ export class User {
 
   static async findById(id: string): Promise<User | null> {
 
-    const { rows } = await pool.query(
+    const { rows }: UserRows = await pool.query(
       `SELECT * FROM users
       WHERE id = $1`,
       [id]
