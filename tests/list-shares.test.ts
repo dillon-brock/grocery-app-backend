@@ -17,32 +17,56 @@ const testUser2 = {
   username: 'second_user'
 };
 
+type ListShareRouteData = {
+  listId: string;
+  userId: string;
+  token: string;
+  agent: request.SuperAgentTest;
+}
+
+async function signUpAndGetListShareData(): Promise<ListShareRouteData> {
+  const agent = request.agent(app);
+
+  const signUpRes = await agent.post('/users').send(testUser);
+  const { token } = signUpRes.body;
+  const otherUser: User = await UserService.create(testUser2);
+  const newListRes = await agent
+    .post('/lists')
+    .set('Authorization', `Bearer ${token}`);
+  const { list } = newListRes.body;
+
+  return { listId: list.id, userId: otherUser.id, token, agent };
+}
+
 describe('POST /users-lists (share list) tests', () => {
   beforeEach(setupDb);
 
   it('shares a list with a non-owner user at POST /users-lists', async () => {
-    const agent = request.agent(app);
-    const signUpRes = await agent.post('/users').send(testUser);
-    const { token } = signUpRes.body;
-    const otherUser: User = await UserService.create(testUser2);
-    const newListRes = await agent
-      .post('/lists')
-      .set('Authorization', `Bearer ${token}`);
-    const { list } = newListRes.body;
+    const { listId, userId, token, agent } = await signUpAndGetListShareData();
 
     const res = await agent.post('/list-shares')
       .set('Authorization', `Bearer ${token}`)
-      .send({ listId: list.id, userId: otherUser.id, editable: true });
-      
+      .send({ listId, userId, editable: true });
+
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List shared successfully',
       shareData: {
         id: expect.any(String),
-        userId: otherUser.id,
-        listId: list.id,
+        userId,
+        listId,
         editable: true
       }
     });
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, listId, userId } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .send({ listId, userId, editable: true });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });
