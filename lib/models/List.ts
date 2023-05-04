@@ -1,7 +1,7 @@
 import pool from '../../sql/pool.js';
-import { DeletionError, InsertionError } from '../types/errorTypes.js';
-import { CoalescedListItem } from '../types/listItemTypes.js';
-import { CreateListParams, ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/listTypes.js';
+import { DeletionError, InsertionError } from '../types/error.js';
+import { CoalescedListItem } from '../types/listItem.js';
+import { CreateListParams, ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/list.js';
 
 export class List {
   id: string;

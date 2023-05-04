@@ -20,7 +20,7 @@ export type CoalescedListItem = {
   id: string;
   bought: boolean;
   item: string;
-  quantity: number;
+  quantity: number | null;
 }
 
 export type ListItemUpdateData = {

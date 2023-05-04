@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqBody } from '../types/extendedExpressTypes.js';
-import { NewListItemData } from '../types/listItemTypes.js';
+import { AuthenticatedReqBody } from '../types/extendedExpress.js';
+import { NewListItemData } from '../types/listItem.js';
 import { List } from '../models/List.js';
-import { ErrorWithStatus } from '../types/errorTypes.js';
+import { ErrorWithStatus } from '../types/error.js';
 
 export default async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
   try {

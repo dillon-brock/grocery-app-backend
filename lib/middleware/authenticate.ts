@@ -1,7 +1,7 @@
 import { type NextFunction, type Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { ErrorWithStatus } from '../types/errorTypes.js';
-import { AuthenticatedRequest } from '../types/extendedExpressTypes.js';
+import { ErrorWithStatus } from '../types/error.js';
+import { AuthenticatedRequest } from '../types/extendedExpress.js';
 
 export default async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
