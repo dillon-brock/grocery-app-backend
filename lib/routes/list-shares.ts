@@ -35,7 +35,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/users', async (req: AuthenticatedReqQuery<{ listId: string }>, res: Response, next: NextFunction) => {
+  .get('/users', authenticate, async (req: AuthenticatedReqQuery<{ listId: string }>, res: Response, next: NextFunction) => {
     try {
       const users = await ListShare.findUsersByListId(req.query.listId);
       res.json({
