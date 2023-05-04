@@ -13,7 +13,7 @@ export class UserList {
     this.listId = row.list_id;
   }
 
-  static async insert({ listId, userId }: NewUserListData) {
+  static async create({ listId, userId }: NewUserListData) {
 
     const { rows }: UserListRows = await pool.query(
       `INSERT INTO users_lists (list_id, user_id)

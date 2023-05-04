@@ -17,11 +17,6 @@ const testUser2 = {
   username: 'second_user'
 };
 
-const item = {
-  item: 'banana',
-  quantity: 3
-};
-
 describe('POST /users-lists (share list) tests', () => {
   beforeEach(setupDb);
 
@@ -42,6 +37,7 @@ describe('POST /users-lists (share list) tests', () => {
     expect(res.body).toEqual({
       message: 'List shared successfully',
       shareData: {
+        id: expect.any(String),
         userId: otherUser.id,
         listId: list.id
       }
