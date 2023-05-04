@@ -232,4 +232,15 @@ describe('GET /list-shares/users tests', () => {
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to view this information');
   });
+
+  it('gives a 404 error for nonexistent list', async () => {
+    const { agent, token } = await signUpAndShareList();
+
+    const res = await agent
+      .get('/list-shares/users?listId=458239')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('List not found');
+  });
 });
