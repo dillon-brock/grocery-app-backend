@@ -295,7 +295,7 @@ describe('PUT /list-items/:id tests', () => {
 describe('DELETE /list-items/:id tests', () => {
   beforeEach(setupDb);
 
-  it('deletes a item at DELETE /list-items/:id', async () => {
+  it('deletes an item at DELETE /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
     const newItemId = await getNewItemId(agent, token, listId);
@@ -303,6 +303,34 @@ describe('DELETE /list-items/:id tests', () => {
     const res = await agent
       .delete(`/list-items/${newItemId}`)
       .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Item deleted successfully',
+      listItem: expect.objectContaining({
+        ...testItem
+      })
+    });
+  });
+
+  it('deletes an item for shared user with edit access', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const secondUser = await UserService.create(testUser2);
+
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUser.id, editable: true });
+
+    const signInRes = await agent.post('/users/sessions')
+      .send({ email: testUser2.email, password: testUser2.password });
+    const { token: token2 } = signInRes.body;
+
+    const res = await agent
+      .delete(`/list-items/${newItemId}`)
+      .set('Authorization', `Bearer ${token2}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
