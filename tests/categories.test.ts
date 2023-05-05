@@ -107,3 +107,30 @@ describe('POST /categories tests', () => {
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });
+
+describe('PUT /categories/:id tests', () => {
+  beforeEach(setupDb);
+
+  it('updates a category at PUT /categories/:id', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+    const categoryRes = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Dessert', listId });
+    const categoryId = categoryRes.body.category.id;
+
+    const res = await agent
+      .put(`/categories/${categoryId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Sweet Stuff' });
+    
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Category updated successfully',
+      category: {
+        id: categoryId,
+        name: 'Sweet Stuff',
+        listId
+      }
+    });
+  });
+});
