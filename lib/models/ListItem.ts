@@ -8,6 +8,7 @@ export class ListItem {
   listId: string;
   bought: boolean;
   quantity: number | null;
+  categoryId: string | null;
 
   constructor(row: ListItemFromDB) {
     this.id = row.id;
@@ -15,15 +16,16 @@ export class ListItem {
     this.listId = row.list_id;
     this.bought = row.bought;
     this.quantity = row.quantity;
+    this.categoryId = row.category_id;
   }
 
-  static async create({ listId, quantity, item }: NewListItemData): Promise<ListItem> {
+  static async create({ listId, quantity, item, categoryId }: NewListItemData): Promise<ListItem> {
 
     const { rows }: ListItemRows = await pool.query(
-      `INSERT INTO list_items (list_id, quantity, item)
-      VALUES ($1, $2, $3)
+      `INSERT INTO list_items (list_id, quantity, item, category_id)
+      VALUES ($1, $2, $3, $4)
       RETURNING *`,
-      [listId, quantity, item]
+      [listId, quantity, item, categoryId]
     );
 
     if (!rows[0]) throw new InsertionError('list_items');
