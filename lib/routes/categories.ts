@@ -33,7 +33,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, authorizeCategoryAccess], async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
     try {
       const deletedCategory = await Category.deleteById(req.params.id);
       res.json({
