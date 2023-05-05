@@ -2,6 +2,7 @@ import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
 import { CoalescedListItem } from '../types/listItem.js';
 import { CreateListParams, ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/list.js';
+import { ListShareRows } from '../types/userList.js';
 
 export class List {
   id: string;
@@ -66,6 +67,19 @@ export class List {
 
     if (!rows[0]) throw new DeletionError('lists');
     return new List(rows[0]);
+  }
+
+  async checkIfSharedWithUser(userId: string): Promise<boolean> {
+
+    const { rows }: ListShareRows = await pool.query(
+      `SELECT list_shares.* FROM lists
+      INNER JOIN list_shares ON list_shares.list_id = lists.id
+      WHERE lists.id = $1 AND list_shares.user_id = $2`,
+      [this.id, userId]
+    );
+
+    if (!rows[0]) return false;
+    return rows[0].editable;
   }
 
 }

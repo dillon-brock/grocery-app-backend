@@ -1,6 +1,7 @@
 import { setupDb } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
+import { UserService } from '../lib/services/UserService.js';
 
 const testUser = {
   email: 'test@user.com',
@@ -54,13 +55,40 @@ async function getNewItemId(agent: request.SuperAgentTest, token: string, listId
 describe('POST /list-items tests', () => {
   beforeEach(setupDb);
 
-  test('it adds an item to a list at POST /list-items', async () => {
+  test('adds an item to a list at POST /list-items', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
 
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token}`)
+      .send({ ...testItem, listId });
+    
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Item added successfully',
+      item: expect.objectContaining({ ...testItem })
+    });
+  });
+
+  test('adds item to list from user whom list is shared with', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const secondUser = await UserService.create(testUser2);
+
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUser.id, editable: true });
+    
+    const signInRes = await agent
+      .post('/users/sessions')
+      .send({ email: testUser2.email, password: testUser2.password });
+    const { token: token2 } = signInRes.body;
+
+    const res = await agent
+      .post('/list-items')
+      .set('Authorization', `Bearer ${token2}`)
       .send({ ...testItem, listId });
     
     expect(res.status).toBe(200);
