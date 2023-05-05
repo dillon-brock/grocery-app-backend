@@ -34,4 +34,13 @@ describe('POST /categories tests', () => {
       }
     });
   });
+
+  it('gives 401 error for unauthenticated user', async () => {
+    const res = await request(app)
+      .post('/categories')
+      .send({ name: 'Bread' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
 });
