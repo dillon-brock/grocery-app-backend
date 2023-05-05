@@ -267,4 +267,12 @@ describe('DELETE /list-shares test', () => {
       })
     });
   });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, shareId } = await signUpAndShareList();
+
+    const res = await agent.delete(`/list-shares/${shareId}`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('You must be signed in to continue');
+  });
 });

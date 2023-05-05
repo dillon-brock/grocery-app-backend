@@ -47,7 +47,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
+  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
     try {
       const deletedShare = await ListShare.deleteById(req.params.id);
       res.json({
