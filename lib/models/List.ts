@@ -1,7 +1,7 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
 import { CoalescedListItem } from '../types/listItem.js';
-import { CreateListParams, ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/list.js';
+import { CreateListParams, ListFromDB, ListRows, ListWithItemsFromDB, ListWithItemsRows } from '../types/list.js';
 import { ListShareRows } from '../types/userList.js';
 
 export class List {
@@ -11,7 +11,7 @@ export class List {
   createdAt: string;
   updatedAt: string;
 
-  constructor(row: ListFromDatabase) {
+  constructor(row: ListFromDB) {
     this.id = row.id;
     this.ownerId = row.owner_id;
     this.title = row.title;
@@ -88,7 +88,7 @@ export class List {
 export class ListWithItems extends List {
   items: CoalescedListItem[];
 
-  constructor(row: ListWithItemsFromDatabase) {
+  constructor(row: ListWithItemsFromDB) {
     const { id, owner_id, title, created_at, updated_at } = row;
     super({ id, owner_id, title, created_at, updated_at });
     this.items = row.items;
@@ -96,7 +96,7 @@ export class ListWithItems extends List {
 
   static async findById(id: string): Promise<ListWithItems | null> {
 
-    const { rows } = await pool.query(
+    const { rows }: ListWithItemsRows = await pool.query(
       `SELECT lists.*,
       COALESCE(
         json_agg(json_build_object(

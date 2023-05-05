@@ -1,13 +1,14 @@
 import pool from '../../sql/pool.js';
-import { CategoryFromDatabase, CategoryRows, NewCategoryData } from '../types/category.js';
+import { CategoryFromDB, NewCategoryData } from '../types/category.js';
 import { InsertionError } from '../types/error.js';
+import { Rows } from '../types/global.js';
 
 export class Category {
   id: string;
   name: string;
   userId: string | null;
 
-  constructor(row: CategoryFromDatabase) {
+  constructor(row: CategoryFromDB) {
     this.id = row.id;
     this.name = row.name;
     this.userId = row.user_id;
@@ -15,7 +16,7 @@ export class Category {
 
   static async create({ name, userId }: NewCategoryData): Promise<Category> {
 
-    const { rows }: CategoryRows = await pool.query(
+    const { rows }: Rows<CategoryFromDB> = await pool.query(
       `INSERT INTO categories (name, user_id)
       VALUES ($1, $2)
       RETURNING *`,

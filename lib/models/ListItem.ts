@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
-import { InsertionError, UpdateError } from '../types/error.js';
-import { ListItemFromDatabase, ListItemRows, ListItemUpdateData, NewListItemData } from '../types/listItem.js';
+import { ErrorWithStatus, InsertionError, UpdateError } from '../types/error.js';
+import { ListItemFromDB, ListItemRows, ListItemUpdateData, NewListItemData, OwnerIDRows } from '../types/listItem.js';
 
 export class ListItem {
   id: string;
@@ -9,7 +9,7 @@ export class ListItem {
   bought: boolean;
   quantity: number | null;
 
-  constructor(row: ListItemFromDatabase) {
+  constructor(row: ListItemFromDB) {
     this.id = row.id;
     this.item = row.item;
     this.listId = row.list_id;
@@ -70,13 +70,14 @@ export class ListItem {
 
   async getOwnerId(): Promise<string> {
 
-    const { rows } = await pool.query(
+    const { rows }: OwnerIDRows = await pool.query(
       `SELECT lists.owner_id AS owner_id FROM list_items
       INNER JOIN lists ON lists.id = list_items.list_id
       WHERE list_items.id = $1`,
       [this.id]
     );
 
+    if (!rows[0]) throw new ErrorWithStatus('Could not get list information', 500);
     return rows[0].owner_id;
   }
 }

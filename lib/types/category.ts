@@ -1,11 +1,7 @@
-export type CategoryFromDatabase = {
+export type CategoryFromDB = {
   id: string;
   user_id: string | null;
   name: string;
-}
-
-export type CategoryRows = {
-  rows: CategoryFromDatabase[];
 }
 
 export type NewCategoryData = {

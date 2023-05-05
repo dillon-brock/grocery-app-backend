@@ -1,14 +1,13 @@
 import { User } from '../models/User.js';
+import { Rows } from './global.js';
 
-export type UserFromDatabase = {
+export type UserRows = Rows<UserFromDB>;
+
+export type UserFromDB = {
   id: string;
   email: string;
   password_hash: string;
   username: string;
-}
-
-export type UserRows = {
-  rows: UserFromDatabase[];
 }
 
 export type UserSignUpData = {

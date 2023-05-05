@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
-import { HashedSignUpData, UserFromDatabase, UserRows } from '../types/user.js';
+import { HashedSignUpData, UserFromDB, UserRows } from '../types/user.js';
 
 export class User {
   id: string;
@@ -8,7 +8,7 @@ export class User {
   #passwordHash: string;
   username: string;
 
-  constructor(row: UserFromDatabase) {
+  constructor(row: UserFromDB) {
     this.id = row.id;
     this.email = row.email;
     this.#passwordHash = row.password_hash;
