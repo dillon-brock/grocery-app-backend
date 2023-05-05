@@ -223,6 +223,30 @@ describe('PUT /list-items/:id tests', () => {
     });
   });
 
+  it('gives a 403 error for shared user without edit access', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const secondUser = await UserService.create(testUser2);
+
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUser.id, editable: false });
+
+    const signInRes = await agent.post('/users/sessions')
+      .send(testUser2);
+    const { token: token2 } = signInRes.body;
+
+    const res = await agent
+      .put(`/list-items/${newItemId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ bought: true });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to access this item');
+  });
+
   test('gives a 404 error for nonexistent item', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const res = await agent
