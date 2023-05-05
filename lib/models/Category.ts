@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { CategoryFromDB, CategoryRows, CategoryUpdateData, NewCategoryData } from '../types/category.js';
-import { InsertionError, UpdateError } from '../types/error.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 
 export class Category {
   id: string;
@@ -50,6 +50,19 @@ export class Category {
     );
 
     if (!rows[0]) throw new UpdateError('categories');
+    return new Category(rows[0]);
+  }
+
+  static async deleteById(id: string) {
+
+    const { rows }: CategoryRows = await pool.query(
+      `DELETE FROM categories
+      WHERE id = $1
+      RETURNING *`,
+      [id]
+    );
+
+    if (!rows[0]) throw new DeletionError('categories');
     return new Category(rows[0]);
   }
 }

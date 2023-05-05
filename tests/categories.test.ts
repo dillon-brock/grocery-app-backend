@@ -200,3 +200,42 @@ describe('PUT /categories/:id tests', () => {
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });
+
+type CreateCategoryInfo = {
+  agent: request.SuperAgentTest;
+  token: string;
+  categoryId: string;
+  listId: string;
+}
+
+async function signUpAndCreateCategory(): Promise<CreateCategoryInfo> {
+  const { agent, token, listId } = await signUpAndCreateList();
+  const categoryRes = await agent.post('/categories')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ name: 'Bread', listId });
+  const categoryId = categoryRes.body.category.id;
+
+  return { agent, token, categoryId, listId };
+}
+
+describe('DELETE /categories/:id tests', () => {
+  beforeEach(setupDb);
+
+  it('deletes category at DELETE /categories/:id', async () => {
+    const { agent, token, categoryId, listId } = await signUpAndCreateCategory();
+
+    const res = await agent
+      .delete(`/categories/${categoryId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Category deleted successfully',
+      category: {
+        id: categoryId,
+        listId,
+        name: 'Bread'
+      }
+    });
+  });
+});

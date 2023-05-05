@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { TypedAuthenticatedRequest } from '../../types/extendedExpress.js';
+import { AuthenticatedReqParams } from '../../types/extendedExpress.js';
 import { Category } from '../../models/Category.js';
 import { List } from '../../models/List.js';
 import { ErrorWithStatus } from '../../types/error.js';
 
-export default async (req: TypedAuthenticatedRequest<{ name: string}, { id: string }>, res: Response, next: NextFunction) => {
+export default async (req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
