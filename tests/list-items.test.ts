@@ -119,7 +119,7 @@ describe('POST /list-items tests', () => {
       .send({ ...testItem, listId });
     
     expect(res.status).toBe(403);
-    expect(res.body.message).toEqual('You are not authorized to add items to this list');
+    expect(res.body.message).toEqual('You are not authorized to edit this list');
   });
 
   test('gives a 403 error for unauthorized user adding element to list', async () => {
@@ -140,7 +140,7 @@ describe('POST /list-items tests', () => {
       .send({ ...testItem, listId });
     
     expect(res.status).toBe(403);
-    expect(res.body.message).toEqual('You are not authorized to add items to this list');
+    expect(res.body.message).toEqual('You are not authorized to edit this list');
   });
 
   test('gives a 404 error for nonexistent list', async () => {

@@ -13,7 +13,7 @@ export default async (req: AuthenticatedReqBody<NewListItemData>, res: Response,
 
     const userHasEditAccess: boolean = await list.checkIfSharedWithUser(req.user.id);
     if (!userHasEditAccess && req.user.id != list.ownerId) {
-      throw new ErrorWithStatus('You are not authorized to add items to this list', 403);
+      throw new ErrorWithStatus('You are not authorized to edit this list', 403);
     }
     next();
   } catch (e) {
