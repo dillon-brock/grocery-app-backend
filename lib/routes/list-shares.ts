@@ -9,6 +9,7 @@ import { User } from '../models/User.js';
 import authorizeListShare from '../middleware/authorization/list-share.js';
 import authorizeGetSharedLists from '../middleware/authorization/get-shared-lists.js';
 import authorizeGetSharedUsers from '../middleware/authorization/get-shared-users.js';
+import authorizeDeleteListShare from '../middleware/authorization/delete-list-share.js';
 
 export default Router()
   .post('/', [authenticate, authorizeListShare], async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {
@@ -47,7 +48,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, authorizeDeleteListShare], async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
     try {
       const deletedShare = await ListShare.deleteById(req.params.id);
       res.json({

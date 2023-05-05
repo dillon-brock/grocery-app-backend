@@ -32,6 +32,18 @@ export class ListShare {
     return new ListShare(rows[0]);
   }
 
+  static async findById(id: string): Promise<ListShare | null> {
+    
+    const { rows }: ListShareRows = await pool.query(
+      `SELECT * FROM list_shares
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    return new ListShare(rows[0]);
+  }
+
   static async findListsByUserId(userId: string): Promise<List[]> {
 
     const { rows }: ListRows = await pool.query(

@@ -275,4 +275,18 @@ describe('DELETE /list-shares test', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toBe('You must be signed in to continue');
   });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, shareId } = await signUpAndShareList();
+
+    const signUpRes = await agent.post('/users').send(testUser3);
+    const { token } = signUpRes.body;
+
+    const res = await agent
+      .delete(`/list-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`);
+    
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to alter the sharing settings of this list');
+  });
 });
