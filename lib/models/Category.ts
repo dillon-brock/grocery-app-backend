@@ -5,7 +5,7 @@ import { InsertionError, UpdateError } from '../types/error.js';
 export class Category {
   id: string;
   name: string;
-  listId: string | null;
+  listId: string;
 
   constructor(row: CategoryFromDB) {
     this.id = row.id;
@@ -26,6 +26,19 @@ export class Category {
     return new Category(rows[0]);
   }
 
+
+  static async findById(id: string): Promise<Category | null> {
+    
+    const { rows }: CategoryRows = await pool.query(
+      `SELECT * FROM categories
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    return new Category(rows[0]);
+  }
+
   static async updateNameById({ id, name }: CategoryUpdateData): Promise<Category> {
 
     const { rows }: CategoryRows = await pool.query(
@@ -38,6 +51,5 @@ export class Category {
 
     if (!rows[0]) throw new UpdateError('categories');
     return new Category(rows[0]);
-
   }
 }

@@ -5,6 +5,7 @@ import { Category } from '../models/Category.js';
 import { NewCategoryData } from '../types/category.js';
 import authorizeEditList from '../middleware/authorization/edit-list.js';
 import { NextFunction, Response } from 'express-serve-static-core';
+import authorizeCategoryAccess from '../middleware/authorization/category-access.js';
 
 export default Router()
   .post('/', [authenticate, authorizeEditList], async (req: AuthenticatedReqBody<NewCategoryData>, res: Response, next: NextFunction) => {
@@ -18,7 +19,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', async (req: TypedAuthenticatedRequest<{ name: string}, { id: string }>, res: Response, next: NextFunction) => {
+  .put('/:id', [authenticate, authorizeCategoryAccess], async (req: TypedAuthenticatedRequest<{ name: string}, { id: string }>, res: Response, next: NextFunction) => {
     try {
       const updatedCategory = await Category.updateNameById({ 
         id: req.params.id, 

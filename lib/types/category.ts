@@ -4,7 +4,7 @@ export type CategoryRows = Rows<CategoryFromDB>
 
 export type CategoryFromDB = {
   id: string;
-  list_id: string | null;
+  list_id: string;
   name: string;
 }
 
