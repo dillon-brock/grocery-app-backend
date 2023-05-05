@@ -98,6 +98,30 @@ describe('POST /list-items tests', () => {
     });
   });
 
+  test('gives 403 error for shared user without edit access', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const secondUser = await UserService.create(testUser2);
+
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUser.id, editable: false });
+    
+    const signInRes = await agent
+      .post('/users/sessions')
+      .send({ email: testUser2.email, password: testUser2.password });
+    const { token: token2 } = signInRes.body;
+
+    const res = await agent
+      .post('/list-items')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ ...testItem, listId });
+    
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to add items to this list');
+  });
+
   test('gives a 403 error for unauthorized user adding element to list', async () => {
     const { agent, token } = await signUpAndGetInfo();
     const newListRes = await agent
