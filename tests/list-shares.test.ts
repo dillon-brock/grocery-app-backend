@@ -289,4 +289,14 @@ describe('DELETE /list-shares test', () => {
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to alter the sharing settings of this list');
   });
+
+  it('gives a 404 error for nonexistent list share data', async () => {
+    const { agent, token } = await signUpAndShareList();
+    const res = await agent
+      .delete('/list-shares/7602')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('List share data not found');
+  });
 });
