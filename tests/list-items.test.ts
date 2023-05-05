@@ -168,7 +168,6 @@ describe('POST /list-items tests', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
-
 });
 
 describe('PUT /list-items/:id tests', () => {
@@ -184,6 +183,36 @@ describe('PUT /list-items/:id tests', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ bought: true });
   
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Item updated successfully',
+      item: expect.objectContaining({
+        ...testItem,
+        bought: true
+      })
+    });
+  });
+
+  test('it updates an item for shared user with edit access', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId);
+
+    const secondUser = await UserService.create(testUser2);
+
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUser.id, editable: true });
+
+    const signInRes = await agent.post('/users/sessions')
+      .send(testUser2);
+    const { token: token2 } = signInRes.body;
+
+    const res = await agent
+      .put(`/list-items/${newItemId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ bought: true });
+
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item updated successfully',
