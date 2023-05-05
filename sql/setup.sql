@@ -37,15 +37,9 @@ CREATE TABLE list_shares (
 CREATE TABLE categories (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name VARCHAR(31) NOT NULL,
-  user_id BIGINT DEFAULT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  list_id BIGINT NOT NULL,
+  FOREIGN KEY (list_id) REFERENCES lists(id)
 );
-
-CREATE TABLE lists_categories {
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  list_id BIGINT,
-  category_id BIGINT,
-}
 
 CREATE TABLE list_items (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -57,8 +51,3 @@ CREATE TABLE list_items (
   FOREIGN KEY (list_id) REFERENCES lists(id),
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
-
-INSERT INTO categories (name) VALUES
-('Fruit'), ('Vegetables'), ('Protein'), 
-('Dairy'), ('Dry Goods'), ('Canned Goods'),
-('Beverages'), ('Snacks');

@@ -16,13 +16,13 @@ describe('POST /categories tests', () => {
     const signUpRes = await agent.post('/users').send(testUser);
     const { token } = signUpRes.body;
 
-    const getUserRes = await agent.get('/users/me')
+    const listRes = await agent.post('/lists')
       .set('Authorization', `Bearer ${token}`);
-    const userId = getUserRes.body.user.id;
+    const listId = listRes.body.list.id;
 
     const res = await agent.post('/categories')
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Cheese' });
+      .send({ name: 'Cheese', listId });
     
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -30,7 +30,7 @@ describe('POST /categories tests', () => {
       category: {
         id: expect.any(String),
         name: 'Cheese',
-        userId
+        listId
       }
     });
   });

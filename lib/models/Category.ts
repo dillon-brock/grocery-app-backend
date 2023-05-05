@@ -6,21 +6,21 @@ import { Rows } from '../types/global.js';
 export class Category {
   id: string;
   name: string;
-  userId: string | null;
+  listId: string | null;
 
   constructor(row: CategoryFromDB) {
     this.id = row.id;
     this.name = row.name;
-    this.userId = row.user_id;
+    this.listId = row.list_id;
   }
 
-  static async create({ name, userId }: NewCategoryData): Promise<Category> {
+  static async create({ name, listId }: NewCategoryData): Promise<Category> {
 
     const { rows }: Rows<CategoryFromDB> = await pool.query(
-      `INSERT INTO categories (name, user_id)
+      `INSERT INTO categories (name, list_id)
       VALUES ($1, $2)
       RETURNING *`,
-      [name, userId]
+      [name, listId]
     );
 
     if (!rows[0]) throw new InsertionError('categories');
