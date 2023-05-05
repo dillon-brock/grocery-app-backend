@@ -35,7 +35,7 @@ CREATE TABLE list_shares (
 
 CREATE TABLE categories (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  name VARCHAR(31),
+  name VARCHAR(31) NOT NULL,
   user_id BIGINT DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
