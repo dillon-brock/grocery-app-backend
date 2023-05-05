@@ -1,9 +1,9 @@
 import { type Response, type NextFunction, Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { List } from '../models/List.js';
-import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpressTypes.js';
-import findListAndAuthorize from '../middleware/find-list-and-authorize.js';
-import { NewListData } from '../types/listTypes.js';
+import { List, ListWithItems } from '../models/List.js';
+import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpress.js';
+import findListAndAuthorize from '../middleware/authorization/find-list-and-authorize.js';
+import { NewListData } from '../types/list.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewListData>, res: Response, next: NextFunction) => {
@@ -28,7 +28,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: List}, { id: string }>, res: Response, next: NextFunction) => {
+  .get('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: ListWithItems }, { id: string }>, res: Response, next: NextFunction) => {
     try {
       const { list } = req.body;
       res.json({

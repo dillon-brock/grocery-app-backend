@@ -1,4 +1,4 @@
-import { CoalescedListItem } from './listItemTypes.js';
+import { CoalescedListItem } from './listItem.js';
 
 export interface ListFromDatabase {
   id: string;

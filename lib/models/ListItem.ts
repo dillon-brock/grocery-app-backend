@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
-import { InsertionError, UpdateError } from '../types/errorTypes.js';
-import { ListItemFromDatabase, ListItemRows, ListItemUpdateData, NewListItemData } from '../types/listItemTypes.js';
+import { InsertionError, UpdateError } from '../types/error.js';
+import { ListItemFromDatabase, ListItemRows, ListItemUpdateData, NewListItemData } from '../types/listItem.js';
 
 export class ListItem {
   id: string;

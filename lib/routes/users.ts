@@ -2,8 +2,8 @@ import { Router, type Response, type NextFunction } from 'express';
 import { UserService } from '../services/UserService.js';
 import authenticate from '../middleware/authenticate.js';
 import { User } from '../models/User.js';
-import { AuthenticatedRequest, RequestWithBody } from '../types/extendedExpressTypes.js';
-import { UserSignInData, UserSignUpData } from '../types/userTypes.js';
+import { AuthenticatedRequest, RequestWithBody } from '../types/extendedExpress.js';
+import { UserSignInData, UserSignUpData } from '../types/user.js';
 
 export default Router()
   .post('/', async (req: RequestWithBody<UserSignUpData>, res: Response, next: NextFunction) => {
