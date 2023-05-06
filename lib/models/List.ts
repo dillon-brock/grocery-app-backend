@@ -1,7 +1,6 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
-import { CoalescedListItem } from '../types/listItem.js';
-import { CreateListParams, ListFromDatabase, ListRows, ListWithItemsFromDatabase } from '../types/list.js';
+import { CoalescedCategory, CreateListParams, ListFromDB, ListRows, ListWithItemsFromDB, ListWithItemsRows } from '../types/list.js';
 import { ListShareRows } from '../types/userList.js';
 
 export class List {
@@ -11,7 +10,7 @@ export class List {
   createdAt: string;
   updatedAt: string;
 
-  constructor(row: ListFromDatabase) {
+  constructor(row: ListFromDB) {
     this.id = row.id;
     this.ownerId = row.owner_id;
     this.title = row.title;
@@ -86,29 +85,42 @@ export class List {
 
 
 export class ListWithItems extends List {
-  items: CoalescedListItem[];
+  categories: CoalescedCategory[];
 
-  constructor(row: ListWithItemsFromDatabase) {
+  constructor(row: ListWithItemsFromDB) {
     const { id, owner_id, title, created_at, updated_at } = row;
     super({ id, owner_id, title, created_at, updated_at });
-    this.items = row.items;
+    this.categories = row.categories;
   }
 
   static async findById(id: string): Promise<ListWithItems | null> {
 
-    const { rows } = await pool.query(
+    const { rows }: ListWithItemsRows = await pool.query(
       `SELECT lists.*,
-      COALESCE(
-        json_agg(json_build_object(
-          'id', list_items.id,
-          'bought', list_items.bought,
-          'quantity', list_items.quantity,
-          'item', list_items.item
-        )) FILTER (WHERE list_items.id IS NOT NULL), '[]'
-      ) as items from lists
-      LEFT JOIN list_items ON list_items.list_id = lists.id
+      (
+        SELECT jsonb_agg(nested_category)
+        FROM (
+          SELECT categories.id::text, categories.name,
+          (
+            SELECT json_agg(nested_item)
+            FROM (
+              SELECT
+              list_items.id::text,
+              list_items.item,
+              list_items.quantity,
+              list_items.bought,
+              list_items.category_id::text AS "categoryId"
+              FROM list_items
+              WHERE list_items.category_id = categories.id
+            ) AS nested_item
+          ) AS items
+          FROM categories
+          WHERE categories.list_id = lists.id
+        ) AS nested_category
+      ) AS categories
+      FROM lists
       WHERE lists.id = $1
-      GROUP BY lists.id`,
+      `,
       [id]
     );
 

@@ -5,13 +5,13 @@ import { ErrorWithStatus } from '../types/error.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest } from '../types/extendedExpress.js';
 import { ListItemUpdateData, NewListItemData } from '../types/listItem.js';
 import authorizeItemAccess from '../middleware/authorization/item-access.js';
-import authorizeAddItem from '../middleware/authorization/add-item.js';
+import authorizeEditList from '../middleware/authorization/edit-list.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeAddItem], async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
+  .post('/', [authenticate, authorizeEditList], async (req: AuthenticatedReqBody<NewListItemData>, res: Response, next: NextFunction) => {
     try {
-      const { listId, quantity, item } = req.body;
-      const newItem = await ListItem.create({ listId, quantity, item });
+      const { listId, quantity, item, categoryId } = req.body;
+      const newItem = await ListItem.create({ listId, quantity, item, categoryId });
       res.json({ message: 'Item added successfully', item: newItem });
     }
     catch (e) {

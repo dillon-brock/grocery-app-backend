@@ -31,22 +31,33 @@ async function signUpAndGetInfo() {
   return { agent, token, user };
 }
 
-async function createList(agent: request.SuperAgentTest, token: string): Promise<string> {
+type ListData = {
+  listId: string;
+  categoryId: string;
+}
+
+async function createList(agent: request.SuperAgentTest, token: string): Promise<ListData> {
   
   const newListRes = await agent
     .post('/lists')
     .set('Authorization', `Bearer ${token}`);
+  const listId = newListRes.body.list.id;
+
+  const categoryRes = await agent.post('/categories')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ name: 'Yellow', listId });
+  const categoryId = categoryRes.body.category.id;
   
-  return newListRes.body.list.id;
+  return { listId, categoryId };
 
 }
 
-async function getNewItemId(agent: request.SuperAgentTest, token: string, listId: string): Promise<string> {
+async function getNewItemId(agent: request.SuperAgentTest, token: string, listId: string, categoryId: string): Promise<string> {
 
   const newItemRes = await agent
     .post('/list-items')
     .set('Authorization', `Bearer ${token}`)
-    .send({ ...testItem, listId });
+    .send({ ...testItem, listId, categoryId });
   
   return newItemRes.body.item.id;
 
@@ -57,23 +68,23 @@ describe('POST /list-items tests', () => {
 
   test('adds an item to a list at POST /list-items', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
+    const { listId, categoryId } = await createList(agent, token);
 
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testItem, listId });
+      .send({ ...testItem, listId, categoryId });
     
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item added successfully',
-      item: expect.objectContaining({ ...testItem })
+      item: expect.objectContaining({ ...testItem, categoryId })
     });
   });
 
   test('adds item to list from user whom list is shared with', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
+    const { listId, categoryId } = await createList(agent, token);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -89,18 +100,18 @@ describe('POST /list-items tests', () => {
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token2}`)
-      .send({ ...testItem, listId });
+      .send({ ...testItem, listId, categoryId });
     
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item added successfully',
-      item: expect.objectContaining({ ...testItem })
+      item: expect.objectContaining({ ...testItem, categoryId })
     });
   });
 
   test('gives 403 error for shared user without edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
+    const { listId, categoryId } = await createList(agent, token);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -116,18 +127,15 @@ describe('POST /list-items tests', () => {
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token2}`)
-      .send({ ...testItem, listId });
+      .send({ ...testItem, listId, categoryId });
     
     expect(res.status).toBe(403);
-    expect(res.body.message).toEqual('You are not authorized to add items to this list');
+    expect(res.body.message).toEqual('You are not authorized to edit this list');
   });
 
   test('gives a 403 error for unauthorized user adding element to list', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const newListRes = await agent
-      .post('/lists')
-      .set('Authorization', `Bearer ${token}`);
-    const listId = newListRes.body.list.id;
+    const { listId, categoryId } = await createList(agent, token);
 
     const secondUserRes = await agent
       .post('/users')
@@ -137,18 +145,19 @@ describe('POST /list-items tests', () => {
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token2}`)
-      .send({ ...testItem, listId });
+      .send({ ...testItem, listId, categoryId });
     
     expect(res.status).toBe(403);
-    expect(res.body.message).toEqual('You are not authorized to add items to this list');
+    expect(res.body.message).toEqual('You are not authorized to edit this list');
   });
 
   test('gives a 404 error for nonexistent list', async () => {
     const { agent, token } = await signUpAndGetInfo();
+    const { categoryId } = await createList(agent, token);
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testItem, listId: '2398' });
+      .send({ ...testItem, listId: '2398', categoryId });
     
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('List not found');
@@ -156,14 +165,11 @@ describe('POST /list-items tests', () => {
 
   test('gives a 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const newListRes = await agent
-      .post('/lists')
-      .set('Authorization', `Bearer ${token}`);
-    const listId = newListRes.body.list.id;
+    const { listId, categoryId } = await createList(agent, token);
 
     const res = await agent
       .post('/list-items')
-      .send({ ...testItem, listId });
+      .send({ ...testItem, listId, categoryId });
     
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
@@ -175,8 +181,8 @@ describe('PUT /list-items/:id tests', () => {
 
   test('it updates an item at PUT /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
   
     const res = await agent
       .put(`/list-items/${newItemId}`)
@@ -188,15 +194,16 @@ describe('PUT /list-items/:id tests', () => {
       message: 'Item updated successfully',
       item: expect.objectContaining({
         ...testItem,
-        bought: true
+        bought: true,
+        categoryId
       })
     });
   });
 
   test('it updates an item for shared user with edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -218,15 +225,16 @@ describe('PUT /list-items/:id tests', () => {
       message: 'Item updated successfully',
       item: expect.objectContaining({
         ...testItem,
-        bought: true
+        bought: true,
+        categoryId
       })
     });
   });
 
   it('gives a 403 error for shared user without edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -260,8 +268,8 @@ describe('PUT /list-items/:id tests', () => {
 
   test('gives 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent
       .put(`/list-items/${newItemId}`)
@@ -273,8 +281,8 @@ describe('PUT /list-items/:id tests', () => {
 
   test('gives a 403 error for unauthorized user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUserRes = await agent
       .post('/users')
@@ -297,8 +305,8 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('deletes an item at DELETE /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent
       .delete(`/list-items/${newItemId}`)
@@ -308,15 +316,16 @@ describe('DELETE /list-items/:id tests', () => {
     expect(res.body).toEqual({
       message: 'Item deleted successfully',
       listItem: expect.objectContaining({
-        ...testItem
+        ...testItem,
+        categoryId
       })
     });
   });
 
   it('deletes an item for shared user with edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -336,15 +345,16 @@ describe('DELETE /list-items/:id tests', () => {
     expect(res.body).toEqual({
       message: 'Item deleted successfully',
       listItem: expect.objectContaining({
-        ...testItem
+        ...testItem,
+        categoryId
       })
     });
   });
 
   it('gives a 403 error for shared user without edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -366,8 +376,8 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('gives a 403 error for unauthorized user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUserRes = await agent
       .post('/users')
@@ -384,8 +394,8 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('gives a 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const listId = await createList(agent, token);
-    const newItemId = await getNewItemId(agent, token, listId);
+    const { listId, categoryId } = await createList(agent, token);
+    const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent.delete(`/list-items/${newItemId}`);
 

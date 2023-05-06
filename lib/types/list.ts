@@ -1,6 +1,9 @@
-import { CoalescedListItem } from './listItem.js';
+import { Rows } from './global.js';
 
-export interface ListFromDatabase {
+export type ListRows = Rows<ListFromDB>;
+export type ListWithItemsRows = Rows<ListWithItemsFromDB>
+
+export interface ListFromDB {
   id: string;
   owner_id: string;
   title: string | null;
@@ -8,16 +11,22 @@ export interface ListFromDatabase {
   updated_at: string;
 }
 
-export interface ListRows {
-  rows: ListFromDatabase[];
+export interface CoalescedListItem {
+  id: string;
+  item: string;
+  quantity: number;
+  bought: boolean;
+  categoryId: string;
 }
 
-export interface ListWithItemsFromDatabase extends ListFromDatabase {
+export interface CoalescedCategory {
+  id: string;
+  name: string;
   items: CoalescedListItem[];
 }
 
-export type ListWithItemsRows = {
-  rows: ListWithItemsFromDatabase;
+export interface ListWithItemsFromDB extends ListFromDB {
+  categories: CoalescedCategory[];
 }
 
 export interface NewListData {

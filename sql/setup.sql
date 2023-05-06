@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS users_lists CASCADE;
 DROP TABLE IF EXISTS lists CASCADE;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS list_shares;
+DROP TABLE IF EXISTS lists_categories;
 
 CREATE TABLE users (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -35,7 +36,9 @@ CREATE TABLE list_shares (
 
 CREATE TABLE categories (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  name VARCHAR(31)
+  name VARCHAR(31) NOT NULL,
+  list_id BIGINT NOT NULL,
+  FOREIGN KEY (list_id) REFERENCES lists(id)
 );
 
 CREATE TABLE list_items (
@@ -48,4 +51,3 @@ CREATE TABLE list_items (
   FOREIGN KEY (list_id) REFERENCES lists(id),
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
-

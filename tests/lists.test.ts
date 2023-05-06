@@ -146,10 +146,25 @@ describe('GET /lists/:id tests', () => {
   beforeEach(setupDb);
 
   it('serves a list with items at GET /lists/:id', async () => {
+
+    const item = {
+      item: 'Popsicles',
+      quantity: 2
+    };
     
     const { agent, user, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
-  
+
+    const categoryRes = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Sweet Things', listId });
+    const categoryId = categoryRes.body.category.id;
+
+    const itemRes = await agent.post('/list-items')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...item, listId, categoryId });
+    const itemId = itemRes.body.item.id;
+
     const res = await agent
       .get(`/lists/${listId}`)
       .set('Authorization', `Bearer ${token}`);
@@ -157,11 +172,24 @@ describe('GET /lists/:id tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'List found',
-      list: expect.objectContaining({
-        id: expect.any(String),
+      list: {
+        id: listId,
         ownerId: user.id,
-        items: expect.any(Array)
-      })
+        categories: [{
+          id: '1',
+          name: 'Sweet Things',
+          items: [{
+            id: itemId,
+            item: 'Popsicles',
+            quantity: 2,
+            bought: false,
+            categoryId
+          }]
+        }],
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        title: null
+      }
     });
   });
 

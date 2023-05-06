@@ -2,7 +2,7 @@ import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
 import { ListRows } from '../types/list.js';
 import { UserRows } from '../types/user.js';
-import { ListShareFromDatabase, ListShareRows, NewListShareData } from '../types/userList.js';
+import { ListShareFromDB, ListShareRows, NewListShareData } from '../types/userList.js';
 import { List } from './List.js';
 import { User } from './User.js';
 
@@ -12,7 +12,7 @@ export class ListShare {
   listId: string;
   editable: boolean;
 
-  constructor(row: ListShareFromDatabase) {
+  constructor(row: ListShareFromDB) {
     this.id = row.id;
     this.userId = row.user_id;
     this.listId = row.list_id;
