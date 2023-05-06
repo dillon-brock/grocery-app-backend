@@ -1,4 +1,5 @@
-import { Rows } from './global.js';
+import { List } from '../models/List.js';
+import { Rows, SuccessResponse } from './global.js';
 
 export type ListRows = Rows<ListFromDB>;
 export type ListWithItemsRows = Rows<ListWithItemsFromDB>
@@ -35,4 +36,12 @@ export interface NewListData {
 
 export interface CreateListParams extends NewListData {
   ownerId: string;
+}
+
+export interface ListRes extends SuccessResponse {
+  list: List;
+}
+
+export interface MultipleListsRes extends SuccessResponse {
+  lists: List[];
 }

@@ -1,12 +1,15 @@
-import { type Response, type NextFunction, Router } from 'express';
+import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { List, ListWithItems } from '../models/List.js';
-import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import findListAndAuthorize from '../middleware/authorization/find-list-and-authorize.js';
-import { NewListData } from '../types/list.js';
+import { ListRes, MultipleListsRes, NewListData } from '../types/list.js';
+import { NextFunction } from 'express-serve-static-core';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedReqBody<NewListData>, res: Response, next: NextFunction) => {
+  .post('/', authenticate, async (
+    req: AuthenticatedReqBody<NewListData>, 
+    res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
       const newList: List = await List.create({ ...req.body, ownerId: req.user.id });
       res.json({ 
@@ -17,7 +20,8 @@ export default Router()
       next(e);
     }
   })
-  .get('/', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  .get('/', authenticate, async (req: AuthenticatedRequest, 
+    res: TypedResponse<MultipleListsRes>, next: NextFunction) => {
     try {
       const lists: List[] = await List.findAllByOwnerId(req.user.id);
       res.json({
@@ -28,7 +32,9 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: ListWithItems }, { id: string }>, res: Response, next: NextFunction) => {
+  .get('/:id', [authenticate, findListAndAuthorize], async (
+    req: TypedAuthenticatedRequest<{ list: ListWithItems }, { id: string }>, 
+    res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
       const { list } = req.body;
       res.json({
@@ -39,7 +45,9 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', [authenticate, findListAndAuthorize], async (req: TypedAuthenticatedRequest<{ list: List }, { id: string }>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, findListAndAuthorize], async (
+    req: TypedAuthenticatedRequest<{ list: List }, { id: string }>, 
+    res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
       const { list } = req.body;
       const deletedList: List = await list.delete();
