@@ -5,6 +5,10 @@ import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest, 
 import findListAndAuthorize from '../middleware/authorization/find-list-and-authorize.js';
 import { ListRes, MultipleListsRes, NewListData } from '../types/list.js';
 import { NextFunction } from 'express-serve-static-core';
+import { Category } from '../models/Category.js';
+
+const defaultCategories: string[] = ['Fruit', 'Vegetables', 'Dry Goods', 
+  'Canned Goods', 'Protein', 'Dairy', 'Beverages', 'Snacks'];
 
 export default Router()
   .post('/', authenticate, async (
@@ -12,6 +16,10 @@ export default Router()
     res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
       const newList: List = await List.create({ ...req.body, ownerId: req.user.id });
+      const listId = newList.id;
+      Promise.all(defaultCategories.map(category => (
+        Category.create({ name: category, listId }))));
+      
       res.json({ 
         message: 'List successfully created',
         list: newList

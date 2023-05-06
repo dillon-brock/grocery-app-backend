@@ -23,7 +23,7 @@ export interface CoalescedListItem {
 export interface CoalescedCategory {
   id: string;
   name: string;
-  items: CoalescedListItem[];
+  items: CoalescedListItem[] | null;
 }
 
 export interface ListWithItemsFromDB extends ListFromDB {

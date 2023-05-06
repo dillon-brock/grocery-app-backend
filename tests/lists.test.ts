@@ -45,7 +45,7 @@ describe('POST /lists tests', () => {
 
     const res = await agent
       .post('/lists')
-      .set('Authorization', `Breaker ${token}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ title: 'Test List' });
 
     expect(res.status).toBe(200);
@@ -58,6 +58,21 @@ describe('POST /lists tests', () => {
         updatedAt: expect.any(String),
         title: 'Test List'
       } 
+    });
+
+    const listDetailRes = await agent
+      .get(`/lists/${res.body.list.id}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(listDetailRes.body).toEqual({
+      message: 'List found',
+      list: expect.objectContaining({
+        categories: expect.arrayContaining([{
+          id: expect.any(String),
+          name: 'Fruit',
+          items: null
+        }])
+      })
     });
   });
 
@@ -175,8 +190,8 @@ describe('GET /lists/:id tests', () => {
       list: {
         id: listId,
         ownerId: user.id,
-        categories: [{
-          id: '1',
+        categories: expect.arrayContaining([{
+          id: categoryId,
           name: 'Sweet Things',
           items: [{
             id: itemId,
@@ -185,7 +200,7 @@ describe('GET /lists/:id tests', () => {
             bought: false,
             categoryId
           }]
-        }],
+        }]),
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         title: null

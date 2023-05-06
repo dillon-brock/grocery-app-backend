@@ -56,6 +56,7 @@ export class List {
   async delete(): Promise<List> {
 
     await pool.query('DELETE FROM list_items WHERE list_id = $1', [this.id]);
+    await pool.query('DELETE FROM categories WHERE list_id = $1', [this.id]);
 
     const { rows }: ListRows = await pool.query(
       `DELETE FROM lists
