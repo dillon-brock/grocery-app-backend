@@ -1,5 +1,5 @@
 import { User } from '../models/User.js';
-import { Rows } from './global.js';
+import { Rows, SuccessResponse } from './global.js';
 
 export type UserRows = Rows<UserFromDB>;
 
@@ -30,4 +30,12 @@ export type UserSignInData = {
 export type SignInResponse = {
   token: string;
   user: User;
+}
+
+export interface TokenRes extends SuccessResponse {
+  token: string;
+}
+
+export interface UserRes extends SuccessResponse {
+  user: User | null;
 }
