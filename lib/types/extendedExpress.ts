@@ -1,5 +1,5 @@
 import { type Request } from 'express';
-import { ParamsDictionary, Query } from 'express-serve-static-core';
+import { ParamsDictionary, Query, Response, Send } from 'express-serve-static-core';
 
 export interface AuthenticatedRequest extends Request {
   user?: any;
@@ -33,4 +33,8 @@ export interface RequestWithParams<T extends ParamsDictionary> extends Request {
 export interface TypedRequest<T, U extends ParamsDictionary> extends Request {
   body: T,
   params: U
+}
+
+export interface TypedResponse<T> extends Response {
+  json: Send<T, this>
 }

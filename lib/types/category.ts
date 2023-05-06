@@ -1,4 +1,4 @@
-import { Rows } from './global.js';
+import { Rows, SucessResponse } from './global.js';
 
 export type CategoryRows = Rows<CategoryFromDB>
 
@@ -16,4 +16,15 @@ export type NewCategoryData = {
 export type CategoryUpdateData = {
   id: string;
   name: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  listId: string;
+}
+
+// response types:
+export interface CategoryRes extends SucessResponse {
+  category: Category;
 }
