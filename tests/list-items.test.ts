@@ -59,7 +59,7 @@ async function getNewItemId(agent: request.SuperAgentTest, token: string, listId
     .set('Authorization', `Bearer ${token}`)
     .send({ ...testItem, listId, categoryId });
   
-  return newItemRes.body.item.id;
+  return newItemRes.body.listItem.id;
 
 }
 
@@ -78,7 +78,7 @@ describe('POST /list-items tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item added successfully',
-      item: expect.objectContaining({ ...testItem, categoryId })
+      listItem: expect.objectContaining({ ...testItem, categoryId })
     });
   });
 
@@ -105,7 +105,7 @@ describe('POST /list-items tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item added successfully',
-      item: expect.objectContaining({ ...testItem, categoryId })
+      listItem: expect.objectContaining({ ...testItem, categoryId })
     });
   });
 
@@ -192,7 +192,7 @@ describe('PUT /list-items/:id tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item updated successfully',
-      item: expect.objectContaining({
+      listItem: expect.objectContaining({
         ...testItem,
         bought: true,
         categoryId
@@ -223,7 +223,7 @@ describe('PUT /list-items/:id tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Item updated successfully',
-      item: expect.objectContaining({
+      listItem: expect.objectContaining({
         ...testItem,
         bought: true,
         categoryId

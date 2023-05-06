@@ -163,7 +163,7 @@ describe('GET /lists/:id tests', () => {
     const itemRes = await agent.post('/list-items')
       .set('Authorization', `Bearer ${token}`)
       .send({ ...item, listId, categoryId });
-    const itemId = itemRes.body.item.id;
+    const itemId = itemRes.body.listItem.id;
 
     const res = await agent
       .get(`/lists/${listId}`)

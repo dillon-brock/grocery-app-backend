@@ -1,4 +1,4 @@
-import { Rows } from './global.js';
+import { Rows, SuccessResponse } from './global.js';
 
 export type ListItemRows = Rows<ListItemFromDB>;
 export type OwnerIDRows = Rows<{ owner_id: string }>;
@@ -33,4 +33,16 @@ export type ListItemUpdateData = {
   bought?: boolean;
   quantity?: string;
   category_id?: string;
+}
+
+interface ListItem {
+  id: string;
+  bought: boolean;
+  item: string;
+  quantity: number | null;
+  categoryId: string | null;
+}
+
+export interface ListItemRes extends SuccessResponse {
+  listItem: ListItem;
 }

@@ -1,4 +1,4 @@
-import { Rows, SucessResponse } from './global.js';
+import { Rows, SuccessResponse } from './global.js';
 
 export type CategoryRows = Rows<CategoryFromDB>
 
@@ -25,6 +25,6 @@ interface Category {
 }
 
 // response types:
-export interface CategoryRes extends SucessResponse {
+export interface CategoryRes extends SuccessResponse {
   category: Category;
 }

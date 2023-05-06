@@ -2,6 +2,6 @@ export type Rows<T> = {
   rows: T[]
 }
 
-export interface SucessResponse {
+export interface SuccessResponse {
   message: string
 }
