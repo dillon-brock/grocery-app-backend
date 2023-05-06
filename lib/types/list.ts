@@ -15,7 +15,7 @@ export interface ListFromDB {
 export interface CoalescedListItem {
   id: string;
   item: string;
-  quantity: number;
+  quantity: string;
   bought: boolean;
   categoryId: string;
 }

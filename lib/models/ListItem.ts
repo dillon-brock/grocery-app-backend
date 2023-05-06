@@ -7,7 +7,7 @@ export class ListItem {
   item: string;
   listId: string;
   bought: boolean;
-  quantity: number | null;
+  quantity: string | null;
   categoryId: string | null;
 
   constructor(row: ListItemFromDB) {

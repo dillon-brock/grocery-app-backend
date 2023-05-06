@@ -164,7 +164,7 @@ describe('GET /lists/:id tests', () => {
 
     const item = {
       item: 'Popsicles',
-      quantity: 2
+      quantity: '1 box'
     };
     
     const { agent, user, token } = await signUpAndGetInfo();
@@ -196,7 +196,7 @@ describe('GET /lists/:id tests', () => {
           items: [{
             id: itemId,
             item: 'Popsicles',
-            quantity: 2,
+            quantity: '1 box',
             bought: false,
             categoryId
           }]

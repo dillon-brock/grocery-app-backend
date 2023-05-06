@@ -17,7 +17,7 @@ const testUser2 = {
 
 const testItem = {
   item: 'bananas',
-  quantity: 3,
+  quantity: '3',
 };
 
 async function signUpAndGetInfo() {

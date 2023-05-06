@@ -9,13 +9,13 @@ export type ListItemFromDB = {
   list_id: string;
   item: string;
   bought: boolean;
-  quantity: number | null;
+  quantity: string | null;
   category_id: string | null;
 };
 
 export type NewListItemData = {
   listId: string;
-  quantity: number;
+  quantity: string;
   item: string;
   categoryId: string;
 };
@@ -24,7 +24,7 @@ export type CoalescedListItem = {
   id: string;
   bought: boolean;
   item: string;
-  quantity: number | null;
+  quantity: string | null;
   categoryId: string | null;
 }
 
@@ -39,7 +39,7 @@ interface ListItem {
   id: string;
   bought: boolean;
   item: string;
-  quantity: number | null;
+  quantity: string | null;
   categoryId: string | null;
 }
 

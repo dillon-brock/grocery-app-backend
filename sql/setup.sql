@@ -46,7 +46,7 @@ CREATE TABLE list_items (
   list_id BIGINT NOT NULL,
   item VARCHAR NOT NULL,
   bought BOOLEAN NOT NULL DEFAULT FALSE,
-  quantity INT,
+  quantity VARCHAR(15),
   category_id BIGINT,
   FOREIGN KEY (list_id) REFERENCES lists(id),
   FOREIGN KEY (category_id) REFERENCES categories(id)
