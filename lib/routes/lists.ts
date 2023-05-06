@@ -17,7 +17,7 @@ export default Router()
     try {
       const newList: List = await List.create({ ...req.body, ownerId: req.user.id });
       const listId = newList.id;
-      Promise.all(defaultCategories.map(category => (
+      await Promise.all(defaultCategories.map(category => (
         Category.create({ name: category, listId }))));
       
       res.json({ 
