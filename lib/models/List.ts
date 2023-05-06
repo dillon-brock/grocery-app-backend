@@ -98,11 +98,11 @@ export class ListWithItems extends List {
 
     const { rows }: ListWithItemsRows = await pool.query(
       `SELECT lists.*,
-      (
+      COALESCE((
         SELECT jsonb_agg(nested_category)
         FROM (
           SELECT categories.id::text, categories.name,
-          (
+          COALESCE((
             SELECT json_agg(nested_item)
             FROM (
               SELECT
@@ -114,11 +114,11 @@ export class ListWithItems extends List {
               FROM list_items
               WHERE list_items.category_id = categories.id
             ) AS nested_item
-          ) AS items
+          ), '[]') AS items
           FROM categories
           WHERE categories.list_id = lists.id
         ) AS nested_category
-      ) AS categories
+      ), '[]') AS categories
       FROM lists
       WHERE lists.id = $1
       `,

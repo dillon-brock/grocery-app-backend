@@ -70,7 +70,7 @@ describe('POST /lists tests', () => {
         categories: expect.arrayContaining([{
           id: expect.any(String),
           name: 'Fruit',
-          items: null
+          items: []
         }])
       })
     });
