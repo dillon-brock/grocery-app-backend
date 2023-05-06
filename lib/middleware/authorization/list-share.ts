@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express-serve-static-core';
 import { AuthenticatedReqBody } from '../../types/extendedExpress.js';
-import { NewListShareData } from '../../types/userList.js';
+import { NewListShareData } from '../../types/listShare.js';
 import { List } from '../../models/List.js';
 import { ErrorWithStatus } from '../../types/error.js';
 

@@ -2,7 +2,7 @@ import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
 import { ListRows } from '../types/list.js';
 import { UserRows } from '../types/user.js';
-import { ListShareFromDB, ListShareRows, NewListShareData } from '../types/userList.js';
+import { ListShareFromDB, ListShareRows, NewListShareData } from '../types/listShare.js';
 import { List } from './List.js';
 import { User } from './User.js';
 

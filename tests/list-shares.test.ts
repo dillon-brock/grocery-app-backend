@@ -261,7 +261,7 @@ describe('DELETE /list-shares test', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       message: 'Stopped sharing list successfully',
-      deletedShareData: expect.objectContaining({
+      shareData: expect.objectContaining({
         id: shareId,
         userId: sharedUserId
       })

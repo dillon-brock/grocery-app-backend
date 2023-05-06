@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery } from '../types/extendedExpress.js';
-import { NewListShareData } from '../types/userList.js';
-import { NextFunction, Response } from 'express-serve-static-core';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedResponse } from '../types/extendedExpress.js';
+import { ListShareRes, NewListShareData, SharedListsRes, SharedUsersRes } from '../types/listShare.js';
+import { NextFunction } from 'express-serve-static-core';
 import { ListShare } from '../models/ListShare.js';
 import authenticate from '../middleware/authenticate.js';
 import { ErrorWithStatus } from '../types/error.js';
@@ -12,7 +12,9 @@ import authorizeGetSharedUsers from '../middleware/authorization/get-shared-user
 import authorizeDeleteListShare from '../middleware/authorization/delete-list-share.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeListShare], async (req: AuthenticatedReqBody<NewListShareData>, res: Response, next: NextFunction) => {
+  .post('/', [authenticate, authorizeListShare], async (
+    req: AuthenticatedReqBody<NewListShareData>, 
+    res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {
       const otherUser = await User.findById(req.body.userId);
       if (!otherUser) throw new ErrorWithStatus('User not found', 404);
@@ -26,7 +28,9 @@ export default Router()
       next(e);
     }
   })
-  .get('/lists', [authenticate, authorizeGetSharedLists], async (req: AuthenticatedReqQuery<{ userId: string }>, res: Response, next: NextFunction) => {
+  .get('/lists', [authenticate, authorizeGetSharedLists], async (
+    req: AuthenticatedReqQuery<{ userId: string }>, 
+    res: TypedResponse<SharedListsRes>, next: NextFunction) => {
     try {
       const sharedLists = await ListShare.findListsByUserId(req.query.userId);
       res.json({
@@ -37,7 +41,9 @@ export default Router()
       next(e);
     }
   })
-  .get('/users', [authenticate, authorizeGetSharedUsers], async (req: AuthenticatedReqQuery<{ listId: string }>, res: Response, next: NextFunction) => {
+  .get('/users', [authenticate, authorizeGetSharedUsers], async (
+    req: AuthenticatedReqQuery<{ listId: string }>, 
+    res: TypedResponse<SharedUsersRes>, next: NextFunction) => {
     try {
       const users = await ListShare.findUsersByListId(req.query.listId);
       res.json({
@@ -48,12 +54,14 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', [authenticate, authorizeDeleteListShare], async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
+  .delete('/:id', [authenticate, authorizeDeleteListShare], async (
+    req: AuthenticatedReqParams<{id: string}>, 
+    res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {
       const deletedShare = await ListShare.deleteById(req.params.id);
       res.json({
         message: 'Stopped sharing list successfully',
-        deletedShareData: deletedShare
+        shareData: deletedShare
       });
     } catch (e) {
       next(e);

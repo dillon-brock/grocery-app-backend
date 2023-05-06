@@ -1,7 +1,7 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
 import { CoalescedCategory, CreateListParams, ListFromDB, ListRows, ListWithItemsFromDB, ListWithItemsRows } from '../types/list.js';
-import { ListShareRows } from '../types/userList.js';
+import { ListShareRows } from '../types/listShare.js';
 
 export class List {
   id: string;
