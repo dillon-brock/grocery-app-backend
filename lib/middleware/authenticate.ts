@@ -16,8 +16,11 @@ export default async (req: AuthenticatedRequest, res: Response, next: NextFuncti
       }
     }
     else {
+      const firstTerm = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
-      if (!token) throw new ErrorWithStatus('Invalid token', 401);
+      if (!token || firstTerm != 'Bearer') {
+        throw new ErrorWithStatus('Invalid token', 401);
+      }
 
       let decodedToken: jwt.JwtPayload | string;
       try {

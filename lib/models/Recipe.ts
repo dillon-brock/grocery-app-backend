@@ -31,4 +31,15 @@ export class Recipe {
     if (!rows[0]) throw new InsertionError('recipes');
     return new Recipe(rows[0]);
   }
+
+  static async findByUserId(userId: string): Promise<Recipe[]> {
+
+    const { rows }: RecipeRows = await pool.query(
+      `SELECT * FROM recipes
+      WHERE user_id = $1`,
+      [userId]
+    );
+
+    return rows.map(row => new Recipe(row));
+  }
 }
