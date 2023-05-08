@@ -35,7 +35,14 @@ export class ListItem {
   async update(data: ListItemUpdateData): Promise<ListItem> {
 
     const query = `UPDATE list_items SET
-    ${Object.entries(data).map(([k, v]) => `${k} = ${v}`).join(', ')}
+    ${Object.entries(data)
+    .map(([k, v]) => {
+      let newVal: string = `${v}`;
+      if (v.toString().includes(' ')) {
+        newVal = `'${v}'`;
+      }
+      return `${k} = ` + newVal;
+    }).join(', ')}
     WHERE id = $1
     RETURNING *`;
 
