@@ -69,7 +69,7 @@ export class List {
     return new List(rows[0]);
   }
 
-  async checkIfSharedWithUser(userId: string): Promise<boolean> {
+  async checkIfUserCanEdit(userId: string): Promise<boolean> {
 
     const { rows }: ListShareRows = await pool.query(
       `SELECT list_shares.* FROM lists
@@ -80,6 +80,18 @@ export class List {
 
     if (!rows[0]) return false;
     return rows[0].editable;
+  }
+
+  async checkIfUserCanView(userId: string): Promise<boolean> {
+
+    const { rows }: ListShareRows = await pool.query(
+      `SELECT list_shares.* FROM lists
+      INNER JOIN list_shares ON list_shares.list_id = lists.id
+      WHERE lists.id = $1 AND list_shares.user_id = $2`,
+      [this.id, userId]
+    );
+
+    return !!rows[0];
   }
 
 }

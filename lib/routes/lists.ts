@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { List, ListWithItems } from '../models/List.js';
-import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import findListAndAuthorize from '../middleware/authorization/find-list-and-authorize.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import authorizeListAccess from '../middleware/authorization/list-access.js';
 import { ListRes, MultipleListsRes, NewListData } from '../types/list.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Category } from '../models/Category.js';
+import { ErrorWithStatus } from '../types/error.js';
 
 const defaultCategories: string[] = ['Fruit', 'Vegetables', 'Dry Goods', 
   'Canned Goods', 'Protein', 'Dairy', 'Beverages', 'Snacks'];
@@ -40,11 +41,12 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', [authenticate, findListAndAuthorize], async (
-    req: TypedAuthenticatedRequest<{ list: ListWithItems }, { id: string }>, 
+  .get('/:id', [authenticate, authorizeListAccess], async (
+    req: AuthenticatedReqParams<{ id: string }>, 
     res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
-      const { list } = req.body;
+      const list = await ListWithItems.findById(req.params.id);
+      if (!list) throw new ErrorWithStatus('List not found', 404);
       res.json({
         message: 'List found',
         list
@@ -53,11 +55,14 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', [authenticate, findListAndAuthorize], async (
-    req: TypedAuthenticatedRequest<{ list: List }, { id: string }>, 
+  .delete('/:id', [authenticate, authorizeListAccess], async (
+    req: AuthenticatedReqParams<{ id: string }>, 
     res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
-      const { list } = req.body;
+      const list = await List.findById(req.params.id);
+      if (!list) {
+        throw new ErrorWithStatus('List not found', 404);
+      }
       const deletedList: List = await list.delete();
       res.json({
         message: 'List deleted successfully',
