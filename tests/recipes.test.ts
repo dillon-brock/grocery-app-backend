@@ -91,5 +91,12 @@ describe('GET /recipes test', () => {
     });
   });
 
+  it('gives a 401 error for unauthenticated user', async () => {
+    const res = await request(app)
+      .get('/recipes');
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
 });
 

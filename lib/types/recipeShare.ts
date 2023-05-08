@@ -1,0 +1,14 @@
+import { Rows } from './global.js';
+
+export type RecipeShareFromDB = {
+  id: string;
+  recipe_id: string;
+  user_id: string;
+}
+
+export type RecipeShareRows = Rows<RecipeShareFromDB>;
+
+export type NewRecipeShareData = {
+  recipeId: string;
+  userId: string;
+}

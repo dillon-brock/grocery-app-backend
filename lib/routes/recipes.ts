@@ -9,7 +9,7 @@ export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeBody>, 
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {
-      const newRecipe = await Recipe.create({ ...req.body, userId: req.user.id });
+      const newRecipe = await Recipe.create({ ...req.body, ownerId: req.user.id });
       res.json({
         message: 'Recipe created successfully',
         recipe: newRecipe

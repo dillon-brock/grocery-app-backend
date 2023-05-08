@@ -3,7 +3,7 @@ import { Rows, SuccessResponse } from './global.js';
 
 export type RecipeFromDB = {
   id: string;
-  user_id: string;
+  owner_id: string;
   name: string;
   description: string;
   created_at: string;
@@ -18,7 +18,7 @@ export interface NewRecipeBody {
 }
 
 export interface NewRecipeData extends NewRecipeBody {
-  userId: string;
+  ownerId: string;
 }
 
 export interface RecipeRes extends SuccessResponse {

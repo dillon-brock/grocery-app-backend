@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS list_shares;
 DROP TABLE IF EXISTS lists_categories;
 DROP TABLE IF EXISTS recipes CASCADE;
+DROP TABLE IF EXISTS recipe_shares CASCADE;
 DROP TABLE IF EXISTS ingredients;
 DROP TABLE IF EXISTS recipe_steps;
 
@@ -57,12 +58,12 @@ CREATE TABLE list_items (
 
 CREATE TABLE recipes (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id BIGINT NOT NULL,
+  owner_id BIGINT NOT NULL,
   name VARCHAR NOT NULL,
   description VARCHAR,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
 CREATE TABLE ingredients (
@@ -79,4 +80,13 @@ CREATE TABLE recipe_steps (
   recipe_id BIGINT NOT NULL,
   description VARCHAR NOT NULL,
   FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+);
+
+CREATE TABLE recipe_shares (
+  id BIGINT GENERATED ALWAYS AS IDENTITY,
+  recipe_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  editable BOOLEAN NOT NULL DEFAULT FALSE,
+  FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
