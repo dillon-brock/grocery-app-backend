@@ -1,11 +1,18 @@
 import { setupDb } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
+import { UserService } from '../lib/services/UserService.js';
 
 const testUser = {
   email: 'test@user.com',
   password: '123456',
   username: 'test_user'
+};
+
+const testUser2 = {
+  email: 'test2@user.com',
+  password: 'password',
+  username: 'second_user'
 };
 
 const testRecipe = {
@@ -132,6 +139,36 @@ describe('GET /recipes/:id tests', () => {
     });
   });
 
+  it('gets a recipe by id for user with view access', async () => {
+    const { agent, token, userId } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const secondUser = await UserService.create(testUser2);
+
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, userId: secondUser.id });
+
+    const signInRes = await agent.post('/users/sessions')
+      .send(testUser2);
+    const { token: token2 } = signInRes.body;
+
+    const res = await agent.get(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Recipe found',
+      recipe: {
+        ...testRecipe,
+        id: recipeId,
+        ownerId: userId,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String)
+      }
+    });
+  });
+
   it('gives a 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUp();
     const recipeId = await createRecipe(agent, token);
@@ -140,6 +177,31 @@ describe('GET /recipes/:id tests', () => {
     
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const signUpRes = await agent.post('/users')
+      .send(testUser2);
+    const { token: token2 } = signUpRes.body;
+
+    const res = await agent.get(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You do not have access to this recipe');
+  });
+
+  it('gives a 404 error for nonexistent recipe', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.get('/recipes/56891')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Recipe not found');
   });
 });
 
