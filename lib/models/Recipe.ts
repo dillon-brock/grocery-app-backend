@@ -7,12 +7,16 @@ export class Recipe {
   userId: string;
   name: string;
   description: string | null;
+  createdAt: string;
+  updatedAt: string;
 
   constructor(row: RecipeFromDB) {
     this.id = row.id;
     this.userId = row.user_id;
     this.name = row.name;
     this.description = row.description;
+    this.createdAt = row.created_at;
+    this.updatedAt = row.updated_at;
   }
 
   static async create({ userId, name, description }: NewRecipeData): Promise<Recipe> {
