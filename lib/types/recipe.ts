@@ -22,7 +22,7 @@ export interface NewRecipeData extends NewRecipeBody {
 }
 
 export interface RecipeRes extends SuccessResponse {
-  recipe: Recipe
+  recipe: Recipe | null;
 }
 
 export interface MultipleRecipesRes extends SuccessResponse {

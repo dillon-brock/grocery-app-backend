@@ -13,7 +13,7 @@ const testRecipe = {
   description: 'so cheesy and delicious'
 };
 
-type AuthAgentData = {
+interface AuthAgentData {
   agent: request.SuperAgentTest;
   token: string;
   userId: string;
@@ -32,6 +32,15 @@ const signUp = async (): Promise<AuthAgentData> => {
   return { agent, token, userId }; 
 };
 
+
+const createRecipe = async (agent: request.SuperAgentTest, token: string): Promise<string>  => {
+  const newRecipeRes = await agent.post('/recipes')
+    .set('Authorization', `Bearer ${token}`)
+    .send(testRecipe);
+
+  return newRecipeRes.body.recipe.id;
+};
+
 describe('POST /recipes tests', () => {
   beforeEach(setupDb);
 
@@ -48,7 +57,7 @@ describe('POST /recipes tests', () => {
       recipe: {
         ...testRecipe,
         id: expect.any(String),
-        userId,
+        ownerId: userId,
         createdAt: expect.any(String),
         updatedAt: expect.any(String)
       }
@@ -85,7 +94,7 @@ describe('GET /recipes test', () => {
     expect(res.body.recipes[0]).toEqual({
       ...testRecipe,
       id: expect.any(String),
-      userId,
+      ownerId: userId,
       createdAt: expect.any(String),
       updatedAt: expect.any(String)
     });
@@ -97,6 +106,26 @@ describe('GET /recipes test', () => {
 
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gets a recipe by id at GET /recipes/:id', async () => {
+    const { agent, token, userId } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.get(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Recipe found',
+      recipe: {
+        ...testRecipe,
+        id: recipeId,
+        ownerId: userId,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String)
+      }
+    });
   });
 });
 

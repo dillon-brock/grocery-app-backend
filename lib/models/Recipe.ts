@@ -4,7 +4,7 @@ import { NewRecipeData, RecipeFromDB, RecipeRows } from '../types/recipe.js';
 
 export class Recipe {
   id: string;
-  userId: string;
+  ownerId: string;
   name: string;
   description: string | null;
   createdAt: string;
@@ -12,7 +12,7 @@ export class Recipe {
 
   constructor(row: RecipeFromDB) {
     this.id = row.id;
-    this.userId = row.owner_id;
+    this.ownerId = row.owner_id;
     this.name = row.name;
     this.description = row.description;
     this.createdAt = row.created_at;
@@ -41,5 +41,17 @@ export class Recipe {
     );
 
     return rows.map(row => new Recipe(row));
+  }
+
+  static async findById(id: string): Promise<Recipe | null> {
+
+    const { rows }: RecipeRows = await pool.query(
+      `SELECT * FROM recipes
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    return new Recipe(rows[0]);
   }
 }
