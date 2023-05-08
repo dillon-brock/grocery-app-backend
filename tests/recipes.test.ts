@@ -107,6 +107,10 @@ describe('GET /recipes test', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
+});
+
+describe('GET /recipes/:id tests', () => {
+  beforeEach(setupDb);
 
   it('gets a recipe by id at GET /recipes/:id', async () => {
     const { agent, token, userId } = await signUp();
@@ -126,6 +130,16 @@ describe('GET /recipes test', () => {
         updatedAt: expect.any(String)
       }
     });
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.get(`/recipes/${recipeId}`);
+    
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });
 

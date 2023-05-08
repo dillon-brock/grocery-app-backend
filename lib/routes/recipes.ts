@@ -4,6 +4,7 @@ import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, Typ
 import { MultipleRecipesRes, NewRecipeBody, RecipeRes } from '../types/recipe.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Recipe } from '../models/Recipe.js';
+import authorizeRecipeAccess from '../middleware/authorization/recipe-access.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeBody>, 
@@ -30,7 +31,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', authenticate, async(req: AuthenticatedReqParams<{id: string}>, 
+  .get('/:id', [authenticate, authorizeRecipeAccess], async(req: AuthenticatedReqParams<{id: string}>, 
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {
       const recipe = await Recipe.findById(req.params.id);

@@ -54,4 +54,16 @@ export class Recipe {
     if (!rows[0]) return null;
     return new Recipe(rows[0]);
   }
+
+  async checkIfUserCanView(userId: string): Promise<boolean> {
+
+    const { rows } = await pool.query(
+      `SELECT recipe_shares.* FROM recipes
+      INNER JOIN recipe_shares ON recipe_shares.recipe_id = recipes.id
+      WHERE recipes.id = $1 AND recipe_shares.user_id = $2`,
+      [this.id, userId]
+    );
+
+    return !!rows[0];
+  }
 }
