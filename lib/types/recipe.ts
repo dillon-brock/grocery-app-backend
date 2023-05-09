@@ -29,4 +29,8 @@ export interface MultipleRecipesRes extends SuccessResponse {
   recipes: Recipe[]
 }
 
+export interface UpdateRecipeData {
+  name?: string;
+  description?: string;
+}
 

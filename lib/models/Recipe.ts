@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/error.js';
-import { NewRecipeData, RecipeFromDB, RecipeRows } from '../types/recipe.js';
+import { InsertionError, UpdateError } from '../types/error.js';
+import { NewRecipeData, RecipeFromDB, RecipeRows, UpdateRecipeData } from '../types/recipe.js';
 
 export class Recipe {
   id: string;
@@ -52,6 +52,26 @@ export class Recipe {
     );
 
     if (!rows[0]) return null;
+    return new Recipe(rows[0]);
+  }
+
+  static async updateById(id: string, data: UpdateRecipeData): Promise<Recipe> {
+
+    const query = `UPDATE recipes SET
+    ${Object.entries(data)
+    .map(([k, v]) => {
+      let newVal: string = `${v}`;
+      if (typeof v == 'string') {
+        newVal = `'${v}'`;
+      }
+      return `${k} = ` + newVal;
+    }).join(', ')}
+      WHERE id = $1
+      RETURNING *`;
+    
+    const { rows }: RecipeRows = await pool.query(query, [id]);
+
+    if (!rows[0]) throw new UpdateError('recipes');
     return new Recipe(rows[0]);
   }
 

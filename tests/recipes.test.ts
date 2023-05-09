@@ -205,3 +205,29 @@ describe('GET /recipes/:id tests', () => {
   });
 });
 
+describe('PUT /recipes/:id tests', () => {
+  beforeEach(setupDb);
+
+  it('updates a recipe at PUT /recipes/:id', async () => {
+    const { agent, token, userId } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.put(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Macaroni' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Recipe updated successfully',
+      recipe: {
+        name: 'Macaroni',
+        description: testRecipe.description,
+        id: expect.any(String),
+        ownerId: userId,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String)
+      }
+    });
+  });
+});
+

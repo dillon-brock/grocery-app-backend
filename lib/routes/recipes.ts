@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { MultipleRecipesRes, NewRecipeBody, RecipeRes } from '../types/recipe.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Recipe } from '../models/Recipe.js';
@@ -31,13 +31,26 @@ export default Router()
       next(e);
     }
   })
-  .get('/:id', [authenticate, authorizeRecipeAccess], async(req: AuthenticatedReqParams<{id: string}>, 
+  .get('/:id', [authenticate, authorizeRecipeAccess], async (req: AuthenticatedReqParams<{id: string}>, 
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {
       const recipe = await Recipe.findById(req.params.id);
       res.json({
         message: 'Recipe found',
         recipe
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .put('/:id', authenticate, async (
+    req: TypedAuthenticatedRequest<{}, {id: string}>,
+    res: TypedResponse<RecipeRes>, next: NextFunction) => {
+    try {
+      const updatedRecipe = await Recipe.updateById(req.params.id, req.body);
+      res.json({
+        message: 'Recipe updated successfully',
+        recipe: updatedRecipe
       });
     } catch (e) {
       next(e);
