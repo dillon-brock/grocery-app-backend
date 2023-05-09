@@ -2,7 +2,9 @@ import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
 import { RecipeRows } from '../types/recipe.js';
 import { NewRecipeShareData, RecipeShareFromDB, RecipeShareRows } from '../types/recipeShare.js';
+import { UserRows } from '../types/user.js';
 import { Recipe } from './Recipe.js';
+import { User } from './User.js';
 
 export class RecipeShare {
   id: string;
@@ -40,5 +42,17 @@ export class RecipeShare {
     );
 
     return rows.map(row => new Recipe(row));
+  }
+
+  static async findUsersByRecipeId(recipeId: string): Promise<User[]> {
+
+    const { rows }: UserRows = await pool.query(
+      `SELECT users.username, users.email FROM recipe_shares
+      INNER JOIN users ON users.id = recipe_shares.user_id
+      WHERE recipe_shares.recipe_id = $1`,
+      [recipeId]
+    );
+
+    return rows.map(row => new User(row));
   }
 }

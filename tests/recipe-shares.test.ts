@@ -119,3 +119,28 @@ describe('GET /recipe-shares/recipes tests', () => {
     });
   });
 });
+
+describe('GET /recipe-shares/users tests', () => {
+  beforeEach(setupDb);
+
+  test('gets list of users with access to list at GET /recipe-shares/users', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const secondUser = await UserService.create(testUser2);
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, userId: secondUser.id, editable: true });
+
+    const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Shared users found',
+      users: expect.any(Array)
+    });
+    expect(res.body.users[0]).toEqual({ 
+      email: testUser2.email,
+      username: testUser2.username
+    });
+  });
+});

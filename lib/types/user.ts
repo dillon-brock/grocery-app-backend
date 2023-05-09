@@ -39,3 +39,7 @@ export interface TokenRes extends SuccessResponse {
 export interface UserRes extends SuccessResponse {
   user: User | null;
 }
+
+export interface MultipleUserRes extends SuccessResponse {
+  users: User[];
+}
