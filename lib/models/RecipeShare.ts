@@ -6,11 +6,13 @@ export class RecipeShare {
   id: string;
   recipeId: string;
   userId: string;
+  editable: boolean;
 
   constructor(row: RecipeShareFromDB) {
     this.id = row.id;
     this.recipeId = row.recipe_id;
     this.userId = row.user_id;
+    this.editable = row.editable;
   }
 
   static async create({ recipeId, userId }: NewRecipeShareData): Promise<RecipeShare> {

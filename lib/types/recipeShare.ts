@@ -5,6 +5,7 @@ export type RecipeShareFromDB = {
   id: string;
   recipe_id: string;
   user_id: string;
+  editable: boolean;
 }
 
 export type RecipeShareRows = Rows<RecipeShareFromDB>;

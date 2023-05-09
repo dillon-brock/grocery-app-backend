@@ -43,7 +43,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (
+  .put('/:id', [authenticate, authorizeRecipeAccess], async (
     req: TypedAuthenticatedRequest<{}, {id: string}>,
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {

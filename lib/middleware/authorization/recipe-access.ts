@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express-serve-static-core';
 import { AuthenticatedReqParams } from '../../types/extendedExpress.js';
 import { Recipe } from '../../models/Recipe.js';
 import { ErrorWithStatus } from '../../types/error.js';
+import { Permissions } from '../../types/global.js';
 
 export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
 
@@ -10,9 +11,23 @@ export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, 
     if (!recipe) {
       throw new ErrorWithStatus('Recipe not found', 404);
     }
-    const userCanView = await recipe.checkIfUserCanView(req.user.id);
+    if (recipe.ownerId == req.user.id) {
+      next();
+    }
 
-    if (recipe.ownerId != req.user.id && !userCanView) {
+    const userPermissions: Permissions = await recipe.checkUserPermissions(req.user.id);
+    let authorized: boolean;
+    if (req.method == 'GET') {
+      authorized = userPermissions.view;
+    }
+    else if (req.method == 'PUT') {
+      authorized = userPermissions.edit;
+    }
+    else {
+      authorized = false;
+    }
+
+    if (!authorized) {
       throw new ErrorWithStatus('You do not have access to this recipe', 403);
     }
     next();

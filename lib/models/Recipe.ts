@@ -1,6 +1,8 @@
 import pool from '../../sql/pool.js';
 import { InsertionError, UpdateError } from '../types/error.js';
+import { Permissions } from '../types/global.js';
 import { NewRecipeData, RecipeFromDB, RecipeRows, UpdateRecipeData } from '../types/recipe.js';
+import { RecipeShareRows } from '../types/recipeShare.js';
 
 export class Recipe {
   id: string;
@@ -75,15 +77,18 @@ export class Recipe {
     return new Recipe(rows[0]);
   }
 
-  async checkIfUserCanView(userId: string): Promise<boolean> {
+  async checkUserPermissions(userId: string): Promise<Permissions> {
 
-    const { rows } = await pool.query(
+    const { rows }: RecipeShareRows = await pool.query(
       `SELECT recipe_shares.* FROM recipes
       INNER JOIN recipe_shares ON recipe_shares.recipe_id = recipes.id
       WHERE recipes.id = $1 AND recipe_shares.user_id = $2`,
       [this.id, userId]
     );
 
-    return !!rows[0];
+    return {
+      view: !!rows[0],
+      edit: rows[0] ? rows[0].editable : false
+    };
   }
 }

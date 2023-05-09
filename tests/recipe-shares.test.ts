@@ -58,6 +58,7 @@ describe('POST /recipe-shares tests', () => {
       recipeShare: {
         id: expect.any(String),
         recipeId,
+        editable: false,
         userId: secondUser.id
       }
     });
