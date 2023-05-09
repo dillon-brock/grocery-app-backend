@@ -314,5 +314,29 @@ describe('DELETE /recipes/:id tests', () => {
       }
     });
   });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const signUpRes = await agent.post('/users').send(testUser2);
+    const { token: token2 } = signUpRes.body;
+
+    const res = await agent.delete(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You do not have access to this recipe');
+  });
+
+  it('gives a 401 for unauthenticated user', async () => {
+    const { agent, token } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.delete(`/recipes/${recipeId}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
 });
 
