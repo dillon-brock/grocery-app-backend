@@ -143,4 +143,21 @@ describe('GET /recipe-shares/users tests', () => {
       username: testUser2.username
     });
   });
+
+  it('gives a 403 error for unauthorized users', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const secondUser = await UserService.create(testUser2);
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, userId: secondUser.id, editable: true });
+
+    const { token: token2 } = (await agent.post('/users/sessions')
+      .send(testUser2)).body;
+
+    const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to view this information');
+  });
 });

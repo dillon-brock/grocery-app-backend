@@ -7,6 +7,7 @@ import { RecipeShare } from '../models/RecipeShare.js';
 import { MultipleRecipesRes } from '../types/recipe.js';
 import authorizeRecipeShare from '../middleware/authorization/recipe-share.js';
 import { MultipleUserRes } from '../types/user.js';
+import authorizeGetSharedUsers from '../middleware/authorization/get-users-with-recipe-access.js';
 
 export default Router()
   .post('/', [authenticate, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
@@ -33,7 +34,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/users', authenticate, async (req: AuthenticatedReqQuery<{ recipeId: string }>,
+  .get('/users', [authenticate, authorizeGetSharedUsers], async (req: AuthenticatedReqQuery<{ recipeId: string }>,
     res: TypedResponse<MultipleUserRes>, next: NextFunction) => {
     try {
       const sharedUsers = await RecipeShare.findUsersByRecipeId(req.query.recipeId);
