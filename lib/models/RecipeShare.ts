@@ -1,5 +1,5 @@
 import pool from '../../sql/pool.js';
-import { InsertionError, UpdateError } from '../types/error.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { RecipeRows } from '../types/recipe.js';
 import { NewRecipeShareData, RecipeShareFromDB, RecipeShareRows, RecipeShareUpdateData } from '../types/recipeShare.js';
 import { UserRows } from '../types/user.js';
@@ -74,6 +74,19 @@ export class RecipeShare {
     const { rows }: RecipeShareRows = await pool.query(query, [id]);
 
     if (!rows[0]) throw new UpdateError('recipe_shares');
+    return new RecipeShare(rows[0]);
+  }
+
+  static async deleteById(id: string): Promise<RecipeShare> {
+
+    const { rows }: RecipeShareRows = await pool.query(
+      `DELETE FROM recipe_shares
+      WHERE id = $1
+      RETURNING *`,
+      [id]
+    );
+
+    if (!rows[0]) throw new DeletionError('recipe_shares');
     return new RecipeShare(rows[0]);
   }
 }

@@ -283,3 +283,26 @@ describe('PUT /recipe-shares/:id tests', () => {
     );
   });
 });
+
+
+describe('DELETE /recipe-shares/:id tests', () => {
+  beforeEach(setupDb);
+
+  it('deletes recipe share (stops sharing recipe) at DELETE /recipe-shares/:id', async () => {
+    const { agent, token, shareId, recipeId, sharedUserId } = await signUpAndShareRecipe();
+
+    const res = await agent.delete(`/recipe-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Recipe share deleted successfully',
+      recipeShare: {
+        id: shareId,
+        recipeId,
+        userId: sharedUserId,
+        editable: false
+      }
+    });
+  });
+});
