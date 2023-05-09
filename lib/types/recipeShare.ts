@@ -13,6 +13,7 @@ export type RecipeShareRows = Rows<RecipeShareFromDB>;
 export type NewRecipeShareData = {
   recipeId: string;
   userId: string;
+  editable: boolean;
 }
 
 export type RecipeShareRes = {

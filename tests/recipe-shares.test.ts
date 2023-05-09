@@ -50,7 +50,7 @@ describe('POST /recipe-shares tests', () => {
 
     const res = await agent.post('/recipe-shares')
       .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUser.id });
+      .send({ recipeId, userId: secondUser.id, editable: false });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({

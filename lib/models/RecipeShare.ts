@@ -15,13 +15,13 @@ export class RecipeShare {
     this.editable = row.editable;
   }
 
-  static async create({ recipeId, userId }: NewRecipeShareData): Promise<RecipeShare> {
+  static async create({ recipeId, userId, editable }: NewRecipeShareData): Promise<RecipeShare> {
 
     const { rows }: RecipeShareRows = await pool.query(
-      `INSERT INTO recipe_shares (user_id, recipe_id)
-      VALUES ($1, $2)
+      `INSERT INTO recipe_shares (user_id, recipe_id, editable)
+      VALUES ($1, $2, $3)
       RETURNING *`,
-      [userId, recipeId]
+      [userId, recipeId, editable]
     );
 
     if (!rows[0]) throw new InsertionError('recipe_shares');
