@@ -27,10 +27,16 @@ const testRecipe = {
   description: 'so cheesy and delicious'
 };
 
-type RecipeAgentData = {
+interface RecipeAgentData {
   agent: request.SuperAgentTest;
   token: string;
   recipeId: string;
+}
+
+interface SharedRecipeAgentData extends RecipeAgentData {
+  token2: string;
+  shareId: string;
+  sharedUserId: string;
 }
 
 async function signUpAndCreateRecipe(): Promise<RecipeAgentData> {
@@ -46,6 +52,24 @@ async function signUpAndCreateRecipe(): Promise<RecipeAgentData> {
 
   return { agent, token, recipeId };
 }
+
+async function signUpAndShareRecipe(): Promise<SharedRecipeAgentData> {
+  const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+  const secondUser = await UserService.create(testUser2);
+  const sharedUserId = secondUser.id;
+
+  const shareRes = await agent.post('/recipe-shares')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ recipeId, userId: secondUser.id, editable: false });
+  const shareId = shareRes.body.recipeShare.id;
+
+  const { token: token2 } = (await agent.post('/users/sessions')
+    .send(testUser2)).body;
+
+  return { agent, token, token2, recipeId, shareId, sharedUserId };
+}
+
 
 describe('POST /recipe-shares tests', () => {
   beforeEach(setupDb);
@@ -220,5 +244,29 @@ describe('GET /recipe-shares/users tests', () => {
       .set('Authorization', `Bearer ${token2}`);
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to view this information');
+  });
+});
+
+
+describe('PUT /recipe-shares/:id tests', () => {
+  beforeEach(setupDb);
+
+  it('updates a users permissions at PUT /recipe-shares/:id', async () => {
+    const { agent, token, shareId, recipeId, sharedUserId } = await signUpAndShareRecipe();
+
+    const res = await agent.put(`/recipe-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ editable: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Recipe share updated successfully',
+      recipeShare: {
+        id: shareId,
+        recipeId,
+        userId: sharedUserId,
+        editable: true
+      }
+    });
   });
 });

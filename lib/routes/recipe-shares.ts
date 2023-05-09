@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqQuery, AuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqQuery, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { NextFunction } from 'express-serve-static-core';
-import { NewRecipeShareData, RecipeShareRes } from '../types/recipeShare.js';
+import { NewRecipeShareData, RecipeShareRes, RecipeShareUpdateData } from '../types/recipeShare.js';
 import { RecipeShare } from '../models/RecipeShare.js';
 import { MultipleRecipesRes } from '../types/recipe.js';
 import authorizeRecipeShare from '../middleware/authorization/recipe-share.js';
@@ -41,6 +41,18 @@ export default Router()
       res.json({
         message: 'Shared users found',
         users: sharedUsers
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .put('/:id', authenticate, async (req: TypedAuthenticatedRequest<RecipeShareUpdateData, { id: string }>,
+    res: TypedResponse<RecipeShareRes>, next: NextFunction) => {
+    try {
+      const updatedRecipeShare = await RecipeShare.updateById(req.params.id, req.body);
+      res.json({
+        message: 'Recipe share updated successfully',
+        recipeShare: updatedRecipeShare
       });
     } catch (e) {
       next(e);

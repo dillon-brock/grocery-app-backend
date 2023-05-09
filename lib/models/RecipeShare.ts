@@ -1,8 +1,9 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/error.js';
+import { InsertionError, UpdateError } from '../types/error.js';
 import { RecipeRows } from '../types/recipe.js';
-import { NewRecipeShareData, RecipeShareFromDB, RecipeShareRows } from '../types/recipeShare.js';
+import { NewRecipeShareData, RecipeShareFromDB, RecipeShareRows, RecipeShareUpdateData } from '../types/recipeShare.js';
 import { UserRows } from '../types/user.js';
+import { buildUpdateQuery } from '../utils.js';
 import { Recipe } from './Recipe.js';
 import { User } from './User.js';
 
@@ -54,5 +55,14 @@ export class RecipeShare {
     );
 
     return rows.map(row => new User(row));
+  }
+
+  static async updateById(id: string, data: RecipeShareUpdateData): Promise<RecipeShare> {
+
+    const query = buildUpdateQuery('recipe_shares', data);
+    const { rows }: RecipeShareRows = await pool.query(query, [id]);
+
+    if (!rows[0]) throw new UpdateError('recipe_shares');
+    return new RecipeShare(rows[0]);
   }
 }

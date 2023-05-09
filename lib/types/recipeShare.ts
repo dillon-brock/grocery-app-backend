@@ -20,3 +20,7 @@ export type RecipeShareRes = {
   message: string;
   recipeShare: RecipeShare;
 }
+
+export type RecipeShareUpdateData = {
+  editable: boolean;
+}
