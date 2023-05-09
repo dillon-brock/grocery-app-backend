@@ -269,4 +269,17 @@ describe('PUT /recipe-shares/:id tests', () => {
       }
     });
   });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token2, shareId } = await signUpAndShareRecipe();
+
+    const res = await agent.put(`/recipe-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ editable: true });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual(
+      'You are not authorized to make changes to this information'
+    );
+  });
 });

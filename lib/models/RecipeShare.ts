@@ -33,6 +33,17 @@ export class RecipeShare {
     return new RecipeShare(rows[0]);
   }
 
+  static async findById(id: string): Promise<RecipeShare | null> {
+    const { rows }: RecipeShareRows = await pool.query(
+      `SELECT * FROM recipe_shares
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    return new RecipeShare(rows[0]);
+  }
+
   static async findRecipesByUserId(userId: string): Promise<Recipe[]> {
 
     const { rows }: RecipeRows = await pool.query(

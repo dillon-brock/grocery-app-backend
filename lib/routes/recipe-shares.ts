@@ -5,9 +5,10 @@ import { NextFunction } from 'express-serve-static-core';
 import { NewRecipeShareData, RecipeShareRes, RecipeShareUpdateData } from '../types/recipeShare.js';
 import { RecipeShare } from '../models/RecipeShare.js';
 import { MultipleRecipesRes } from '../types/recipe.js';
-import authorizeRecipeShare from '../middleware/authorization/recipe-share.js';
+import authorizeRecipeShare from '../middleware/authorization/share-recipe.js';
 import { MultipleUserRes } from '../types/user.js';
 import authorizeGetSharedUsers from '../middleware/authorization/get-users-with-recipe-access.js';
+import authorizeUpdateRecipeShare from '../middleware/authorization/update-recipe-share.js';
 
 export default Router()
   .post('/', [authenticate, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
@@ -46,7 +47,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (req: TypedAuthenticatedRequest<RecipeShareUpdateData, { id: string }>,
+  .put('/:id', [authenticate, authorizeUpdateRecipeShare], async (req: TypedAuthenticatedRequest<RecipeShareUpdateData, { id: string }>,
     res: TypedResponse<RecipeShareRes>, next: NextFunction) => {
     try {
       const updatedRecipeShare = await RecipeShare.updateById(req.params.id, req.body);
