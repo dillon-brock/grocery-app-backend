@@ -151,6 +151,20 @@ describe('GET /recipe-shares/recipes tests', () => {
       updatedAt: expect.any(String)
     });
   });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const secondUser = await UserService.create(testUser2);
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, userId: secondUser.id, editable: false });
+
+    const res = await agent.get('/recipe-shares/recipes');
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
 });
 
 describe('GET /recipe-shares/users tests', () => {
@@ -175,6 +189,20 @@ describe('GET /recipe-shares/users tests', () => {
       email: testUser2.email,
       username: testUser2.username
     });
+  });
+
+  it('gives a 401 error for unauthenticated users', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const secondUser = await UserService.create(testUser2);
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, userId: secondUser.id, editable: true });
+
+    const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
   });
 
   it('gives a 403 error for unauthorized users', async () => {
