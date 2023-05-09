@@ -55,5 +55,17 @@ export default Router()
     } catch (e) {
       next(e);
     }
-  });
+  })
+  .delete('/:id', [authenticate, authorizeRecipeAccess], async (req: AuthenticatedReqParams<{id: string}>,
+    res: TypedResponse<RecipeRes>, next: NextFunction) => {
+    try {
+      const deletedRecipe = await Recipe.deleteById(req.params.id);
+      res.json({
+        message: 'Recipe deleted successfully',
+        recipe: deletedRecipe
+      });
+    } catch (e) {
+      next(e);
+    }
+  }); 
 

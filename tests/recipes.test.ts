@@ -291,3 +291,28 @@ describe('PUT /recipes/:id tests', () => {
   });
 });
 
+
+describe('DELETE /recipes/:id tests', () => {
+  beforeEach(setupDb);
+
+  it('deletes a recipe at DELETE /recipes/:id', async () => {
+    const { agent, token, userId } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.delete(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Recipe deleted successfully',
+      recipe: {
+        ...testRecipe,
+        id: expect.any(String),
+        ownerId: userId,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String)
+      }
+    });
+  });
+});
+
