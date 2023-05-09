@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { NextFunction } from 'express-serve-static-core';
 import { NewRecipeShareData, RecipeShareRes } from '../types/recipeShare.js';
 import { RecipeShare } from '../models/RecipeShare.js';
+import { MultipleRecipesRes } from '../types/recipe.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeShareData>, 
@@ -13,6 +14,18 @@ export default Router()
       res.json({
         message: 'Recipe shared successfully',
         recipeShare: newShare
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .get('/recipes', authenticate, async (req: AuthenticatedRequest, 
+    res: TypedResponse<MultipleRecipesRes>, next: NextFunction) => {
+    try {
+      const sharedRecipes = await RecipeShare.findRecipesByUserId(req.user.id);
+      res.json({
+        message: 'Shared recipes found',
+        recipes: sharedRecipes
       });
     } catch (e) {
       next(e);

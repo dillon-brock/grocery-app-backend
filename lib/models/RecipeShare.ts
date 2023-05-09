@@ -1,6 +1,8 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
+import { RecipeRows } from '../types/recipe.js';
 import { NewRecipeShareData, RecipeShareFromDB, RecipeShareRows } from '../types/recipeShare.js';
+import { Recipe } from './Recipe.js';
 
 export class RecipeShare {
   id: string;
@@ -26,5 +28,17 @@ export class RecipeShare {
 
     if (!rows[0]) throw new InsertionError('recipe_shares');
     return new RecipeShare(rows[0]);
+  }
+
+  static async findRecipesByUserId(userId: string): Promise<Recipe[]> {
+
+    const { rows }: RecipeRows = await pool.query(
+      `SELECT recipes.* FROM recipe_shares
+      INNER JOIN recipes ON recipes.id = recipe_shares.recipe_id
+      WHERE recipe_shares.user_id = $1`,
+      [userId]
+    );
+
+    return rows.map(row => new Recipe(row));
   }
 }
