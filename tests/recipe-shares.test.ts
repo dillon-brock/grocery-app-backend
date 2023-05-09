@@ -148,16 +148,7 @@ describe('GET /recipe-shares/recipes tests', () => {
   beforeEach(setupDb);
 
   test('gets recipes shared with user at GET /recipes-shares/recipes', async () => {
-    const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const secondUser = await UserService.create(testUser2);
-    await agent.post('/recipe-shares')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUser.id, editable: false });
-
-    const signInRes = await agent.post('/users/sessions')
-      .send(testUser2);
-    const { token: token2 } = signInRes.body;
+    const { agent, token2, recipeId } = await signUpAndShareRecipe();
 
     const res = await agent.get('/recipe-shares/recipes')
       .set('Authorization', `Bearer ${token2}`);
@@ -177,12 +168,7 @@ describe('GET /recipe-shares/recipes tests', () => {
   });
 
   it('gives a 401 error for unauthenticated user', async () => {
-    const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const secondUser = await UserService.create(testUser2);
-    await agent.post('/recipe-shares')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUser.id, editable: false });
+    const { agent } = await signUpAndShareRecipe();
 
     const res = await agent.get('/recipe-shares/recipes');
 
@@ -195,12 +181,7 @@ describe('GET /recipe-shares/users tests', () => {
   beforeEach(setupDb);
 
   test('gets list of users with access to list at GET /recipe-shares/users', async () => {
-    const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const secondUser = await UserService.create(testUser2);
-    await agent.post('/recipe-shares')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUser.id, editable: true });
+    const { agent, token, recipeId } = await signUpAndShareRecipe();
 
     const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token}`);
@@ -216,12 +197,7 @@ describe('GET /recipe-shares/users tests', () => {
   });
 
   it('gives a 401 error for unauthenticated users', async () => {
-    const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const secondUser = await UserService.create(testUser2);
-    await agent.post('/recipe-shares')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUser.id, editable: true });
+    const { agent, recipeId } = await signUpAndShareRecipe();
 
     const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`);
 
@@ -230,15 +206,7 @@ describe('GET /recipe-shares/users tests', () => {
   });
 
   it('gives a 403 error for unauthorized users', async () => {
-    const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const secondUser = await UserService.create(testUser2);
-    await agent.post('/recipe-shares')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUser.id, editable: true });
-
-    const { token: token2 } = (await agent.post('/users/sessions')
-      .send(testUser2)).body;
+    const { agent, token2, recipeId } = await signUpAndShareRecipe();
 
     const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token2}`);
