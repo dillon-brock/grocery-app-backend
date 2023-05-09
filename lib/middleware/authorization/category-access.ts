@@ -15,7 +15,7 @@ export default async (req: AuthenticatedReqParams<{ id: string }>, res: Response
     if (!list) {
       throw new ErrorWithStatus('List not found', 404);
     }
-    const userHasEditAccess: boolean = await list.checkIfSharedWithUser(req.user.id);
+    const userHasEditAccess: boolean = await list.checkIfUserCanEdit(req.user.id);
 
     if (!userHasEditAccess && list.ownerId != req.user.id) {
       throw new ErrorWithStatus('You are not authorized to access this category', 403);

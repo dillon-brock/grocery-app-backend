@@ -38,7 +38,7 @@ export class ListItem {
     ${Object.entries(data)
     .map(([k, v]) => {
       let newVal: string = `${v}`;
-      if (v.toString().includes(' ')) {
+      if (typeof v == 'string') {
         newVal = `'${v}'`;
       }
       return `${k} = ` + newVal;

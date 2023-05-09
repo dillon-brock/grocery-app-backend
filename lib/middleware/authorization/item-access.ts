@@ -15,7 +15,7 @@ export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, 
     const userIsOwner = itemOwnerId == userId;
 
     const parentList = await List.findById(listItem.listId);
-    const userHasEditAccess = await parentList?.checkIfSharedWithUser(userId);
+    const userHasEditAccess = await parentList?.checkIfUserCanEdit(userId);
 
     if (!userIsOwner && !userHasEditAccess) {
       throw new ErrorWithStatus('You are not authorized to access this item', 403);

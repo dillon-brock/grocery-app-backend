@@ -11,7 +11,7 @@ export default async (req: AuthenticatedReqBody<NewListItemData>, res: Response,
     const list = await List.findById(listId);
     if (!list) throw new ErrorWithStatus('List not found', 404);
 
-    const userHasEditAccess: boolean = await list.checkIfSharedWithUser(req.user.id);
+    const userHasEditAccess: boolean = await list.checkIfUserCanEdit(req.user.id);
     if (!userHasEditAccess && req.user.id != list.ownerId) {
       throw new ErrorWithStatus('You are not authorized to edit this list', 403);
     }
