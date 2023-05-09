@@ -16,6 +16,12 @@ const testUser2 = {
   username: 'second_user'
 };
 
+const testUser3 = {
+  email: 'third@user.com',
+  password: 'password',
+  username: 'third_user'
+};
+
 const testRecipe = {
   name: 'mac and cheese',
   description: 'so cheesy and delicious'
@@ -62,6 +68,22 @@ describe('POST /recipe-shares tests', () => {
         userId: secondUser.id
       }
     });
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, recipeId } = await signUpAndCreateRecipe();
+
+    const secondUser = await UserService.create(testUser2);
+    const signUpRes = await agent.post('/users').send(testUser3);
+    const { token } = signUpRes.body;
+
+    const res = await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ userId: secondUser.id, recipeId, editable: true });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to share this recipe');
+
   });
 });
 

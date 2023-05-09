@@ -5,9 +5,10 @@ import { NextFunction } from 'express-serve-static-core';
 import { NewRecipeShareData, RecipeShareRes } from '../types/recipeShare.js';
 import { RecipeShare } from '../models/RecipeShare.js';
 import { MultipleRecipesRes } from '../types/recipe.js';
+import authorizeRecipeShare from '../middleware/authorization/recipe-share.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeShareData>, 
+  .post('/', [authenticate, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
     res: TypedResponse<RecipeShareRes>, next: NextFunction) => {
     try {
       const newShare = await RecipeShare.create(req.body);
