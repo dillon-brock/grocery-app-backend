@@ -5,6 +5,7 @@ import { IngredientRes, IngredientUpdateData, NewIngredientData } from '../types
 import { NextFunction } from 'express-serve-static-core';
 import { Ingredient } from '../models/Ingredient.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/modify-recipe-details.js';
+import authorizeEditIngredient from '../middleware/authorization/edit-ingredient.js';
 
 export default Router()
   .post('/', [authenticate, authorizeModifyRecipeDetails], async (req: AuthenticatedReqBody<NewIngredientData>, 
@@ -19,7 +20,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (req: TypedAuthenticatedRequest<IngredientUpdateData, { id: string }>,
+  .put('/:id', [authenticate, authorizeEditIngredient], async (req: TypedAuthenticatedRequest<IngredientUpdateData, { id: string }>,
     res: TypedResponse<IngredientRes>, next: NextFunction) => {
     try {
       const updatedIngredient = await Ingredient.updateById(req.params.id, req.body);
