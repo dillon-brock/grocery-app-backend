@@ -106,4 +106,24 @@ describe('PUT /recipe-steps/:id', () => {
       }
     });
   });
+
+  it('updates a recipe step for user with edit access', async () => {
+    const { agent, token, token2, recipeId } = await signUpAndShareRecipe(true);
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.put(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ detail: 'new instructions' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Step updated successfully',
+      step: {
+        ...testStep,
+        detail: 'new instructions',
+        id: stepId,
+        recipeId
+      }
+    });
+  });
 });

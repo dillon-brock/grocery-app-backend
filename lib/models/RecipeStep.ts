@@ -30,6 +30,17 @@ export class RecipeStep {
     return new RecipeStep(rows[0]);
   }
 
+  static async findById(id: string): Promise<RecipeStep | null> {
+    const { rows }: RecipeStepRows = await pool.query(
+      `SELECT * FROM recipe_steps
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    return new RecipeStep(rows[0]);
+  }
+
   static async updateById(id: string, data: StepUpdateData): Promise<RecipeStep> {
     const query: string = buildUpdateQuery('recipe_steps', data);
     const { rows }: RecipeStepRows = await pool.query(query, [id]);

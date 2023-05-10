@@ -5,6 +5,7 @@ import { NewStepReqBody, RecipeStepRes, StepUpdateData } from '../types/recipe-s
 import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
+import authorizeEditStep from '../middleware/authorization/recipe-steps/edit-step.js';
 
 export default Router()
   .post('/', [authenticate, authorizeModifyRecipeDetails], async (
@@ -20,7 +21,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (
+  .put('/:id', [authenticate, authorizeEditStep], async (
     req: TypedAuthenticatedRequest<StepUpdateData, { id: string }>,
     res: TypedResponse<RecipeStepRes>, next: NextFunction) => {
     try {
