@@ -26,4 +26,15 @@ export class Ingredient {
     if (!rows[0]) throw new InsertionError('ingredients');
     return new Ingredient(rows[0]);
   }
+
+  static async findById(id: string): Promise<Ingredient | null> {
+    const { rows }: IngredientRows = await pool.query(
+      `SELECT * FROM ingredients
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) return null;
+    return new Ingredient(rows[0]);
+  }
 }
