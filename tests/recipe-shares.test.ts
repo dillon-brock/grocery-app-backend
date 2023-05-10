@@ -80,7 +80,7 @@ describe('GET /recipe-shares/recipes tests', () => {
   beforeEach(setupDb);
 
   test('gets recipes shared with user at GET /recipes-shares/recipes', async () => {
-    const { agent, token2, recipeId } = await signUpAndShareRecipe();
+    const { agent, token2, recipeId } = await signUpAndShareRecipe(false);
 
     const res = await agent.get('/recipe-shares/recipes')
       .set('Authorization', `Bearer ${token2}`);
@@ -100,7 +100,7 @@ describe('GET /recipe-shares/recipes tests', () => {
   });
 
   it('gives a 401 error for unauthenticated user', async () => {
-    const { agent } = await signUpAndShareRecipe();
+    const { agent } = await signUpAndShareRecipe(false);
 
     const res = await agent.get('/recipe-shares/recipes');
 
@@ -113,7 +113,7 @@ describe('GET /recipe-shares/users tests', () => {
   beforeEach(setupDb);
 
   test('gets list of users with access to list at GET /recipe-shares/users', async () => {
-    const { agent, token, recipeId } = await signUpAndShareRecipe();
+    const { agent, token, recipeId } = await signUpAndShareRecipe(true);
 
     const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token}`);
@@ -129,7 +129,7 @@ describe('GET /recipe-shares/users tests', () => {
   });
 
   it('gives a 401 error for unauthenticated users', async () => {
-    const { agent, recipeId } = await signUpAndShareRecipe();
+    const { agent, recipeId } = await signUpAndShareRecipe(false);
 
     const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`);
 
@@ -138,7 +138,7 @@ describe('GET /recipe-shares/users tests', () => {
   });
 
   it('gives a 403 error for unauthorized users', async () => {
-    const { agent, token2, recipeId } = await signUpAndShareRecipe();
+    const { agent, token2, recipeId } = await signUpAndShareRecipe(false);
 
     const res = await agent.get(`/recipe-shares/users?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token2}`);
@@ -152,7 +152,7 @@ describe('PUT /recipe-shares/:id tests', () => {
   beforeEach(setupDb);
 
   it('updates a users permissions at PUT /recipe-shares/:id', async () => {
-    const { agent, token, shareId, recipeId, sharedUserId } = await signUpAndShareRecipe();
+    const { agent, token, shareId, recipeId, sharedUserId } = await signUpAndShareRecipe(false);
 
     const res = await agent.put(`/recipe-shares/${shareId}`)
       .set('Authorization', `Bearer ${token}`)
@@ -171,7 +171,7 @@ describe('PUT /recipe-shares/:id tests', () => {
   });
 
   it('gives a 403 error for unauthorized user', async () => {
-    const { agent, token2, shareId } = await signUpAndShareRecipe();
+    const { agent, token2, shareId } = await signUpAndShareRecipe(false);
 
     const res = await agent.put(`/recipe-shares/${shareId}`)
       .set('Authorization', `Bearer ${token2}`)
@@ -189,7 +189,7 @@ describe('DELETE /recipe-shares/:id tests', () => {
   beforeEach(setupDb);
 
   it('deletes recipe share (stops sharing recipe) at DELETE /recipe-shares/:id', async () => {
-    const { agent, token, shareId, recipeId, sharedUserId } = await signUpAndShareRecipe();
+    const { agent, token, shareId, recipeId, sharedUserId } = await signUpAndShareRecipe(false);
 
     const res = await agent.delete(`/recipe-shares/${shareId}`)
       .set('Authorization', `Bearer ${token}`);
@@ -207,7 +207,7 @@ describe('DELETE /recipe-shares/:id tests', () => {
   });
   
   it('gives a 401 error for unauthenticated user', async () => {
-    const { agent, shareId } = await signUpAndShareRecipe();
+    const { agent, shareId } = await signUpAndShareRecipe(false);
 
     const res = await agent.delete(`/recipe-shares/${shareId}`);
     expect(res.status).toBe(401);
@@ -215,7 +215,7 @@ describe('DELETE /recipe-shares/:id tests', () => {
   });
 
   it('gives a 403 error for unauthorized user', async () => {
-    const { agent, token2, shareId } = await signUpAndShareRecipe();
+    const { agent, token2, shareId } = await signUpAndShareRecipe(false);
 
     const res = await agent.delete(`/recipe-shares/${shareId}`)
       .set('Authorization', `Bearer ${token2}`);

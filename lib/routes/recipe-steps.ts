@@ -4,9 +4,11 @@ import { AuthReqBodyAndQuery, TypedResponse } from '../types/extendedExpress.js'
 import { NewStepReqBody, RecipeStepRes } from '../types/recipe-step.js';
 import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
+import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthReqBodyAndQuery<NewStepReqBody, { recipeId: string }>,
+  .post('/', [authenticate, authorizeModifyRecipeDetails], async (
+    req: AuthReqBodyAndQuery<NewStepReqBody, { recipeId: string }>,
     res: TypedResponse<RecipeStepRes>, next: NextFunction) => {
     try {
       const newStep = await RecipeStep.create({ ...req.body, recipeId: req.query.recipeId });

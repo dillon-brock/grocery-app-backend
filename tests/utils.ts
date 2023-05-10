@@ -247,7 +247,7 @@ interface SharedRecipeAgentData {
   sharedUserId: string;
 }
 
-export async function signUpAndShareRecipe(): Promise<SharedRecipeAgentData> {
+export async function signUpAndShareRecipe(canEdit: boolean): Promise<SharedRecipeAgentData> {
   const { agent, token, recipeId } = await signUpAndCreateRecipe();
 
   const secondUser = await UserService.create(testUser2);
@@ -255,7 +255,7 @@ export async function signUpAndShareRecipe(): Promise<SharedRecipeAgentData> {
 
   const shareRes = await agent.post('/recipe-shares')
     .set('Authorization', `Bearer ${token}`)
-    .send({ recipeId, userId: secondUser.id, editable: false });
+    .send({ recipeId, userId: secondUser.id, editable: canEdit });
   const shareId = shareRes.body.recipeShare.id;
 
   const { token: token2 } = (await agent.post('/users/sessions')
