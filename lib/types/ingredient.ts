@@ -1,4 +1,5 @@
-import { Rows } from './global.js';
+import { Ingredient } from '../models/Ingredient.js';
+import { Rows, SuccessResponse } from './global.js';
 
 export interface IngredientFromDB {
   id: string;
@@ -13,4 +14,8 @@ export interface NewIngredientData {
   recipeId: string;
   name: string;
   amount: string | null;
+}
+
+export interface IngredientRes extends SuccessResponse {
+  ingredient: Ingredient;
 }
