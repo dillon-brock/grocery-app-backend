@@ -78,7 +78,7 @@ CREATE TABLE recipe_steps (
   id BIGINT GENERATED ALWAYS AS IDENTITY,
   num INT NOT NULL,
   recipe_id BIGINT NOT NULL,
-  description VARCHAR NOT NULL,
+  detail VARCHAR NOT NULL,
   FOREIGN KEY (recipe_id) REFERENCES recipes(id)
 );
 
