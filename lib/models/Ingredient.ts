@@ -1,5 +1,5 @@
 import pool from '../../sql/pool.js';
-import { InsertionError, UpdateError } from '../types/error.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { IngredientFromDB, IngredientRows, IngredientUpdateData, NewIngredientData } from '../types/ingredient.js';
 import { buildUpdateQuery } from '../utils.js';
 
@@ -57,5 +57,19 @@ export class Ingredient {
     );
 
     return rows.map(row => new Ingredient(row));
+  }
+
+  static async deleteById(id: string): Promise<Ingredient> {
+    const { rows }: IngredientRows = await pool.query(
+      `DELETE FROM ingredients
+      WHERE id = $1
+      RETURNING *`,
+      [id]
+    );
+
+    if (!rows[0]) {
+      throw new DeletionError('ingredients');
+    }
+    return new Ingredient(rows[0]);
   }
 }

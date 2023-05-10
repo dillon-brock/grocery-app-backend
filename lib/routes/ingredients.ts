@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { IngredientRes, IngredientUpdateData, MultipleIngredientRes, NewIngredientData } from '../types/ingredient.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Ingredient } from '../models/Ingredient.js';
@@ -42,6 +42,19 @@ export default Router()
       res.json({
         message: 'Ingredient updated successfully',
         ingredient: updatedIngredient
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .delete('/:id', [authenticate, authorizeEditIngredient], async (
+    req: AuthenticatedReqParams<{id: string}>, res: TypedResponse<IngredientRes>,
+    next: NextFunction) => {
+    try {
+      const deletedIngredient = await Ingredient.deleteById(req.params.id);
+      res.json({
+        message: 'Ingredient deleted successfully',
+        ingredient: deletedIngredient
       });
     } catch (e) {
       next(e);

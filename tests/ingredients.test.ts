@@ -2,6 +2,7 @@ import { setupDb } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
+import { Ingredient } from '../lib/models/Ingredient.js';
 
 const testUser = {
   email: 'test@user.com',
@@ -305,5 +306,31 @@ describe('GET /ingredients', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Recipe not found');
+  });
+});
+
+
+describe('DELETE /ingredients/:id', () => {
+  beforeEach(setupDb);
+
+  it('deletes an ingredient at DELETE /ingredients/:id', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    const res = await agent.delete(`/ingredients/${ingredientId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Ingredient deleted successfully',
+      ingredient: {
+        ...testIngredient,
+        id: ingredientId,
+        recipeId
+      }
+    });
+
+    const ingredient = await Ingredient.findById(ingredientId);
+    expect(ingredient).toBe(null);
   });
 });
