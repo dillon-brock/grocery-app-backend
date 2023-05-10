@@ -1,52 +1,8 @@
-import { setupDb } from './utils.js';
+import { createRecipe, setupDb, signUp, testRecipe, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
 
-const testUser = {
-  email: 'test@user.com',
-  password: '123456',
-  username: 'test_user'
-};
-
-const testUser2 = {
-  email: 'test2@user.com',
-  password: 'password',
-  username: 'second_user'
-};
-
-const testRecipe = {
-  name: 'mac and cheese',
-  description: 'so cheesy and delicious'
-};
-
-interface AuthAgentData {
-  agent: request.SuperAgentTest;
-  token: string;
-  userId: string;
-}
-
-const signUp = async (): Promise<AuthAgentData> => {
-  const agent = request.agent(app);
-
-  const signUpRes = await agent.post('/users').send(testUser);
-  const { token } = signUpRes.body;
-
-  const userRes = await agent.get('/users/me')
-    .set('Authorization', `Bearer ${token}`);
-  const userId = userRes.body.user.id;
-
-  return { agent, token, userId }; 
-};
-
-
-const createRecipe = async (agent: request.SuperAgentTest, token: string): Promise<string>  => {
-  const newRecipeRes = await agent.post('/recipes')
-    .set('Authorization', `Bearer ${token}`)
-    .send(testRecipe);
-
-  return newRecipeRes.body.recipe.id;
-};
 
 describe('POST /recipes tests', () => {
   beforeEach(setupDb);

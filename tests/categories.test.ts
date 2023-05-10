@@ -1,37 +1,5 @@
-import { setupDb } from './utils.js';
-import request from 'supertest';
-import app from '../lib/app.js';
+import { setupDb, signUpAndCreateCategory, signUpAndCreateList, testUser2 } from './utils.js';
 import { UserService } from '../lib/services/UserService.js';
-
-const testUser = {
-  email: 'test@user.com',
-  password: '123456',
-  username: 'test_user'
-};
-
-const testUser2 = {
-  email: 'test2@user.com',
-  password: 'password',
-  username: 'second_user'
-};
-
-type CreateListInfo = {
-  agent: request.SuperAgentTest;
-  token: string;
-  listId: string;
-}
-
-async function signUpAndCreateList(): Promise<CreateListInfo> {
-  const agent = request.agent(app);
-  const signUpRes = await agent.post('/users').send(testUser);
-  const { token } = signUpRes.body;
-
-  const listRes = await agent.post('/lists')
-    .set('Authorization', `Bearer ${token}`);
-  const listId = listRes.body.list.id;
-
-  return { agent, token, listId };
-}
 
 describe('POST /categories tests', () => {
   beforeEach(setupDb);
@@ -200,23 +168,6 @@ describe('PUT /categories/:id tests', () => {
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });
-
-type CreateCategoryInfo = {
-  agent: request.SuperAgentTest;
-  token: string;
-  categoryId: string;
-  listId: string;
-}
-
-async function signUpAndCreateCategory(): Promise<CreateCategoryInfo> {
-  const { agent, token, listId } = await signUpAndCreateList();
-  const categoryRes = await agent.post('/categories')
-    .set('Authorization', `Bearer ${token}`)
-    .send({ name: 'Bread', listId });
-  const categoryId = categoryRes.body.category.id;
-
-  return { agent, token, categoryId, listId };
-}
 
 describe('DELETE /categories/:id tests', () => {
   beforeEach(setupDb);

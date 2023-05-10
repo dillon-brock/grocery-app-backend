@@ -1,20 +1,8 @@
 /* @jest-environment node */
-import { setupDb } from './utils.js';
+import { setupDb, testUser, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
-
-const testUser = {
-  email: 'test@user.com',
-  password: '123456',
-  username: 'test_user'
-};
-
-const testUser2 = {
-  email: 'test2@user.com',
-  password: 'password',
-  username: 'second_user'
-};
 
 describe('POST /users (sign up) tests', () => {
   beforeEach(setupDb);

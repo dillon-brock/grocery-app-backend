@@ -1,49 +1,8 @@
 /* @jest-environment node */
-import { setupDb } from './utils.js';
+import { setupDb, signUpAndGetListShareData, testUser2, testUser3 } from './utils.js';
 import request from 'supertest';
-import app from '../lib/app.js';
-import { UserService } from '../lib/services/UserService.js';
 import { User } from '../lib/models/User.js';
 import { List } from '../lib/models/List.js';
-
-const testUser = {
-  email: 'test@user.com',
-  password: '123456',
-  username: 'test_user'
-};
-
-const testUser2 = {
-  email: 'test2@user.com',
-  password: 'password',
-  username: 'second_user'
-};
-
-const testUser3 = {
-  email: 'third@user.com',
-  password: 'password',
-  username: 'third_user'
-};
-
-type ListShareRouteData = {
-  listId: string;
-  userId: string;
-  token: string;
-  agent: request.SuperAgentTest;
-}
-
-async function signUpAndGetListShareData(): Promise<ListShareRouteData> {
-  const agent = request.agent(app);
-
-  const signUpRes = await agent.post('/users').send(testUser);
-  const { token } = signUpRes.body;
-  const otherUser: User = await UserService.create(testUser2);
-  const newListRes = await agent
-    .post('/lists')
-    .set('Authorization', `Bearer ${token}`);
-  const { list } = newListRes.body;
-
-  return { listId: list.id, userId: otherUser.id, token, agent };
-}
 
 describe('POST /list-shares (share list) tests', () => {
   beforeEach(setupDb);

@@ -1,74 +1,13 @@
-import { setupDb } from './utils.js';
-import request from 'supertest';
-import app from '../lib/app.js';
+import { createListWithCategory, getNewItemId, setupDb, signUpAndGetInfo, testItem, testUser2 } from './utils.js';
 import { UserService } from '../lib/services/UserService.js';
 
-const testUser = {
-  email: 'test@user.com',
-  password: '123456',
-  username: 'test_user'
-};
-
-const testUser2 = {
-  email: 'test2@user.com',
-  password: 'password',
-  username: 'second_user'
-};
-
-const testItem = {
-  item: 'bananas',
-  quantity: '3',
-};
-
-async function signUpAndGetInfo() {
-  const agent = request.agent(app);
-  
-  const signUpRes = await agent.post('/users').send(testUser);
-  const { token } = signUpRes.body;
-  const getUserRes = await agent.get('/users/me').set('Authorization', `Bearer ${token}`);
-  const { user } = getUserRes.body;
-  
-  return { agent, token, user };
-}
-
-type ListData = {
-  listId: string;
-  categoryId: string;
-}
-
-async function createList(agent: request.SuperAgentTest, token: string): Promise<ListData> {
-  
-  const newListRes = await agent
-    .post('/lists')
-    .set('Authorization', `Bearer ${token}`);
-  const listId = newListRes.body.list.id;
-
-  const categoryRes = await agent.post('/categories')
-    .set('Authorization', `Bearer ${token}`)
-    .send({ name: 'Yellow', listId });
-  const categoryId = categoryRes.body.category.id;
-  
-  return { listId, categoryId };
-
-}
-
-async function getNewItemId(agent: request.SuperAgentTest, token: string, listId: string, categoryId: string): Promise<string> {
-
-  const newItemRes = await agent
-    .post('/list-items')
-    .set('Authorization', `Bearer ${token}`)
-    .send({ ...testItem, listId, categoryId });
-  
-  return newItemRes.body.listItem.id;
-
-}
 
 describe('POST /list-items tests', () => {
   beforeEach(setupDb);
 
   test('adds an item to a list at POST /list-items', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const res = await agent
       .post('/list-items')
@@ -84,7 +23,7 @@ describe('POST /list-items tests', () => {
 
   test('adds item to list from user whom list is shared with', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -111,7 +50,7 @@ describe('POST /list-items tests', () => {
 
   test('gives 403 error for shared user without edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const secondUser = await UserService.create(testUser2);
 
@@ -135,7 +74,7 @@ describe('POST /list-items tests', () => {
 
   test('gives a 403 error for unauthorized user adding element to list', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const secondUserRes = await agent
       .post('/users')
@@ -153,7 +92,7 @@ describe('POST /list-items tests', () => {
 
   test('gives a 404 error for nonexistent list', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { categoryId } = await createList(agent, token);
+    const { categoryId } = await createListWithCategory(agent, token);
     const res = await agent
       .post('/list-items')
       .set('Authorization', `Bearer ${token}`)
@@ -165,7 +104,7 @@ describe('POST /list-items tests', () => {
 
   test('gives a 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const res = await agent
       .post('/list-items')
@@ -181,7 +120,7 @@ describe('PUT /list-items/:id tests', () => {
 
   test('it updates an item at PUT /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
   
     const res = await agent
@@ -202,7 +141,7 @@ describe('PUT /list-items/:id tests', () => {
 
   test('it updates an item for shared user with edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
@@ -233,7 +172,7 @@ describe('PUT /list-items/:id tests', () => {
 
   it('gives a 403 error for shared user without edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
@@ -268,7 +207,7 @@ describe('PUT /list-items/:id tests', () => {
 
   test('gives 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent
@@ -281,7 +220,7 @@ describe('PUT /list-items/:id tests', () => {
 
   test('gives a 403 error for unauthorized user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUserRes = await agent
@@ -305,7 +244,7 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('deletes an item at DELETE /list-items/:id', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent
@@ -324,7 +263,7 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('deletes an item for shared user with edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
@@ -353,7 +292,7 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('gives a 403 error for shared user without edit access', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUser = await UserService.create(testUser2);
@@ -376,7 +315,7 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('gives a 403 error for unauthorized user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const secondUserRes = await agent
@@ -394,7 +333,7 @@ describe('DELETE /list-items/:id tests', () => {
 
   it('gives a 401 error for unauthenticated user', async () => {
     const { agent, token } = await signUpAndGetInfo();
-    const { listId, categoryId } = await createList(agent, token);
+    const { listId, categoryId } = await createListWithCategory(agent, token);
     const newItemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent.delete(`/list-items/${newItemId}`);
