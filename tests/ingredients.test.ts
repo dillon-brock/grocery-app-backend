@@ -276,4 +276,34 @@ describe('GET /ingredients', () => {
       }])
     });
   });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, recipeId } = await signUpAndCreateRecipe();
+    const { token2 } = await createSecondaryUser(agent);
+
+    const res = await agent.get(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to view this recipe');
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.get(`/ingredients?recipeId=${recipeId}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 404 error for nonexistent recipe', async () => {
+    const { agent, token } = await signUpAndCreateRecipe();
+
+    const res = await agent.get('/ingredients?recipeId=3895')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Recipe not found');
+  });
 });
