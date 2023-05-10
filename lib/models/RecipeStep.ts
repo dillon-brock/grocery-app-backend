@@ -15,12 +15,12 @@ export class RecipeStep {
     this.recipeId = row.recipe_id;
   }
 
-  static async create({ num, detail }: NewRecipeStepData): Promise<RecipeStep> {
+  static async create({ num, detail, recipeId }: NewRecipeStepData): Promise<RecipeStep> {
     const { rows }: RecipeStepRows = await pool.query(
-      `INSERT INTO recipe_steps (num, detail)
-      VALUES ($1, $2)
+      `INSERT INTO recipe_steps (num, detail, recipe_id)
+      VALUES ($1, $2, $3)
       RETURNING *`,
-      [num, detail]
+      [num, detail, recipeId]
     );
 
     if (!rows[0]) {

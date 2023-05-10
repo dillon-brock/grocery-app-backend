@@ -1,4 +1,5 @@
-import { Rows } from './global.js';
+import { RecipeStep } from '../models/RecipeStep.js';
+import { Rows, SuccessResponse } from './global.js';
 
 export type RecipeStepFromDB = {
   id: string;
@@ -9,7 +10,15 @@ export type RecipeStepFromDB = {
 
 export type RecipeStepRows = Rows<RecipeStepFromDB>
 
-export type NewRecipeStepData = {
+export interface NewStepReqBody {
   num: number;
   detail: string;
+}
+
+export interface NewRecipeStepData extends NewStepReqBody {
+  recipeId: string;
+}
+
+export interface RecipeStepRes extends SuccessResponse {
+  step: RecipeStep
 }

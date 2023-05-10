@@ -7,6 +7,7 @@ import categoriesRouter from './routes/categories.js';
 import recipesRouter from './routes/recipes.js';
 import recipeSharesRouter from './routes/recipe-shares.js';
 import ingredientsRouter from './routes/ingredients.js';
+import recipeStepsRouter from './routes/recipe-steps.js';
 import notFoundMiddleWare from './middleware/not-found.js';
 import errorMiddleware from './middleware/error.js';
 import cors from 'cors';
@@ -28,6 +29,7 @@ app.use('/categories', categoriesRouter);
 app.use('/recipes', recipesRouter);
 app.use('/recipe-shares', recipeSharesRouter);
 app.use('/ingredients', ingredientsRouter);
+app.use('/recipe-steps', recipeStepsRouter);
 
 // Error handling & 404 middleware for when
 // a request doesn't match any app routes
