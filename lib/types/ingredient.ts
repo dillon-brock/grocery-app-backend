@@ -19,3 +19,8 @@ export interface NewIngredientData {
 export interface IngredientRes extends SuccessResponse {
   ingredient: Ingredient;
 }
+
+export type IngredientUpdateData = {
+  name?: string;
+  amount?: string;
+}

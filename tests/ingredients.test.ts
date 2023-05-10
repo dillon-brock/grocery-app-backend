@@ -1,7 +1,6 @@
 import { setupDb } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
-import { User } from '../lib/models/User.js';
 import { UserService } from '../lib/services/UserService.js';
 
 const testUser = {
@@ -131,5 +130,40 @@ describe('POST /ingredients tests', () => {
     
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to edit this recipe');
+  });
+});
+
+
+async function addIngredient(agent: request.SuperAgentTest, token: string, recipeId: string): Promise<string> {
+  
+  const res = await agent.post('/ingredients')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ ...testIngredient, recipeId });
+
+  return res.body.ingredient.id;
+}
+
+
+describe('PUT /ingredients/:id', () => {
+  beforeEach(setupDb);
+
+  it('updates an ingredient at PUT /ingredients/:id', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    const res = await agent.put(`/ingredients/${ingredientId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'oat milk' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Ingredient updated successfully',
+      ingredient: {
+        id: ingredientId,
+        name: 'oat milk',
+        amount: '1 cup',
+        recipeId
+      }
+    });
   });
 });

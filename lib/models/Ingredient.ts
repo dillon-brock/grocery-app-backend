@@ -1,6 +1,7 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/error.js';
-import { IngredientFromDB, IngredientRows, NewIngredientData } from '../types/ingredient.js';
+import { InsertionError, UpdateError } from '../types/error.js';
+import { IngredientFromDB, IngredientRows, IngredientUpdateData, NewIngredientData } from '../types/ingredient.js';
+import { buildUpdateQuery } from '../utils.js';
 
 export class Ingredient {
   id: string;
@@ -35,6 +36,16 @@ export class Ingredient {
     );
 
     if (!rows[0]) return null;
+    return new Ingredient(rows[0]);
+  }
+
+  static async updateById(id: string, data: IngredientUpdateData): Promise<Ingredient> {
+    const query = buildUpdateQuery('ingredients', data);
+    const { rows }: IngredientRows = await pool.query(query, [id]);
+
+    if (!rows[0]) {
+      throw new UpdateError('ingredients');
+    }
     return new Ingredient(rows[0]);
   }
 }
