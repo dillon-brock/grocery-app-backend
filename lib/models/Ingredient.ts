@@ -48,4 +48,14 @@ export class Ingredient {
     }
     return new Ingredient(rows[0]);
   }
+
+  static async findByRecipeId(recipeId: string): Promise<Ingredient[]> {
+    const { rows }: IngredientRows = await pool.query(
+      `SELECT * FROM ingredients
+      WHERE recipe_id = $1`,
+      [recipeId]
+    );
+
+    return rows.map(row => new Ingredient(row));
+  }
 }

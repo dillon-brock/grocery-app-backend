@@ -231,3 +231,26 @@ describe('PUT /ingredients/:id', () => {
     expect(res.body.message).toEqual('Ingredient not found');
   });
 });
+
+
+describe('GET /ingredients', () => {
+  beforeEach(setupDb);
+
+  it('gets a list of all ingredients corresponding to recipe at GET /ingredients', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    const res = await agent.get(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Ingredients found',
+      ingredients: expect.arrayContaining([{
+        ...testIngredient,
+        id: ingredientId,
+        recipeId
+      }])
+    });
+  });
+});
