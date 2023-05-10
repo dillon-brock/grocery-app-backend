@@ -6,7 +6,7 @@ import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthReqBodyAndQuery<NewStepReqBody, { recipeId: string}>,
+  .post('/', authenticate, async (req: AuthReqBodyAndQuery<NewStepReqBody, { recipeId: string }>,
     res: TypedResponse<RecipeStepRes>, next: NextFunction) => {
     try {
       const newStep = await RecipeStep.create({ ...req.body, recipeId: req.query.recipeId });

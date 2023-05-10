@@ -1,12 +1,15 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
-import { NewIngredientData } from '../../../types/ingredient.js';
+import { AuthenticatedRequest } from '../../../types/extendedExpress.js';
 import { Recipe } from '../../../models/Recipe.js';
 import { ErrorWithStatus } from '../../../types/error.js';
 
-export default async (req: AuthenticatedReqBody<NewIngredientData>, res: Response, next: NextFunction) => {
+export default async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const recipe = await Recipe.findById(req.body.recipeId);
+    const recipeId = req.query.recipeId;
+    if (!recipeId) {
+      throw new ErrorWithStatus('Missing recipeId query parameter', 400);
+    }
+    const recipe = await Recipe.findById(recipeId as string);
     if (!recipe) {
       throw new ErrorWithStatus('Recipe not found', 404);
     }

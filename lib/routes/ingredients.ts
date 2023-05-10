@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthReqBodyAndQuery, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { IngredientRes, IngredientUpdateData, MultipleIngredientRes, NewIngredientData } from '../types/ingredient.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Ingredient } from '../models/Ingredient.js';
@@ -10,10 +10,10 @@ import authorizeViewRecipe from '../middleware/authorization/recipes/view-from-q
 
 export default Router()
   .post('/', [authenticate, authorizeModifyRecipeDetails], async (
-    req: AuthenticatedReqBody<NewIngredientData>, 
+    req: AuthReqBodyAndQuery<NewIngredientData, { recipeId: string }>, 
     res: TypedResponse<IngredientRes>, next: NextFunction) => {
     try {
-      const newIngredient = await Ingredient.create(req.body);
+      const newIngredient = await Ingredient.create({ ...req.body, recipeId: req.query.recipeId });
       res.json({
         message: 'Ingredient added successfully',
         ingredient: newIngredient

@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
-import { IngredientFromDB, IngredientRows, IngredientUpdateData, NewIngredientData } from '../types/ingredient.js';
+import { CreateIngredientParams, IngredientFromDB, IngredientRows, IngredientUpdateData } from '../types/ingredient.js';
 import { buildUpdateQuery } from '../utils.js';
 
 export class Ingredient {
@@ -16,7 +16,7 @@ export class Ingredient {
     this.amount = row.amount;
   }
 
-  static async create({ recipeId, name, amount }: NewIngredientData): Promise<Ingredient> {
+  static async create({ name, amount, recipeId }: CreateIngredientParams): Promise<Ingredient> {
     const { rows }: IngredientRows = await pool.query(
       `INSERT INTO ingredients (name, amount, recipe_id)
       VALUES ($1, $2, $3)

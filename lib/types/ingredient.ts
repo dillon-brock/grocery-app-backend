@@ -11,7 +11,6 @@ export interface IngredientFromDB {
 export type IngredientRows = Rows<IngredientFromDB>;
 
 export interface NewIngredientData {
-  recipeId: string;
   name: string;
   amount: string | null;
 }
@@ -27,4 +26,8 @@ export interface MultipleIngredientRes extends SuccessResponse {
 export type IngredientUpdateData = {
   name?: string;
   amount?: string;
+}
+
+export interface CreateIngredientParams extends NewIngredientData {
+  recipeId: string;
 }

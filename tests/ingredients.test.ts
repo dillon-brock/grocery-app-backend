@@ -8,9 +8,9 @@ describe('POST /ingredients tests', () => {
   it('adds a new ingredient at POST /ingredients', async () => {
     const { agent, token, recipeId } = await signUpAndCreateRecipe();
 
-    const res = await agent.post('/ingredients')
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testIngredient, recipeId });
+      .send({ ...testIngredient });
     
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -31,9 +31,9 @@ describe('POST /ingredients tests', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ userId: secondUserId, recipeId, editable: true });
 
-    const res = await agent.post('/ingredients')
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token2}`)
-      .send({ ...testIngredient, recipeId });
+      .send({ ...testIngredient });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -49,8 +49,8 @@ describe('POST /ingredients tests', () => {
   it('gives a 401 error for unauthenticated user', async () => {
     const { agent, recipeId } = await signUpAndCreateRecipe();
 
-    const res = await agent.post('/ingredients')
-      .send({ ...testIngredient, recipeId });
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
+      .send({ ...testIngredient });
 
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
@@ -60,9 +60,9 @@ describe('POST /ingredients tests', () => {
     const { agent, recipeId } = await signUpAndCreateRecipe();
     const { token2 } = await createSecondaryUser(agent);
 
-    const res = await agent.post('/ingredients')
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
       .set('Authorization', `Bearer ${token2}`)
-      .send({ ...testIngredient, recipeId });
+      .send({ ...testIngredient });
     
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to edit this recipe');
@@ -72,9 +72,9 @@ describe('POST /ingredients tests', () => {
 
 async function addIngredient(agent: request.SuperAgentTest, token: string, recipeId: string): Promise<string> {
   
-  const res = await agent.post('/ingredients')
+  const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
     .set('Authorization', `Bearer ${token}`)
-    .send({ ...testIngredient, recipeId });
+    .send({ ...testIngredient });
 
   return res.body.ingredient.id;
 }
