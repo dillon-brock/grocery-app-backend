@@ -253,4 +253,27 @@ describe('GET /ingredients', () => {
       }])
     });
   });
+
+  it('gets a list of ingredients for user with view access', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ userId: secondUserId, recipeId, editable: false });
+
+    const res = await agent.get(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Ingredients found',
+      ingredients: expect.arrayContaining([{
+        ...testIngredient,
+        id: ingredientId,
+        recipeId
+      }])
+    });
+  });
 });
