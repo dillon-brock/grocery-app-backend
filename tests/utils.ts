@@ -274,3 +274,13 @@ export async function createRecipe(agent: request.SuperAgentTest, token: string)
   return newRecipeRes.body.recipe.id;
 }
 
+
+// recipe steps helper functions:
+export async function createRecipeStep(agent: request.SuperAgentTest, token: string, recipeId: string): Promise<string> {
+  const newStepRes = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send(testStep);
+
+  return newStepRes.body.step.id;
+}
+

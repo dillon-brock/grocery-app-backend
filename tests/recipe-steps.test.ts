@@ -1,4 +1,4 @@
-import { setupDb, signUpAndCreateRecipe, signUpAndShareRecipe, testStep } from './utils.js';
+import { createRecipeStep, setupDb, signUpAndCreateRecipe, signUpAndShareRecipe, testStep } from './utils.js';
 
 describe('POST /recipe-steps', () => {
   beforeEach(setupDb);
@@ -80,5 +80,30 @@ describe('POST /recipe-steps', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Recipe not found');
+  });
+});
+
+
+describe('PUT /recipe-steps/:id', () => {
+  beforeEach(setupDb);
+
+  it('updates a recipe step at PUT /recipe-steps/:id', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.put(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ detail: 'new instructions' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Step updated successfully',
+      step: {
+        ...testStep,
+        detail: 'new instructions',
+        id: stepId,
+        recipeId
+      }
+    });
   });
 });

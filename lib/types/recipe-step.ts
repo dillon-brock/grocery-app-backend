@@ -22,3 +22,8 @@ export interface NewRecipeStepData extends NewStepReqBody {
 export interface RecipeStepRes extends SuccessResponse {
   step: RecipeStep
 }
+
+export interface StepUpdateData {
+  num?: number;
+  detail?: string;
+}
