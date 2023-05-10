@@ -1,9 +1,9 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqBody } from '../../types/extendedExpress.js';
-import { NewRecipeShareData } from '../../types/recipeShare.js';
-import { Recipe } from '../../models/Recipe.js';
-import { ErrorWithStatus } from '../../types/error.js';
-import { User } from '../../models/User.js';
+import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
+import { NewRecipeShareData } from '../../../types/recipeShare.js';
+import { Recipe } from '../../../models/Recipe.js';
+import { ErrorWithStatus } from '../../../types/error.js';
+import { User } from '../../../models/User.js';
 
 export default async (req: AuthenticatedReqBody<NewRecipeShareData>, 
   res: Response, next: NextFunction) => {

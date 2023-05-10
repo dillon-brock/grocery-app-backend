@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedRequest } from '../../types/extendedExpress.js';
-import { ErrorWithStatus } from '../../types/error.js';
+import { AuthenticatedRequest } from '../../../types/extendedExpress.js';
+import { ErrorWithStatus } from '../../../types/error.js';
 
 export default async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {

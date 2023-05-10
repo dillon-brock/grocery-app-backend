@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqBody } from '../../types/extendedExpress.js';
-import { NewIngredientData } from '../../types/ingredient.js';
-import { Recipe } from '../../models/Recipe.js';
-import { ErrorWithStatus } from '../../types/error.js';
+import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
+import { NewIngredientData } from '../../../types/ingredient.js';
+import { Recipe } from '../../../models/Recipe.js';
+import { ErrorWithStatus } from '../../../types/error.js';
 
 export default async (req: AuthenticatedReqBody<NewIngredientData>, res: Response, next: NextFunction) => {
   try {

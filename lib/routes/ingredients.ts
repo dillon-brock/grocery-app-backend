@@ -4,8 +4,8 @@ import { AuthenticatedReqBody, AuthenticatedReqQuery, TypedAuthenticatedRequest,
 import { IngredientRes, IngredientUpdateData, MultipleIngredientRes, NewIngredientData } from '../types/ingredient.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Ingredient } from '../models/Ingredient.js';
-import authorizeModifyRecipeDetails from '../middleware/authorization/modify-recipe-details.js';
-import authorizeEditIngredient from '../middleware/authorization/edit-ingredient.js';
+import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
+import authorizeEditIngredient from '../middleware/authorization/ingredients/edit-ingredient.js';
 
 export default Router()
   .post('/', [authenticate, authorizeModifyRecipeDetails], async (

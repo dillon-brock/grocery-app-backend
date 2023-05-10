@@ -1,9 +1,9 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { TypedAuthenticatedRequest } from '../../types/extendedExpress.js';
-import { IngredientUpdateData } from '../../types/ingredient.js';
-import { Ingredient } from '../../models/Ingredient.js';
-import { ErrorWithStatus } from '../../types/error.js';
-import { Recipe } from '../../models/Recipe.js';
+import { TypedAuthenticatedRequest } from '../../../types/extendedExpress.js';
+import { IngredientUpdateData } from '../../../types/ingredient.js';
+import { Ingredient } from '../../../models/Ingredient.js';
+import { ErrorWithStatus } from '../../../types/error.js';
+import { Recipe } from '../../../models/Recipe.js';
 
 export default async (req: TypedAuthenticatedRequest<IngredientUpdateData, { id: string }>,
   res: Response, next: NextFunction) => {

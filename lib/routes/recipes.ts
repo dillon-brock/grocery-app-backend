@@ -4,7 +4,7 @@ import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, Typ
 import { MultipleRecipesRes, NewRecipeBody, RecipeRes } from '../types/recipe.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Recipe } from '../models/Recipe.js';
-import authorizeRecipeAccess from '../middleware/authorization/recipe-access.js';
+import authorizeRecipeAccess from '../middleware/authorization/recipes/recipe-access.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeBody>, 

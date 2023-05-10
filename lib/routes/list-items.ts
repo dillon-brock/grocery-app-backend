@@ -4,8 +4,8 @@ import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/error.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { ListItemRes, ListItemUpdateData, NewListItemData } from '../types/listItem.js';
-import authorizeItemAccess from '../middleware/authorization/item-access.js';
-import authorizeEditList from '../middleware/authorization/edit-list.js';
+import authorizeItemAccess from '../middleware/authorization/list-items/item-access.js';
+import authorizeEditList from '../middleware/authorization/lists/edit-list.js';
 import { NextFunction } from 'express-serve-static-core';
 
 export default Router()
