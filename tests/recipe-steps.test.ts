@@ -38,4 +38,47 @@ describe('POST /recipe-steps', () => {
       }
     });
   });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token2, recipeId } = await signUpAndShareRecipe(false);
+
+    const res = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send(testStep);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to edit this recipe');
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+      .send(testStep);
+    
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 400 error for missing query', async () => {
+    const { agent, token } = await signUpAndCreateRecipe();
+
+    const res = await agent.post('/recipe-steps')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testStep);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Missing recipeId query parameter');
+  });
+
+  it('gives a 404 error for nonexistent recipe', async () => {
+    const { agent, token } = await signUpAndCreateRecipe();
+
+    const res = await agent.post('/recipe-steps?recipeId=786981')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testStep);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Recipe not found');
+  });
 });
