@@ -1,4 +1,4 @@
-import { createRecipe, setupDb, signUp, testRecipe, testUser2 } from './utils.js';
+import { createRecipe, createRecipeStep, setupDb, signUp, testRecipe, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
@@ -78,6 +78,7 @@ describe('GET /recipes/:id tests', () => {
   it('gets a recipe by id at GET /recipes/:id', async () => {
     const { agent, token, userId } = await signUp();
     const recipeId = await createRecipe(agent, token);
+    await createRecipeStep(agent, token, recipeId);
 
     const res = await agent.get(`/recipes/${recipeId}`)
       .set('Authorization', `Bearer ${token}`);
@@ -90,7 +91,9 @@ describe('GET /recipes/:id tests', () => {
         id: recipeId,
         ownerId: userId,
         createdAt: expect.any(String),
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
+        ingredients: expect.any(Array),
+        steps: expect.any(Array)
       }
     });
   });
@@ -120,7 +123,9 @@ describe('GET /recipes/:id tests', () => {
         id: recipeId,
         ownerId: userId,
         createdAt: expect.any(String),
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
+        ingredients: expect.any(Array),
+        steps: expect.any(Array)
       }
     });
   });
