@@ -104,7 +104,24 @@ describe('GET /recipe-steps', () => {
         recipeId
       }])
     });
-    
+  });
+
+  it('gets a list of steps for user with view access', async () => {
+    const { agent, token, token2, recipeId } = await signUpAndShareRecipe(false);
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.get(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Steps found',
+      steps: expect.arrayContaining([{
+        ...testStep,
+        id: stepId,
+        recipeId
+      }])
+    });
   });
 });
 

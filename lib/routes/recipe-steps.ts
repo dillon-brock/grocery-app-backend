@@ -6,6 +6,7 @@ import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
 import authorizeEditStep from '../middleware/authorization/recipe-steps/edit-step.js';
+import authorizeViewRecipe from '../middleware/authorization/recipes/view-from-query.js';
 
 export default Router()
   .post('/', [authenticate, authorizeModifyRecipeDetails], async (
@@ -21,7 +22,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/', authenticate, async (req: AuthenticatedReqQuery<{ recipeId: string }>,
+  .get('/', [authenticate, authorizeViewRecipe], async (req: AuthenticatedReqQuery<{ recipeId: string }>,
     res: TypedResponse<MultipleStepRes>, next: NextFunction) => {
     try {
       const steps = await RecipeStep.findByRecipeId(req.query.recipeId);
