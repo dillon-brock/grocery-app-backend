@@ -6,10 +6,10 @@ import { ListShare } from '../models/ListShare.js';
 import authenticate from '../middleware/authenticate.js';
 import { ErrorWithStatus } from '../types/error.js';
 import { User } from '../models/User.js';
-import authorizeListShare from '../middleware/authorization/list-share.js';
-import authorizeGetSharedLists from '../middleware/authorization/get-shared-lists.js';
-import authorizeGetSharedUsers from '../middleware/authorization/get-shared-users.js';
-import authorizeDeleteListShare from '../middleware/authorization/delete-list-share.js';
+import authorizeListShare from '../middleware/authorization/list-shares/list-share.js';
+import authorizeGetSharedLists from '../middleware/authorization/list-shares/get-shared-lists.js';
+import authorizeGetSharedUsers from '../middleware/authorization/list-shares/get-shared-users.js';
+import authorizeDeleteListShare from '../middleware/authorization/list-shares/delete-list-share.js';
 
 export default Router()
   .post('/', [authenticate, authorizeListShare], async (

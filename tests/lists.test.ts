@@ -1,39 +1,7 @@
-import { setupDb } from './utils.js';
+import { createList, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 
-const testUser = {
-  email: 'test@user.com',
-  password: '123456',
-  username: 'test_user'
-};
-
-const testUser2 = {
-  email: 'test2@user.com',
-  password: 'password',
-  username: 'second_user'
-};
-
-const signUpAndGetInfo = async () => {
-  const agent = request.agent(app);
-
-  const signUpRes = await agent.post('/users').send(testUser);
-  const { token } = signUpRes.body;
-  const getUserRes = await agent.get('/users/me').set('Authorization', `Bearer ${token}`);
-  const { user } = getUserRes.body;
-
-  return { agent, token, user };
-};
-
-async function createList(agent: request.SuperAgentTest, token: string): Promise<string> {
-  
-  const newListRes = await agent
-    .post('/lists')
-    .set('Authorization', `Bearer ${token}`);
-  
-  return newListRes.body.list.id;
-
-}
 
 
 describe('POST /lists tests', () => {

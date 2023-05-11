@@ -3,8 +3,8 @@ import authenticate from '../middleware/authenticate.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { MultipleRecipesRes, NewRecipeBody, RecipeRes } from '../types/recipe.js';
 import { NextFunction } from 'express-serve-static-core';
-import { Recipe } from '../models/Recipe.js';
-import authorizeRecipeAccess from '../middleware/authorization/recipe-access.js';
+import { Recipe, RecipeWithDetail } from '../models/Recipe.js';
+import authorizeRecipeAccess from '../middleware/authorization/recipes/recipe-access.js';
 
 export default Router()
   .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeBody>, 
@@ -34,7 +34,7 @@ export default Router()
   .get('/:id', [authenticate, authorizeRecipeAccess], async (req: AuthenticatedReqParams<{id: string}>, 
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {
-      const recipe = await Recipe.findById(req.params.id);
+      const recipe = await RecipeWithDetail.findById(req.params.id);
       res.json({
         message: 'Recipe found',
         recipe

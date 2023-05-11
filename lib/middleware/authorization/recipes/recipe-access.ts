@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqParams } from '../../types/extendedExpress.js';
-import { Recipe } from '../../models/Recipe.js';
-import { ErrorWithStatus } from '../../types/error.js';
-import { Permissions } from '../../types/global.js';
+import { AuthenticatedReqParams } from '../../../types/extendedExpress.js';
+import { Recipe } from '../../../models/Recipe.js';
+import { ErrorWithStatus } from '../../../types/error.js';
+import { Permissions } from '../../../types/global.js';
 
 export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {
 

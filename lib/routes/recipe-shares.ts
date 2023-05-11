@@ -5,10 +5,10 @@ import { NextFunction } from 'express-serve-static-core';
 import { NewRecipeShareData, RecipeShareRes, RecipeShareUpdateData } from '../types/recipeShare.js';
 import { RecipeShare } from '../models/RecipeShare.js';
 import { MultipleRecipesRes } from '../types/recipe.js';
-import authorizeRecipeShare from '../middleware/authorization/share-recipe.js';
+import authorizeRecipeShare from '../middleware/authorization/recipe-shares/share-recipe.js';
 import { MultipleUserRes } from '../types/user.js';
-import authorizeGetSharedUsers from '../middleware/authorization/get-users-with-recipe-access.js';
-import authorizeUpdateRecipeShare from '../middleware/authorization/update-recipe-share.js';
+import authorizeGetSharedUsers from '../middleware/authorization/recipe-shares/get-users-with-recipe-access.js';
+import authorizeUpdateRecipeShare from '../middleware/authorization/recipe-shares/update-recipe-share.js';
 
 export default Router()
   .post('/', [authenticate, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 

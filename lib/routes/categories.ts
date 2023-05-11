@@ -3,9 +3,9 @@ import authenticate from '../middleware/authenticate.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { Category } from '../models/Category.js';
 import { CategoryRes, NewCategoryData } from '../types/category.js';
-import authorizeEditList from '../middleware/authorization/edit-list.js';
+import authorizeEditList from '../middleware/authorization/lists/edit-list.js';
 import { NextFunction } from 'express-serve-static-core';
-import authorizeCategoryAccess from '../middleware/authorization/category-access.js';
+import authorizeCategoryAccess from '../middleware/authorization/categories/category-access.js';
 
 export default Router()
   .post('/', [authenticate, authorizeEditList], async (

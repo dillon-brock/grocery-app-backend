@@ -1,8 +1,10 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { Permissions } from '../types/global.js';
-import { NewRecipeData, RecipeFromDB, RecipeRows, UpdateRecipeData } from '../types/recipe.js';
+import { NewRecipeData, RecipeFromDB, RecipeRows, RecipeWithDetailFromDB, UpdateRecipeData } from '../types/recipe.js';
 import { RecipeShareRows } from '../types/recipeShare.js';
+import { Ingredient } from './Ingredient.js';
+import { RecipeStep } from './RecipeStep.js';
 
 export class Recipe {
   id: string;
@@ -103,5 +105,49 @@ export class Recipe {
       view: !!rows[0],
       edit: rows[0] ? rows[0].editable : false
     };
+  }
+}
+
+
+export class RecipeWithDetail extends Recipe {
+  ingredients: Ingredient[];
+  steps: RecipeStep[];
+
+  constructor(row: RecipeWithDetailFromDB) {
+    const { id, owner_id, name, description, updated_at, created_at } = row;
+    super({ id, owner_id, name, description, updated_at, created_at });
+    this.steps = row.steps;
+    this.ingredients = row.ingredients;
+  }
+
+  static async findById(id: string): Promise<RecipeWithDetail | null> {
+
+    const { rows } = await pool.query(
+      `SELECT 
+      recipes.*,
+      COALESCE(
+        json_agg(json_build_object(
+          'id', ingredients.id::text, 
+          'recipeId', ingredients.recipe_id::text, 
+          'name', ingredients.name,
+          'amount', ingredients.amount))
+        FILTER (WHERE ingredients.id IS NOT NULL), '[]'
+      ) as ingredients,
+      COALESCE(
+        json_agg(json_build_object(
+          'id', recipe_steps.id::text, 
+          'recipeId', recipe_steps.recipe_id::text, 
+          'num', recipe_steps.num,
+          'detail', recipe_steps.detail))
+        FILTER (WHERE recipe_steps.id IS NOT NULL), '[]'
+      ) as steps from recipes 
+      LEFT JOIN recipe_steps on recipe_steps.recipe_id = recipes.id
+      LEFT JOIN ingredients ON ingredients.recipe_id = recipes.id
+      WHERE recipes.id = $1
+      GROUP BY recipes.id`,
+      [id]
+    );
+
+    return new RecipeWithDetail(rows[0]);
   }
 }

@@ -1,4 +1,6 @@
+import { Ingredient } from '../models/Ingredient.js';
 import { Recipe } from '../models/Recipe.js';
+import { RecipeStep } from '../models/RecipeStep.js';
 import { Rows, SuccessResponse } from './global.js';
 
 export type RecipeFromDB = {
@@ -32,5 +34,10 @@ export interface MultipleRecipesRes extends SuccessResponse {
 export interface UpdateRecipeData {
   name?: string;
   description?: string;
+}
+
+export interface RecipeWithDetailFromDB extends RecipeFromDB {
+  ingredients: Ingredient[]
+  steps: RecipeStep[]
 }
 

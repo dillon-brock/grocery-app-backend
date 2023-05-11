@@ -1,6 +1,6 @@
-import { List } from '../../models/List.js';
-import { ErrorWithStatus } from '../../types/error.js';
-import { AuthenticatedReqParams } from '../../types/extendedExpress.js';
+import { List } from '../../../models/List.js';
+import { ErrorWithStatus } from '../../../types/error.js';
+import { AuthenticatedReqParams } from '../../../types/extendedExpress.js';
 import { Response, NextFunction } from 'express-serve-static-core';
 
 export default async (req: AuthenticatedReqParams<{id: string}>, res: Response, next: NextFunction) => {

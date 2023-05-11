@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqParams } from '../../types/extendedExpress.js';
-import { ListShare } from '../../models/ListShare.js';
-import { ErrorWithStatus } from '../../types/error.js';
-import { List } from '../../models/List.js';
+import { AuthenticatedReqParams } from '../../../types/extendedExpress.js';
+import { ListShare } from '../../../models/ListShare.js';
+import { ErrorWithStatus } from '../../../types/error.js';
+import { List } from '../../../models/List.js';
 
 export default async(req: AuthenticatedReqParams<{ id: string }>, res: Response, next: NextFunction) => {
   try {

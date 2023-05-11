@@ -17,6 +17,11 @@ export interface AuthenticatedReqQuery<T extends Query> extends AuthenticatedReq
   query: T
 }
 
+export interface AuthReqBodyAndQuery<T, U extends Query> extends AuthenticatedRequest {
+  body: T,
+  query: U
+}
+
 export interface TypedAuthenticatedRequest<T, U extends ParamsDictionary> extends AuthenticatedRequest {
   body: T,
   params: U
