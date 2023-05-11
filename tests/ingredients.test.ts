@@ -1,5 +1,5 @@
-import { createSecondaryUser, setupDb, signUpAndCreateRecipe, testIngredient } from './utils.js';
-import request from 'supertest';
+import { addIngredient, createSecondaryUser, setupDb, signUpAndCreateRecipe, testIngredient } from './utils.js';
+
 import { Ingredient } from '../lib/models/Ingredient.js';
 
 describe('POST /ingredients tests', () => {
@@ -68,16 +68,6 @@ describe('POST /ingredients tests', () => {
     expect(res.body.message).toEqual('You are not authorized to edit this recipe');
   });
 });
-
-
-async function addIngredient(agent: request.SuperAgentTest, token: string, recipeId: string): Promise<string> {
-  
-  const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
-    .set('Authorization', `Bearer ${token}`)
-    .send({ ...testIngredient });
-
-  return res.body.ingredient.id;
-}
 
 
 describe('PUT /ingredients/:id', () => {

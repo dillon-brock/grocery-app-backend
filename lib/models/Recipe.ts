@@ -127,16 +127,16 @@ export class RecipeWithDetail extends Recipe {
       recipes.*,
       COALESCE(
         json_agg(json_build_object(
-          'id', ingredients.id, 
-          'recipeId', ingredients.recipe_id, 
+          'id', ingredients.id::text, 
+          'recipeId', ingredients.recipe_id::text, 
           'name', ingredients.name,
           'amount', ingredients.amount))
         FILTER (WHERE ingredients.id IS NOT NULL), '[]'
       ) as ingredients,
       COALESCE(
         json_agg(json_build_object(
-          'id', recipe_steps.id, 
-          'recipeId', recipe_steps.recipe_id, 
+          'id', recipe_steps.id::text, 
+          'recipeId', recipe_steps.recipe_id::text, 
           'num', recipe_steps.num,
           'detail', recipe_steps.detail))
         FILTER (WHERE recipe_steps.id IS NOT NULL), '[]'
