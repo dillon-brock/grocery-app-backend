@@ -50,4 +50,14 @@ export class RecipeStep {
     }
     return new RecipeStep(rows[0]);
   }
+
+  static async findByRecipeId(recipeId: string): Promise<RecipeStep[]> {
+    const { rows }: RecipeStepRows = await pool.query(
+      `SELECT * FROM recipe_steps
+      WHERE recipe_id = $1`,
+      [recipeId]
+    );
+
+    return rows.map(row => new RecipeStep(row));
+  }
 }

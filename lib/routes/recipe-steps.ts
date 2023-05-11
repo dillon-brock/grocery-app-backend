@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthReqBodyAndQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { NewStepReqBody, RecipeStepRes, StepUpdateData } from '../types/recipe-step.js';
+import { AuthReqBodyAndQuery, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { MultipleStepRes, NewStepReqBody, RecipeStepRes, StepUpdateData } from '../types/recipe-step.js';
 import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
@@ -16,6 +16,18 @@ export default Router()
       res.json({ 
         message: 'Step added successfully',
         step: newStep
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .get('/', authenticate, async (req: AuthenticatedReqQuery<{ recipeId: string }>,
+    res: TypedResponse<MultipleStepRes>, next: NextFunction) => {
+    try {
+      const steps = await RecipeStep.findByRecipeId(req.query.recipeId);
+      res.json({
+        message: 'Steps found',
+        steps
       });
     } catch (e) {
       next(e);

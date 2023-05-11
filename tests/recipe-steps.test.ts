@@ -84,6 +84,31 @@ describe('POST /recipe-steps', () => {
 });
 
 
+
+describe('GET /recipe-steps', () => {
+  beforeEach(setupDb);
+
+  it('gets a list of steps for recipe', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.get(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Steps found',
+      steps: expect.arrayContaining([{
+        ...testStep,
+        id: stepId,
+        recipeId
+      }])
+    });
+    
+  });
+});
+
+
 describe('PUT /recipe-steps/:id', () => {
   beforeEach(setupDb);
 

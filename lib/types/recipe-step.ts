@@ -23,6 +23,10 @@ export interface RecipeStepRes extends SuccessResponse {
   step: RecipeStep
 }
 
+export interface MultipleStepRes extends SuccessResponse {
+  steps: RecipeStep[];
+}
+
 export interface StepUpdateData {
   num?: number;
   detail?: string;
