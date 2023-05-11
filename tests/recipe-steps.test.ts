@@ -229,5 +229,28 @@ describe('PUT /recipe-steps/:id', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Step not found');
   });
+});
 
+
+
+describe('DELETE /recipe-steps/:id', () => {
+  beforeEach(setupDb);
+
+  it('deletes a recipe step at DELETE /recipe-steps/:id', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.delete(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Step deleted successfully',
+      step: {
+        ...testStep,
+        id: stepId,
+        recipeId
+      }
+    });
+  });
 });

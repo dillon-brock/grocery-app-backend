@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthReqBodyAndQuery, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthReqBodyAndQuery, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { MultipleStepRes, NewStepReqBody, RecipeStepRes, StepUpdateData } from '../types/recipe-step.js';
 import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
@@ -46,5 +46,19 @@ export default Router()
     } catch (e) {
       next(e);
     }
+  })
+  .delete('/:id', [authenticate, authorizeEditStep], async (
+    req: AuthenticatedReqParams<{ id: string }>,
+    res: TypedResponse<RecipeStepRes>, next: NextFunction) => {
+    try {
+      const deletedStep = await RecipeStep.deleteById(req.params.id);
+      res.json({
+        message: 'Step deleted successfully',
+        step: deletedStep
+      });
+    } catch (e) {
+      next(e);
+    }
   });
+
 
