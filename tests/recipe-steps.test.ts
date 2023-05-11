@@ -126,4 +126,28 @@ describe('PUT /recipe-steps/:id', () => {
       }
     });
   });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token, token2, recipeId } = await signUpAndShareRecipe(false);
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.put(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ detail: 'new instructions' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to edit this recipe');
+  });
+
+  it('gives a 404 error for nonexistent step', async () => {
+    const { agent, token } = await signUpAndCreateRecipe();
+
+    const res = await agent.put('/recipe-steps/6758')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ detail: 'new instructions' });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Step not found');
+  });
+
 });
