@@ -6,8 +6,11 @@ import { Permissions } from '../../../types/global.js';
 
 export default async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const recipeId = req.query.recipeId as string;
-    const recipe = await Recipe.findById(recipeId);
+    const recipeId = req.query.recipeId;
+    if (!recipeId) {
+      throw new ErrorWithStatus('Missing recipeId query parameter', 400);
+    }
+    const recipe = await Recipe.findById(recipeId as string);
     if (!recipe) {
       throw new ErrorWithStatus('Recipe not found', 404);
     }
