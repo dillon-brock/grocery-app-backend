@@ -38,7 +38,6 @@ export const testUser3 = {
 
 export const testRecipe = {
   name: 'mac and cheese',
-  description: 'so cheesy and delicious'
 };
 
 export const testIngredient = {
@@ -142,6 +141,7 @@ export async function signUpAndCreateRecipe(): Promise<RecipeAgentData> {
     .set('Authorization', `Bearer ${token}`)
     .send(testRecipe);
   const recipeId = newRecipeRes.body.recipe.id;
+
 
   return { agent, token, userId, recipeId };
 }

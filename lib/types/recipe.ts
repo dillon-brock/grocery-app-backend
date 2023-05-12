@@ -16,7 +16,6 @@ export type RecipeRows = Rows<RecipeFromDB>
 
 export interface NewRecipeBody {
   name: string;
-  description: string | null;
 }
 
 export interface NewRecipeData extends NewRecipeBody {
