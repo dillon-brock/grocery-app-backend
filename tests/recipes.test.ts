@@ -19,6 +19,7 @@ describe('POST /recipes tests', () => {
       message: 'Recipe created successfully',
       recipe: {
         ...testRecipe,
+        description: null,
         id: expect.any(String),
         ownerId: userId,
         createdAt: expect.any(String),
@@ -56,6 +57,7 @@ describe('GET /recipes test', () => {
     });
     expect(res.body.recipes[0]).toEqual({
       ...testRecipe,
+      description: null,
       id: expect.any(String),
       ownerId: userId,
       createdAt: expect.any(String),
@@ -87,6 +89,7 @@ describe('GET /recipes/:id tests', () => {
       message: 'Recipe found',
       recipe: {
         ...testRecipe,
+        description: null,
         id: recipeId,
         ownerId: userId,
         createdAt: expect.any(String),
@@ -111,6 +114,7 @@ describe('GET /recipes/:id tests', () => {
       message: 'Recipe found',
       recipe: {
         ...testRecipe,
+        description: null,
         id: recipeId,
         ownerId: userId,
         createdAt: expect.any(String),
@@ -151,6 +155,7 @@ describe('GET /recipes/:id tests', () => {
       message: 'Recipe found',
       recipe: {
         ...testRecipe,
+        description: null,
         id: recipeId,
         ownerId: userId,
         createdAt: expect.any(String),
@@ -215,7 +220,7 @@ describe('PUT /recipes/:id tests', () => {
       message: 'Recipe updated successfully',
       recipe: {
         name: 'Updated name',
-        description: testRecipe.description,
+        description: null,
         id: expect.any(String),
         ownerId: userId,
         createdAt: expect.any(String),
@@ -248,7 +253,7 @@ describe('PUT /recipes/:id tests', () => {
       recipe: {
         name: 'Updated name',
         id: expect.any(String),
-        description: testRecipe.description,
+        description: null,
         updatedAt: expect.any(String),
         createdAt: expect.any(String),
         ownerId: userId
@@ -299,6 +304,7 @@ describe('DELETE /recipes/:id tests', () => {
       message: 'Recipe deleted successfully',
       recipe: {
         ...testRecipe,
+        description: null,
         id: expect.any(String),
         ownerId: userId,
         updatedAt: expect.any(String),

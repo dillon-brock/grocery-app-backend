@@ -92,6 +92,7 @@ describe('GET /recipe-shares/recipes tests', () => {
     });
     expect(res.body.recipes[0]).toEqual({
       ...testRecipe,
+      description: null,
       id: recipeId,
       ownerId: expect.any(String),
       createdAt: expect.any(String),

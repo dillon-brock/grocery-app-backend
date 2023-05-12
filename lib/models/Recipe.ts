@@ -23,13 +23,13 @@ export class Recipe {
     this.updatedAt = row.updated_at;
   }
 
-  static async create({ ownerId, name, description }: NewRecipeData): Promise<Recipe> {
+  static async create({ ownerId, name }: NewRecipeData): Promise<Recipe> {
 
     const { rows }: RecipeRows = await pool.query(
-      `INSERT INTO RECIPES (owner_id, name, description)
-      VALUES ($1, $2, $3)
+      `INSERT INTO RECIPES (owner_id, name)
+      VALUES ($1, $2)
       RETURNING *`,
-      [ownerId, name, description]
+      [ownerId, name]
     );
 
     if (!rows[0]) throw new InsertionError('recipes');
