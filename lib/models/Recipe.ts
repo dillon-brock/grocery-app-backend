@@ -148,6 +148,20 @@ export class RecipeWithDetail extends Recipe {
       [id]
     );
 
+    rows[0].ingredients = rows[0]
+      .ingredients.filter((ingredient: Ingredient, i: Number, arr: Ingredient[]) => {
+        return i == arr.findIndex((ing) => (
+          ing.id == ingredient.id
+        ));
+      });
+
+    rows[0].steps = rows[0]
+      .steps.filter((step: RecipeStep, i: Number, arr: RecipeStep[]) => {
+        return i == arr.findIndex((ing) => (
+          ing.id == step.id
+        ));
+      });
+
     return new RecipeWithDetail(rows[0]);
   }
 }
