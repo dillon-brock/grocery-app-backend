@@ -403,4 +403,26 @@ describe('PUT /lists/:id', () => {
     expect(res.status).toEqual(403);
     expect(res.body.message).toEqual('You are not authorized to edit this list');
   });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const res = await agent.put(`/lists/${listId}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 404 error for nonexistent list', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+
+    const res = await agent.put('/lists/58302')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('List not found');
+  });
 });
