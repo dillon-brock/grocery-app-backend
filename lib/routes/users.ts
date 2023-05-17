@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { UserService } from '../services/UserService.js';
 import authenticate from '../middleware/authenticate.js';
-import { User } from '../models/User.js';
-import { AuthenticatedRequest, RequestWithBody, TypedResponse } from '../types/extendedExpress.js';
-import { TokenRes, UserRes, UserSignInData, UserSignUpData } from '../types/user.js';
+import { PublicUser, User } from '../models/User.js';
+import { AuthenticatedReqQuery, AuthenticatedRequest, RequestWithBody, TypedResponse } from '../types/extendedExpress.js';
+import { PublicUsersRes, TokenRes, UserRes, UserSignInData, UserSignUpData } from '../types/user.js';
 import { NextFunction } from 'express-serve-static-core';
 
 export default Router()
@@ -43,6 +43,19 @@ export default Router()
         res.json({ user, message: 'Current user found' });
       }
     } catch (e) {
+      next(e);
+    }
+  })
+  .get('/', authenticate, async (req: AuthenticatedReqQuery<{ username: string }>,
+    res: TypedResponse<PublicUsersRes>, next: NextFunction) => {
+    try {
+      const users = await PublicUser.findByUsername(req.query.username);
+      res.json({
+        message: 'Users found',
+        users
+      });
+    }
+    catch (e) {
       next(e);
     }
   });

@@ -1,4 +1,4 @@
-import { User } from '../models/User.js';
+import { PublicUser, User } from '../models/User.js';
 import { Rows, SuccessResponse } from './global.js';
 
 export type UserRows = Rows<UserFromDB>;
@@ -53,3 +53,6 @@ export type PublicUserFromDB = {
 
 export type PublicUserRows = Rows<PublicUserFromDB>;
 
+export interface PublicUsersRes extends SuccessResponse {
+  users: PublicUser[];
+}
