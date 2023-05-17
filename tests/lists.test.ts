@@ -1,4 +1,4 @@
-import { createList, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
+import { createList, createSecondaryUser, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 
@@ -359,5 +359,48 @@ describe('PUT /lists/:id', () => {
         title: 'new title'
       }
     });
+  });
+
+  it('updates a list for user with edit access', async () => {
+    const { agent, token, user } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+    
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUserId, editable: true });
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'List updated successfully',
+      list: {
+        id: listId,
+        ownerId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String),
+        title: 'new title'
+      }
+    });
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+    
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUserId, editable: false });
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toEqual(403);
+    expect(res.body.message).toEqual('You are not authorized to edit this list');
   });
 });

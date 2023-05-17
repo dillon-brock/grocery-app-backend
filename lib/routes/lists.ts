@@ -3,6 +3,7 @@ import authenticate from '../middleware/authenticate.js';
 import { List, ListWithItems } from '../models/List.js';
 import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import authorizeListAccess from '../middleware/authorization/lists/list-access.js';
+import authorizeUpdateList from '../middleware/authorization/lists/update-list.js';
 import { ListRes, ListUpdateData, MultipleListsRes, NewListData } from '../types/list.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Category } from '../models/Category.js';
@@ -55,7 +56,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (req: TypedAuthenticatedRequest<ListUpdateData, { id: string}>,
+  .put('/:id', [authenticate, authorizeUpdateList], async (req: TypedAuthenticatedRequest<ListUpdateData, { id: string}>,
     res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
       const updatedList = await List.updateById(req.params.id, req.body);
