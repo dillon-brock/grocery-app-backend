@@ -45,3 +45,7 @@ export interface ListRes extends SuccessResponse {
 export interface MultipleListsRes extends SuccessResponse {
   lists: List[];
 }
+
+export type ListUpdateData = {
+  title?: string
+}
