@@ -1,8 +1,6 @@
-import { createList, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
+import { createList, createSecondaryUser, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
-
-
 
 describe('POST /lists tests', () => {
   beforeEach(setupDb);
@@ -334,5 +332,97 @@ describe('DELETE /lists/:id tests', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toBe('You are not authorized to access this list');
+  });
+});
+
+
+
+describe('PUT /lists/:id', () => {
+  beforeEach(setupDb);
+
+  it('updates a list at PUT /lists/:id', async () => {
+    const { agent, token, user } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'List updated successfully',
+      list: {
+        id: listId,
+        ownerId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String),
+        title: 'new title'
+      }
+    });
+  });
+
+  it('updates a list for user with edit access', async () => {
+    const { agent, token, user } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+    
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUserId, editable: true });
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'List updated successfully',
+      list: {
+        id: listId,
+        ownerId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String),
+        title: 'new title'
+      }
+    });
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+    
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUserId, editable: false });
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toEqual(403);
+    expect(res.body.message).toEqual('You are not authorized to edit this list');
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const res = await agent.put(`/lists/${listId}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 404 error for nonexistent list', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+
+    const res = await agent.put('/lists/58302')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('List not found');
   });
 });

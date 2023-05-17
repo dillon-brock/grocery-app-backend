@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { List, ListWithItems } from '../models/List.js';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import authorizeListAccess from '../middleware/authorization/lists/list-access.js';
-import { ListRes, MultipleListsRes, NewListData } from '../types/list.js';
+import authorizeUpdateList from '../middleware/authorization/lists/update-list.js';
+import { ListRes, ListUpdateData, MultipleListsRes, NewListData } from '../types/list.js';
 import { NextFunction } from 'express-serve-static-core';
 import { Category } from '../models/Category.js';
 import { ErrorWithStatus } from '../types/error.js';
@@ -52,6 +53,19 @@ export default Router()
         list
       });
     } catch (e) {
+      next(e);
+    }
+  })
+  .put('/:id', [authenticate, authorizeUpdateList], async (req: TypedAuthenticatedRequest<ListUpdateData, { id: string}>,
+    res: TypedResponse<ListRes>, next: NextFunction) => {
+    try {
+      const updatedList = await List.updateById(req.params.id, req.body);
+      res.json({
+        message: 'List updated successfully',
+        list: updatedList
+      });
+    }
+    catch (e) {
       next(e);
     }
   })

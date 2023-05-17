@@ -1,7 +1,8 @@
 import pool from '../../sql/pool.js';
-import { DeletionError, InsertionError } from '../types/error.js';
-import { CoalescedCategory, CreateListParams, ListFromDB, ListRows, ListWithItemsFromDB, ListWithItemsRows } from '../types/list.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
+import { CoalescedCategory, CreateListParams, ListFromDB, ListRows, ListUpdateData, ListWithItemsFromDB, ListWithItemsRows } from '../types/list.js';
 import { ListShareRows } from '../types/listShare.js';
+import { buildUpdateQuery } from '../utils.js';
 
 export class List {
   id: string;
@@ -51,6 +52,14 @@ export class List {
     );
 
     return rows.map(row => new List(row));
+  }
+
+  static async updateById(id: string, data: ListUpdateData): Promise<List> {
+    const query = buildUpdateQuery('lists', data);
+    const { rows }: ListRows = await pool.query(query, [id]);
+
+    if (!rows[0]) throw new UpdateError('lists');
+    return new List(rows[0]);
   }
 
   async delete(): Promise<List> {
