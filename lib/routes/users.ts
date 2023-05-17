@@ -51,7 +51,7 @@ export default Router()
     try {
       const users = await PublicUser.findByUsername(req.query.username);
       res.json({
-        message: 'Users found',
+        message: users.length > 0 ? 'Users found' : 'No users found',
         users
       });
     }
