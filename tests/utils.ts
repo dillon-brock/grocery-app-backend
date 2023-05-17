@@ -36,6 +36,12 @@ export const testUser3 = {
   username: 'third_user'
 };
 
+export const testUser4 = {
+  email: 'fourth@user.com',
+  password: 'password',
+  username: 'test_user4'
+};
+
 export const testRecipe = {
   name: 'mac and cheese',
 };
