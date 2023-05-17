@@ -43,3 +43,13 @@ export interface UserRes extends SuccessResponse {
 export interface MultipleUserRes extends SuccessResponse {
   users: User[];
 }
+
+
+
+export type PublicUserFromDB = {
+  id: string;
+  username: string;
+}
+
+export type PublicUserRows = Rows<PublicUserFromDB>;
+

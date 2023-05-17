@@ -1,6 +1,28 @@
 import pool from '../../sql/pool.js';
 import { InsertionError } from '../types/error.js';
-import { HashedSignUpData, UserFromDB, UserRows } from '../types/user.js';
+import { HashedSignUpData, PublicUserFromDB, PublicUserRows, UserFromDB, UserRows } from '../types/user.js';
+
+export class PublicUser {
+  id: string;
+  username: string;
+
+  constructor(row: PublicUserFromDB) {
+    this.id = row.id;
+    this.username = row.username;
+  }
+
+  static async findByUsername(username: string): Promise<PublicUser[]> {
+    username = `${username}%`;
+
+    const { rows }: PublicUserRows = await pool.query(
+      `SELECT id, username FROM users
+      WHERE users.username ILIKE $1`,
+      [username]
+    );
+
+    return rows.map(row => new PublicUser(row));
+  }
+}
 
 export class User {
   id: string;
