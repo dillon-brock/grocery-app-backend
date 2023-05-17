@@ -2,8 +2,6 @@ import { createList, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 
-
-
 describe('POST /lists tests', () => {
   beforeEach(setupDb);
 
@@ -334,5 +332,32 @@ describe('DELETE /lists/:id tests', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toBe('You are not authorized to access this list');
+  });
+});
+
+
+
+describe('PUT /lists/:id', () => {
+  beforeEach(setupDb);
+
+  it('updates a list at PUT /lists/:id', async () => {
+    const { agent, token, user } = await signUpAndGetInfo();
+    const listId = await createList(agent, token);
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'new title' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'List updated successfully',
+      list: {
+        id: listId,
+        ownerId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String),
+        title: 'new title'
+      }
+    });
   });
 });
