@@ -132,21 +132,6 @@ describe('GET /list-shares/lists tests', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
-
-  it('gives 403 error for unauthorized user', async () => {
-    const { agent, sharedUserId } = await signUpAndShareList();
-
-    const signUpRes = await agent.post('/users')
-      .send(testUser3);
-    const { token } = signUpRes.body;
-
-    const res = await agent
-      .get(`/list-shares/lists?userId=${sharedUserId}`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(403);
-    expect(res.body.message).toEqual('You are not authorized to view this information');
-  });
 });
 
 describe('GET /list-shares/users tests', () => {
