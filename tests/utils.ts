@@ -199,9 +199,9 @@ export async function createListWithCategory(agent: request.SuperAgentTest, toke
 export async function getNewItemId(agent: request.SuperAgentTest, token: string, listId: string, categoryId: string): Promise<string> {
 
   const newItemRes = await agent
-    .post('/list-items')
+    .post(`/list-items?listId=${listId}`)
     .set('Authorization', `Bearer ${token}`)
-    .send({ ...testItem, listId, categoryId });
+    .send({ ...testItem, categoryId });
   
   return newItemRes.body.listItem.id;
 }

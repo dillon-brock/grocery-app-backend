@@ -2,14 +2,14 @@ import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/error.js';
-import { AuthReqBodyAndQuery, AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { ListItemRes, ListItemUpdateData, NewListItemBody, NewListItemData } from '../types/listItem.js';
+import { AuthReqBodyAndQuery, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { ListItemRes, ListItemUpdateData, NewListItemBody } from '../types/listItem.js';
 import authorizeItemAccess from '../middleware/authorization/list-items/item-access.js';
-import authorizeEditList from '../middleware/authorization/lists/edit-list.js';
+import authorizeAddItem from '../middleware/authorization/list-items/add-item.js';
 import { NextFunction } from 'express-serve-static-core';
 
 export default Router()
-  .post('/', [authenticate, authorizeEditList], async (
+  .post('/', [authenticate, authorizeAddItem], async (
     req: AuthReqBodyAndQuery<NewListItemBody, { listId: string }>, 
     res: TypedResponse<ListItemRes>, next: NextFunction) => {
     try {

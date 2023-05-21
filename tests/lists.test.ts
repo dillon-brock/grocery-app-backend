@@ -1,4 +1,4 @@
-import { createList, createSecondaryUser, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
+import { createList, createSecondaryUser, getNewItemId, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 
@@ -141,10 +141,7 @@ describe('GET /lists/:id tests', () => {
       .send({ name: 'Sweet Things', listId });
     const categoryId = categoryRes.body.category.id;
 
-    const itemRes = await agent.post('/list-items')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ ...item, listId, categoryId });
-    const itemId = itemRes.body.listItem.id;
+    const itemId = await getNewItemId(agent, token, listId, categoryId);
 
     const res = await agent
       .get(`/lists/${listId}`)
