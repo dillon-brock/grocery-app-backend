@@ -7,6 +7,7 @@ import { ListItemRes, ListItemUpdateData, NewListItemBody } from '../types/listI
 import authorizeItemAccess from '../middleware/authorization/list-items/item-access.js';
 import authorizeAddItem from '../middleware/authorization/list-items/add-item.js';
 import { NextFunction } from 'express-serve-static-core';
+import { MultipleItemsRes } from '../types/listItem.js';
 
 export default Router()
   .post('/', [authenticate, authorizeAddItem], async (
@@ -17,6 +18,16 @@ export default Router()
       res.json({ message: 'Item added successfully', listItem: newItem });
     }
     catch (e) {
+      next(e);
+    }
+  })
+  .post('/multiple', [authenticate], async (
+    req: AuthReqBodyAndQuery<{ items: NewListItemBody[] }, { listId: string }>,
+    res: TypedResponse<MultipleItemsRes>, next: NextFunction) => {
+    try {
+      const newItems = await ListItem.createMultiple(req.body.items, req.query.listId);
+      res.json({ message: 'Items added successfully', listItems: newItems });
+    } catch (e) {
       next(e);
     }
   })

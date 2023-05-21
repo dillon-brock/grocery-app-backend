@@ -56,6 +56,16 @@ export const testItem = {
   quantity: '3',
 };
 
+export const testItem2 = {
+  item: 'oat milk',
+  quantity: null
+};
+
+export const testItem3 = {
+  item: 'ground turkey',
+  quantity: '1 lb'
+};
+
 export const testStep = {
   num: 1,
   detail: 'boil the pasta'

@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { ErrorWithStatus, InsertionError, UpdateError } from '../types/error.js';
-import { ListItemFromDB, ListItemRows, ListItemUpdateData, NewListItemData, OwnerIDRows } from '../types/listItem.js';
+import { ListItemFromDB, ListItemRows, ListItemUpdateData, NewListItemBody, NewListItemData, OwnerIDRows } from '../types/listItem.js';
 
 export class ListItem {
   id: string;
@@ -32,7 +32,7 @@ export class ListItem {
     return new ListItem(rows[0]);
   }
 
-  static async createMultiple(items: NewListItemData[]): Promise<ListItem[]> {
+  static async createMultiple(items: NewListItemBody[], listId: string): Promise<ListItem[]> {
 
     if (!items[0]) return [];
 
@@ -40,11 +40,11 @@ export class ListItem {
     const values: string[] = [];
 
     for (let i = 0; i < items.length; i++) {
-      const item: NewListItemData | undefined = items[i];
+      const item: NewListItemBody | undefined = items[i];
       if (!item) throw new Error('Invalid data structure');
 
       const rowValues = [
-        item.listId,
+        listId,
         item.quantity,
         item.item,
         item.categoryId
@@ -53,6 +53,7 @@ export class ListItem {
       let row = '(';
       for (let j = 1; j <= 4; j++) {
         row += `$${j + (i * 4)}`;
+        if (j != 4) row += ', ';
       }
       row += i == items.length - 1 ? ') ' : '), ';
       query += row;

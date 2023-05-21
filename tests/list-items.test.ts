@@ -1,4 +1,4 @@
-import { createListWithCategory, getNewItemId, setupDb, signUpAndGetInfo, testItem, testUser2 } from './utils.js';
+import { createListWithCategory, getNewItemId, setupDb, signUpAndGetInfo, testItem, testItem2, testItem3, testUser2 } from './utils.js';
 import { UserService } from '../lib/services/UserService.js';
 
 
@@ -114,6 +114,30 @@ describe('POST /list-items tests', () => {
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });
+
+
+
+describe('POST /list-items/multiple', () => {
+  beforeEach(setupDb);
+
+  it('adds multiple items to list at POST /list-items/multiple', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+
+    const res = await agent.post(`/list-items/multiple?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ items: [
+        { ...testItem, categoryId }, 
+        { ...testItem2, categoryId }, 
+        { ...testItem3, categoryId }
+      ] });
+
+    expect(res.status).toBe(200);
+    expect(res.body.listItems.length).toBe(3);
+
+  });
+});
+
 
 describe('PUT /list-items/:id tests', () => {
   beforeEach(setupDb);
