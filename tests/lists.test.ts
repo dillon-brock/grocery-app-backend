@@ -1,4 +1,4 @@
-import { createList, createSecondaryUser, getNewItemId, setupDb, signUpAndGetInfo, testUser2 } from './utils.js';
+import { createList, createSecondaryUser, getNewItemId, setupDb, signUpAndGetInfo, testItem, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 
@@ -127,11 +127,6 @@ describe('GET /lists/:id tests', () => {
   beforeEach(setupDb);
 
   it('serves a list with items at GET /lists/:id', async () => {
-
-    const item = {
-      item: 'Popsicles',
-      quantity: '1 box'
-    };
     
     const { agent, user, token } = await signUpAndGetInfo();
     const listId = await createList(agent, token);
@@ -157,9 +152,8 @@ describe('GET /lists/:id tests', () => {
           id: categoryId,
           name: 'Sweet Things',
           items: [{
+            ...testItem,
             id: itemId,
-            item: 'Popsicles',
-            quantity: '1 box',
             bought: false,
             categoryId
           }]
