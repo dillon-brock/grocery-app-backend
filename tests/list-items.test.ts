@@ -10,9 +10,9 @@ describe('POST /list-items tests', () => {
     const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const res = await agent
-      .post('/list-items')
+      .post(`/list-items?listId=${listId}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testItem, listId, categoryId });
+      .send({ ...testItem, categoryId });
     
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -37,9 +37,9 @@ describe('POST /list-items tests', () => {
     const { token: token2 } = signInRes.body;
 
     const res = await agent
-      .post('/list-items')
+      .post(`/list-items?listId=${listId}`)
       .set('Authorization', `Bearer ${token2}`)
-      .send({ ...testItem, listId, categoryId });
+      .send({ ...testItem, categoryId });
     
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -64,7 +64,7 @@ describe('POST /list-items tests', () => {
     const { token: token2 } = signInRes.body;
 
     const res = await agent
-      .post('/list-items')
+      .post(`/list-items?listId=${listId}`)
       .set('Authorization', `Bearer ${token2}`)
       .send({ ...testItem, listId, categoryId });
     
@@ -82,7 +82,7 @@ describe('POST /list-items tests', () => {
     
     const { token: token2 } = secondUserRes.body;
     const res = await agent
-      .post('/list-items')
+      .post(`/list-items?listId=${listId}`)
       .set('Authorization', `Bearer ${token2}`)
       .send({ ...testItem, listId, categoryId });
     
@@ -94,9 +94,9 @@ describe('POST /list-items tests', () => {
     const { agent, token } = await signUpAndGetInfo();
     const { categoryId } = await createListWithCategory(agent, token);
     const res = await agent
-      .post('/list-items')
+      .post('/list-items?listId=2938')
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testItem, listId: '2398', categoryId });
+      .send({ ...testItem, categoryId });
     
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('List not found');
@@ -107,8 +107,8 @@ describe('POST /list-items tests', () => {
     const { listId, categoryId } = await createListWithCategory(agent, token);
 
     const res = await agent
-      .post('/list-items')
-      .send({ ...testItem, listId, categoryId });
+      .post(`/list-items?listId=${listId}`)
+      .send({ ...testItem, categoryId });
     
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
