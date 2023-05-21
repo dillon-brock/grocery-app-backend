@@ -32,6 +32,40 @@ export class ListItem {
     return new ListItem(rows[0]);
   }
 
+  static async createMultiple(items: NewListItemData[]): Promise<ListItem[]> {
+
+    if (!items[0]) return [];
+
+    let query = 'INSERT INTO list_items (list_id, quantity, item, category_id) VALUES ';
+    const values: string[] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item: NewListItemData | undefined = items[i];
+      if (!item) throw new Error('Invalid data structure');
+
+      const rowValues = [
+        item.listId,
+        item.quantity,
+        item.item,
+        item.categoryId
+      ];
+
+      let row = '(';
+      for (let j = 1; j <= 4; j++) {
+        row += `$${j + (i * 4)}`;
+      }
+      row += i == items.length - 1 ? ') ' : '), ';
+      query += row;
+
+      values.push(...rowValues);
+    }
+
+    query += 'RETURNING *';
+
+    const { rows }: ListItemRows = await pool.query(query, values);
+    return rows.map(row => new ListItem(row));
+  }
+
   async update(data: ListItemUpdateData): Promise<ListItem> {
 
     const query = `UPDATE list_items SET

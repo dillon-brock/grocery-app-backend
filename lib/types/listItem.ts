@@ -46,3 +46,7 @@ interface ListItem {
 export interface ListItemRes extends SuccessResponse {
   listItem: ListItem;
 }
+
+export interface MultipleItemsRes extends SuccessResponse {
+  listItems: ListItem[];
+}
