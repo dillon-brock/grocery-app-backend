@@ -311,3 +311,24 @@ export async function addIngredient(agent: request.SuperAgentTest, token: string
   return res.body.ingredient.id;
 }
 
+
+// list shares
+type PostListData = {
+  agent: request.SuperAgentTest;
+  sharedUserId: string;
+  listId: string;
+  token: string;
+  shareId: string;
+}
+
+export async function signUpAndShareList(): Promise<PostListData> {
+  const { agent, userId, listId, token } = await signUpAndGetListShareData(); 
+
+  const shareRes = await agent.post('/list-shares')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ listId, userId, editable: true });
+
+  const shareId = shareRes.body.shareData.id;
+
+  return { agent, sharedUserId: userId, token, listId, shareId };
+}
