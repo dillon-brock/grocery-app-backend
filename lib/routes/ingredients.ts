@@ -7,9 +7,10 @@ import { Ingredient } from '../models/Ingredient.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
 import authorizeEditIngredient from '../middleware/authorization/ingredients/edit-ingredient.js';
 import authorizeViewRecipe from '../middleware/authorization/recipes/view-from-query.js';
+import validateCreateIngredient from '../middleware/validation/ingredients/create-ingredient.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeModifyRecipeDetails], async (
+  .post('/', [authenticate, validateCreateIngredient, authorizeModifyRecipeDetails], async (
     req: AuthReqBodyAndQuery<NewIngredientData, { recipeId: string }>, 
     res: TypedResponse<IngredientRes>, next: NextFunction) => {
     try {
