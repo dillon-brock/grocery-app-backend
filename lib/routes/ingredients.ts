@@ -8,6 +8,7 @@ import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/mo
 import authorizeEditIngredient from '../middleware/authorization/ingredients/edit-ingredient.js';
 import authorizeViewRecipe from '../middleware/authorization/recipes/view-from-query.js';
 import validateCreateIngredient from '../middleware/validation/ingredients/create-ingredient.js';
+import validateUpdateIngredient from '../middleware/validation/ingredients/update-ingredient.js';
 
 export default Router()
   .post('/', [authenticate, validateCreateIngredient, authorizeModifyRecipeDetails], async (
@@ -35,7 +36,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeEditIngredient], async (
+  .put('/:id', [authenticate, validateUpdateIngredient, authorizeEditIngredient], async (
     req: TypedAuthenticatedRequest<IngredientUpdateData, { id: string }>,
     res: TypedResponse<IngredientRes>, next: NextFunction) => {
     try {
