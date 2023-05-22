@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { ErrorWithStatus, InsertionError, UpdateError } from '../types/error.js';
-import { ListItemFromDB, ListItemRows, ListItemUpdateData, NewListItemData, OwnerIDRows } from '../types/listItem.js';
+import { ListItemFromDB, ListItemRows, ListItemUpdateData, NewListItemBody, NewListItemData, OwnerIDRows } from '../types/listItem.js';
 
 export class ListItem {
   id: string;
@@ -30,6 +30,41 @@ export class ListItem {
 
     if (!rows[0]) throw new InsertionError('list_items');
     return new ListItem(rows[0]);
+  }
+
+  static async createMultiple(items: NewListItemBody[], listId: string): Promise<ListItem[]> {
+
+    if (!items[0]) return [];
+
+    let query = 'INSERT INTO list_items (list_id, quantity, item, category_id) VALUES ';
+    const values: string[] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item: NewListItemBody | undefined = items[i];
+      if (!item) throw new Error('Invalid data structure');
+
+      const rowValues = [
+        listId,
+        item.quantity,
+        item.item,
+        item.categoryId
+      ];
+
+      let row = '(';
+      for (let j = 1; j <= 4; j++) {
+        row += `$${j + (i * 4)}`;
+        if (j != 4) row += ', ';
+      }
+      row += i == items.length - 1 ? ') ' : '), ';
+      query += row;
+
+      values.push(...rowValues);
+    }
+
+    query += 'RETURNING *';
+
+    const { rows }: ListItemRows = await pool.query(query, values);
+    return rows.map(row => new ListItem(row));
   }
 
   async update(data: ListItemUpdateData): Promise<ListItem> {

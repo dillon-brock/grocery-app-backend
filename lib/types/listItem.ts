@@ -13,12 +13,15 @@ export type ListItemFromDB = {
   category_id: string | null;
 };
 
-export type NewListItemData = {
-  listId: string;
+export interface NewListItemBody {
   quantity: string;
   item: string;
   categoryId: string;
-};
+}
+
+export interface NewListItemData extends NewListItemBody {
+  listId: string;
+}
 
 export type CoalescedListItem = {
   id: string;
@@ -45,4 +48,8 @@ interface ListItem {
 
 export interface ListItemRes extends SuccessResponse {
   listItem: ListItem;
+}
+
+export interface MultipleItemsRes extends SuccessResponse {
+  listItems: ListItem[];
 }

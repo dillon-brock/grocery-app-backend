@@ -2,22 +2,32 @@ import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { ListItem } from '../models/ListItem.js';
 import { ErrorWithStatus } from '../types/error.js';
-import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { ListItemRes, ListItemUpdateData, NewListItemData } from '../types/listItem.js';
+import { AuthReqBodyAndQuery, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { ListItemRes, ListItemUpdateData, NewListItemBody } from '../types/listItem.js';
 import authorizeItemAccess from '../middleware/authorization/list-items/item-access.js';
-import authorizeEditList from '../middleware/authorization/lists/edit-list.js';
+import authorizeAddItem from '../middleware/authorization/list-items/add-item.js';
 import { NextFunction } from 'express-serve-static-core';
+import { MultipleItemsRes } from '../types/listItem.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeEditList], async (
-    req: AuthenticatedReqBody<NewListItemData>, 
+  .post('/', [authenticate, authorizeAddItem], async (
+    req: AuthReqBodyAndQuery<NewListItemBody, { listId: string }>, 
     res: TypedResponse<ListItemRes>, next: NextFunction) => {
     try {
-      const { listId, quantity, item, categoryId } = req.body;
-      const newItem = await ListItem.create({ listId, quantity, item, categoryId });
+      const newItem = await ListItem.create({ ...req.body, listId: req.query.listId });
       res.json({ message: 'Item added successfully', listItem: newItem });
     }
     catch (e) {
+      next(e);
+    }
+  })
+  .post('/multiple', [authenticate, authorizeAddItem], async (
+    req: AuthReqBodyAndQuery<{ items: NewListItemBody[] }, { listId: string }>,
+    res: TypedResponse<MultipleItemsRes>, next: NextFunction) => {
+    try {
+      const newItems = await ListItem.createMultiple(req.body.items, req.query.listId);
+      res.json({ message: 'Items added successfully', listItems: newItems });
+    } catch (e) {
       next(e);
     }
   })
