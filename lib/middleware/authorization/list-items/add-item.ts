@@ -7,7 +7,7 @@ export default async (req: AuthenticatedRequest, res: Response, next: NextFuncti
   try {
     const listId = req.query.listId;
     if (!listId) {
-      throw new ErrorWithStatus('Missing list id', 400);
+      throw new ErrorWithStatus('Incomplete query (list not specified)', 400);
     }
     const list = await List.findById(listId as string);
     if (!list) {
