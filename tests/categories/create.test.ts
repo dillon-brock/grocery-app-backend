@@ -1,4 +1,4 @@
-import { setupDb, signUpAndCreateList, testUser2 } from '../utils.js';
+import { setupDb, signUp, signUpAndCreateList, testUser2 } from '../utils.js';
 import { UserService } from '../../lib/services/UserService.js';
 
 describe('POST /categories tests', () => {
@@ -73,5 +73,60 @@ describe('POST /categories tests', () => {
 
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 400 error with too many arguments', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+
+    const res = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Cheese', listId, badData: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - too many arguments');
+  });
+
+  it('gives a 400 error for missing name', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+
+    const res = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: '', listId });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name required');
+  });
+
+  it('gives a 400 error for missing listId', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Cheese', listId: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - listId required');
+  });
+
+  it('gives a 400 error for invalid name', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+
+    const res = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: {}, listId });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name must be string');
+  });
+
+  it('gives a 400 error for invalid name', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Bread', listId: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - listId must be string');
   });
 });
