@@ -6,7 +6,8 @@ import { CategoryRes, NewCategoryData } from '../types/category.js';
 import authorizeEditList from '../middleware/authorization/lists/edit-list.js';
 import { NextFunction } from 'express-serve-static-core';
 import authorizeCategoryAccess from '../middleware/authorization/categories/category-access.js';
-import validateCreateCategory from '../middleware/validation/create-category.js';
+import validateCreateCategory from '../middleware/validation/categories/create-category.js';
+import validateUpdateCategory from '../middleware/validation/categories/update-category.js';
 
 export default Router()
   .post('/', [authenticate, validateCreateCategory, authorizeEditList], async (
@@ -22,7 +23,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeCategoryAccess], async (
+  .put('/:id', [authenticate, validateUpdateCategory, authorizeCategoryAccess], async (
     req: TypedAuthenticatedRequest<{ name: string}, { id: string }>, 
     res: TypedResponse<CategoryRes>, next: NextFunction) => {
     try {

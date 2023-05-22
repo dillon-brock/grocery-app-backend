@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { NewCategoryData } from '../../types/category.js';
-import { AuthenticatedReqBody } from '../../types/extendedExpress.js';
-import { ErrorWithStatus } from '../../types/error.js';
+import { NewCategoryData } from '../../../types/category.js';
+import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
+import { ErrorWithStatus } from '../../../types/error.js';
 
 export default async (req: AuthenticatedReqBody<NewCategoryData>, res: Response, next: NextFunction) => {
   try {

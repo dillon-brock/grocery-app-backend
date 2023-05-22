@@ -1,4 +1,4 @@
-import { setupDb, signUpAndCreateList, testUser2 } from '../utils.js';
+import { setupDb, signUpAndCreateCategory, signUpAndCreateList, testUser2 } from '../utils.js';
 import { UserService } from '../../lib/services/UserService.js';
 
 describe('PUT /categories/:id tests', () => {
@@ -91,5 +91,38 @@ describe('PUT /categories/:id tests', () => {
 
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 400 error with too many arguments', async () => {
+    const { agent, token, categoryId } = await signUpAndCreateCategory();
+
+    const res = await agent.put(`/categories/${categoryId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Sweet Stuff', other: 'bad data' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - too many arguments');
+  });
+
+  it('gives a 400 error with too many arguments', async () => {
+    const { agent, token, categoryId } = await signUpAndCreateCategory();
+
+    const res = await agent.put(`/categories/${categoryId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name required');
+  });
+
+  it('gives a 400 error with too many arguments', async () => {
+    const { agent, token, categoryId } = await signUpAndCreateCategory();
+
+    const res = await agent.put(`/categories/${categoryId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name must be string');
   });
 });
