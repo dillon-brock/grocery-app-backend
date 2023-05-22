@@ -21,7 +21,7 @@ export default Router()
       next(e);
     }
   })
-  .post('/multiple', [authenticate], async (
+  .post('/multiple', [authenticate, authorizeAddItem], async (
     req: AuthReqBodyAndQuery<{ items: NewListItemBody[] }, { listId: string }>,
     res: TypedResponse<MultipleItemsRes>, next: NextFunction) => {
     try {

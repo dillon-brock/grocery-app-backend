@@ -1,4 +1,4 @@
-import { createListWithCategory, getNewItemId, setupDb, signUpAndGetInfo, testItem, testItem2, testItem3, testUser2 } from './utils.js';
+import { createListWithCategory, createSecondaryUser, getNewItemId, setupDb, signUpAndGetInfo, testItem, testItem2, testItem3, testUser2 } from './utils.js';
 import { UserService } from '../lib/services/UserService.js';
 
 
@@ -135,6 +135,40 @@ describe('POST /list-items/multiple', () => {
     expect(res.status).toBe(200);
     expect(res.body.listItems.length).toBe(3);
 
+  });
+
+  it('adds multiple items to list for user with edit access', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+
+    await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: secondUserId, editable: true });
+
+    const res = await agent.post(`/list-items/multiple?listId=${listId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ items: [
+        { ...testItem, categoryId }, 
+        { ...testItem2, categoryId }, 
+        { ...testItem3, categoryId }
+      ] });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Items added successfully',
+      listItems: expect.any(Array)
+    });
+    expect(res.body.listItems.length).toBe(3);
+    expect(res.body.listItems).toEqual(
+      expect.arrayContaining([{
+        ...testItem2,
+        id: expect.any(String),
+        categoryId,
+        listId,
+        bought: false
+      }])
+    );
   });
 });
 
