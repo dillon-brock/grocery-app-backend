@@ -65,4 +65,59 @@ describe('POST /ingredients tests', () => {
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to edit this recipe');
   });
+
+  it('gives a 400 error for missing recipeId', async () => {
+    const { agent, token } = await signUpAndCreateRecipe();
+
+    const res = await agent.post('/ingredients')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testIngredient });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid query - recipeId required');
+  });
+
+  it('gives a 400 error with too many arguments', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testIngredient, other: 'bad data' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - too many arguments');
+  });
+
+  it('gives a 400 error for missing name', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testIngredient, name: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name required');
+  });
+
+  it('gives a 400 error for invalid type of name', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testIngredient, name: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name must be string');
+  });
+
+  it('gives a 400 error for invalid type of amount', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/ingredients?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testIngredient, amount: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - amount must be string or null');
+  });
 });
