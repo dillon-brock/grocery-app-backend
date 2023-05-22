@@ -1,4 +1,4 @@
-import { createList, createSecondaryUser, getNewItemId, setupDb, signUpAndGetInfo, testItem, testUser2 } from './utils.js';
+import { createList, createSecondaryUser, getNewItemId, setupDb, signUpAndCreateList, signUpAndGetInfo, testItem, testUser2 } from './utils.js';
 import request from 'supertest';
 import app from '../lib/app.js';
 
@@ -415,5 +415,38 @@ describe('PUT /lists/:id', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('List not found');
+  });
+
+  it('gives a 400 error for too many arguments', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'new title', other: 'bad data' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - too many arguments');
+  });
+
+  it('gives a 400 error for missing title', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - title required');
+  });
+
+  it('gives a 400 error for invalid title type', async () => {
+    const { agent, token, listId } = await signUpAndCreateList();
+
+    const res = await agent.put(`/lists/${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: { test: 'not a title' } });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - title must be string');
   });
 });
