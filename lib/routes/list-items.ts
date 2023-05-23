@@ -11,7 +11,7 @@ import { MultipleItemsRes } from '../types/listItem.js';
 import validateCreateSingleItem from '../middleware/validation/list-items/create-single.js';
 
 export default Router()
-  .post('/', [authenticate, validateCreateSingleItem, authorizeAddItem], async (
+  .post('/', [authenticate, authorizeAddItem, validateCreateSingleItem], async (
     req: AuthReqBodyAndQuery<NewListItemBody, { listId: string }>, 
     res: TypedResponse<ListItemRes>, next: NextFunction) => {
     try {
