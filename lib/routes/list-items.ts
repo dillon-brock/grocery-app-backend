@@ -8,9 +8,10 @@ import authorizeItemAccess from '../middleware/authorization/list-items/item-acc
 import authorizeAddItem from '../middleware/authorization/list-items/add-item.js';
 import { NextFunction } from 'express-serve-static-core';
 import { MultipleItemsRes } from '../types/listItem.js';
+import validateCreateSingleItem from '../middleware/validation/list-items/create-single.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeAddItem], async (
+  .post('/', [authenticate, validateCreateSingleItem, authorizeAddItem], async (
     req: AuthReqBodyAndQuery<NewListItemBody, { listId: string }>, 
     res: TypedResponse<ListItemRes>, next: NextFunction) => {
     try {
