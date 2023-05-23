@@ -9,6 +9,7 @@ import authorizeAddItem from '../middleware/authorization/list-items/add-item.js
 import { NextFunction } from 'express-serve-static-core';
 import { MultipleItemsRes } from '../types/listItem.js';
 import validateCreateSingleItem from '../middleware/validation/list-items/create-single.js';
+import validateCreateMultipleItems from '../middleware/validation/list-items/create-multiple.js';
 
 export default Router()
   .post('/', [authenticate, authorizeAddItem, validateCreateSingleItem], async (
@@ -22,7 +23,7 @@ export default Router()
       next(e);
     }
   })
-  .post('/multiple', [authenticate, authorizeAddItem], async (
+  .post('/multiple', [authenticate, authorizeAddItem, validateCreateMultipleItems], async (
     req: AuthReqBodyAndQuery<{ items: NewListItemBody[] }, { listId: string }>,
     res: TypedResponse<MultipleItemsRes>, next: NextFunction) => {
     try {
