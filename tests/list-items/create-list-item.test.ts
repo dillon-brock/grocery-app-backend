@@ -152,5 +152,18 @@ describe('POST /list-items tests', () => {
     expect(res.body.message).toEqual('Invalid payload - item is required');
   });
 
+  it('gives a 400 error for invalid quantity type', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+
+    const res = await agent
+      .post(`/list-items?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testItem, categoryId, quantity: 5 });
+    
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - quantity must be string or null');
+  });
+
 });
 

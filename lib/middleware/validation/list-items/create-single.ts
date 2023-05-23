@@ -27,8 +27,11 @@ export default async (req: AuthenticatedReqBody<NewListItemBody>, res: Response,
       if (foundArgs[key] == undefined) {
         throw new ErrorWithStatus(`Invalid payload - unexpected argument ${key}`, 400);
       }
-      else if (typeof req.body[key] != 'string') {
+      else if (key != 'quantity' && typeof req.body[key] != 'string') {
         throw new ErrorWithStatus(`Invalid payload - ${key} must be string`, 400);
+      }
+      else if (key == 'quantity' && typeof req.body[key] != 'string' && req.body[key] != null) {
+        throw new ErrorWithStatus('Invalid payload - quantity must be string or null', 400);
       }
       else {
         foundArgs[key] = true;

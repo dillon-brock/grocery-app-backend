@@ -14,7 +14,7 @@ export type ListItemFromDB = {
 };
 
 export interface NewListItemBody {
-  quantity: string;
+  quantity: string | null;
   item: string;
   categoryId: string;
 }
