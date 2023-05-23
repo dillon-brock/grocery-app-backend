@@ -111,4 +111,68 @@ describe('POST /list-items/multiple', () => {
     expect(res.status).toBe(400);
     expect(res.body.message).toEqual('Incomplete query (list not specified)');
   });
+
+  it('gives a 400 error for unexpected argument in one item', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+
+    const res = await agent.post(`/list-items/multiple?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ items: [
+        { ...testItem, categoryId }, 
+        { ...testItem2, categoryId }, 
+        { ...testItem3, categoryId, other: 'bad data' }
+      ] });
+    
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - unexpected argument other');
+  });
+
+  it('gives a 400 error for invalid type (non-quantity)', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+
+    const res = await agent.post(`/list-items/multiple?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ items: [
+        { ...testItem, categoryId, item: {} }, 
+        { ...testItem2, categoryId }, 
+        { ...testItem3, categoryId }
+      ] });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - item must be string');
+  });
+
+  it('gives a 400 error for invalid type of quantity', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+
+    const res = await agent.post(`/list-items/multiple?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ items: [
+        { ...testItem, categoryId }, 
+        { ...testItem2, categoryId, quantity: 2 }, 
+        { ...testItem3, categoryId }
+      ] });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - quantity must be string or null');
+  });
+
+  it('gives a 400 error for missing argument', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const { listId, categoryId } = await createListWithCategory(agent, token);
+
+    const res = await agent.post(`/list-items/multiple?listId=${listId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ items: [
+        { ...testItem, categoryId }, 
+        { ...testItem2 }, 
+        { ...testItem3, categoryId }
+      ] });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - categoryId is required');
+  });
 });
