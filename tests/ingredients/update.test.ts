@@ -86,4 +86,40 @@ describe('PUT /ingredients/:id', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Ingredient not found');
   });
+
+  it('gives a 400 error for invalid arguments', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    const res = await agent.put(`/ingredients/${ingredientId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'oat milk', other: 'bad data' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - unexpected argument other');
+  });
+
+  it('gives a 400 error for invalid name', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    const res = await agent.put(`/ingredients/${ingredientId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name must be string');
+  });
+
+  it('gives a 400 error for invalid amount', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const ingredientId = await addIngredient(agent, token, recipeId);
+
+    const res = await agent.put(`/ingredients/${ingredientId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'oat milk', amount: 2 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - amount must be string');
+  });
 });

@@ -11,7 +11,7 @@ export default async (req: AuthenticatedReqBody<IngredientUpdateData>, res: Resp
         throw new ErrorWithStatus(`Invalid payload - unexpected argument ${key}`, 400);
       }
       if (typeof req.body[key] != 'string') {
-        throw new ErrorWithStatus(`Invalid payload - ${key} must be string or left out of arguments`, 400);
+        throw new ErrorWithStatus(`Invalid payload - ${key} must be string`, 400);
       }
     }
     next();
