@@ -10,6 +10,7 @@ import { NextFunction } from 'express-serve-static-core';
 import { MultipleItemsRes } from '../types/listItem.js';
 import validateCreateSingleItem from '../middleware/validation/list-items/create-single.js';
 import validateCreateMultipleItems from '../middleware/validation/list-items/create-multiple.js';
+import validateItemUpdate from '../middleware/validation/list-items/update.js';
 
 export default Router()
   .post('/', [authenticate, authorizeAddItem, validateCreateSingleItem], async (
@@ -33,7 +34,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeItemAccess], async (
+  .put('/:id', [authenticate, authorizeItemAccess, validateItemUpdate], async (
     req: TypedAuthenticatedRequest<ListItemUpdateData, {id: string}>, 
     res: TypedResponse<ListItemRes>, next: NextFunction) => {
     try {

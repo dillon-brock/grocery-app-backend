@@ -76,6 +76,7 @@ export class ListItem {
       if (typeof v == 'string') {
         newVal = `'${v}'`;
       }
+      else if (v == null) newVal = 'NULL';
       return `${k} = ` + newVal;
     }).join(', ')}
     WHERE id = $1

@@ -34,7 +34,7 @@ export type CoalescedListItem = {
 export type ListItemUpdateData = {
   item?: string;
   bought?: boolean;
-  quantity?: string;
+  quantity?: string | null;
   category_id?: string;
 }
 
