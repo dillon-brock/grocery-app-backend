@@ -10,6 +10,7 @@ import authorizeListShare from '../middleware/authorization/list-shares/list-sha
 import authorizeGetSharedUsers from '../middleware/authorization/list-shares/get-shared-users.js';
 import authorizeModifyListShare from '../middleware/authorization/list-shares/edit-list-share.js';
 import validateNewListShare from '../middleware/validation/list-shares/create.js';
+import validateListShareUpdate from '../middleware/validation/list-shares/update.js';
 
 export default Router()
   .post('/', [authenticate, validateNewListShare, authorizeListShare], async (
@@ -28,7 +29,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeModifyListShare], async (
+  .put('/:id', [authenticate, authorizeModifyListShare, validateListShareUpdate], async (
     req: TypedAuthenticatedRequest<ListShareUpdateData, { id: string }>,
     res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {

@@ -56,4 +56,26 @@ describe('PUT /list-shares/:id', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('List share data not found');
   });
+
+  it('gives a 400 error for missing editable argument', async () => {
+    const { token, agent, shareId } = await signUpAndShareList();
+
+    const res = await agent.put(`/list-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - editable is required');
+  });
+
+  it('gives a 400 error for invalid type for editable', async () => {
+    const { token, agent, shareId } = await signUpAndShareList();
+
+    const res = await agent.put(`/list-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ editable: 'false' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - editable must be boolean');
+  });
 });
