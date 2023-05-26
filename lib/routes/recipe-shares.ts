@@ -9,9 +9,10 @@ import authorizeRecipeShare from '../middleware/authorization/recipe-shares/shar
 import { MultipleUserRes } from '../types/user.js';
 import authorizeGetSharedUsers from '../middleware/authorization/recipe-shares/get-users-with-recipe-access.js';
 import authorizeUpdateRecipeShare from '../middleware/authorization/recipe-shares/update-recipe-share.js';
+import validateNewRecipeShare from '../middleware/validation/recipe-shares/create.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
+  .post('/', [authenticate, validateNewRecipeShare, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
     res: TypedResponse<RecipeShareRes>, next: NextFunction) => {
     try {
       const newShare = await RecipeShare.create(req.body);
