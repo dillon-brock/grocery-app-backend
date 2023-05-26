@@ -1,4 +1,4 @@
-import { setupDb, signUpAndGetInfo } from '../utils.js';
+import { setupDb, signUp, signUpAndGetInfo } from '../utils.js';
 import request from 'supertest';
 import app from '../../lib/app.js';
 
@@ -67,5 +67,27 @@ describe('POST /lists tests', () => {
     
     expect(res.status).toBe(500);
     expect(res.body.message).toBe('jwt malformed');
+  });
+
+  it('gives a 400 error for missing title', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.post('/lists')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - title is required');
+  });
+
+  it('gives a 400 error for invalid title type', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.post('/lists')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 5 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - title must be string or null');
   });
 });

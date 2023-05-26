@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express-serve-static-core';
-import { AuthenticatedReqBody } from '../../types/extendedExpress.js';
-import { ListUpdateData } from '../../types/list.js';
-import { ErrorWithStatus } from '../../types/error.js';
+import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
+import { ListUpdateData } from '../../../types/list.js';
+import { ErrorWithStatus } from '../../../types/error.js';
 
 export default async (req: AuthenticatedReqBody<ListUpdateData>, res: Response, next: NextFunction) => {
   try {

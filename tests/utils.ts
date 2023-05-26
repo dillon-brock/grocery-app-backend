@@ -112,7 +112,8 @@ export async function signUpAndCreateList(): Promise<CreateListInfo> {
   const { token } = signUpRes.body;
 
   const listRes = await agent.post('/lists')
-    .set('Authorization', `Bearer ${token}`);
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: null });
   const listId = listRes.body.list.id;
 
   return { agent, token, listId };
@@ -194,7 +195,8 @@ export async function createListWithCategory(agent: request.SuperAgentTest, toke
   
   const newListRes = await agent
     .post('/lists')
-    .set('Authorization', `Bearer ${token}`);
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: null });
   const listId = newListRes.body.list.id;
 
   const categoryRes = await agent.post('/categories')
@@ -233,7 +235,8 @@ export async function signUpAndGetListShareData(): Promise<ListShareRouteData> {
   const otherUser: User = await UserService.create(testUser2);
   const newListRes = await agent
     .post('/lists')
-    .set('Authorization', `Bearer ${token}`);
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: null });
   const { list } = newListRes.body;
 
   return { listId: list.id, userId: otherUser.id, token, agent };
@@ -245,7 +248,8 @@ export async function createList(agent: request.SuperAgentTest, token: string): 
   
   const newListRes = await agent
     .post('/lists')
-    .set('Authorization', `Bearer ${token}`);
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: null });
   
   return newListRes.body.list.id;
 
