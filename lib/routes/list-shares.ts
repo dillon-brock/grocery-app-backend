@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedResponse } from '../types/extendedExpress.js';
-import { ListShareRes, NewListShareData, SharedListsRes, SharedUsersRes } from '../types/listShare.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { ListShareRes, ListShareUpdateData, NewListShareData, SharedListsRes, SharedUsersRes } from '../types/listShare.js';
 import { NextFunction } from 'express-serve-static-core';
 import { ListShare } from '../models/ListShare.js';
 import authenticate from '../middleware/authenticate.js';
@@ -25,6 +25,19 @@ export default Router()
       });
     } 
     catch (e) {
+      next(e);
+    }
+  })
+  .put('/:id', [authenticate], async (
+    req: TypedAuthenticatedRequest<ListShareUpdateData, { id: string }>,
+    res: TypedResponse<ListShareRes>, next: NextFunction) => {
+    try {
+      const updatedShare = await ListShare.updateById(req.params.id, req.body);
+      res.json({
+        message: 'List share updated successfully',
+        shareData: updatedShare
+      });
+    } catch (e) {
       next(e);
     }
   })
