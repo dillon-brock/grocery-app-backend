@@ -66,4 +66,71 @@ describe('POST /list-shares (share list) tests', () => {
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to share this list');
   });
+
+  it('gives a 400 error for missing listId', async () => {
+    const { userId, token, agent } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ userId, editable: true });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - listId is required');
+  });
+
+  it('gives a 400 error for invalid listId type', async () => {
+    const { userId, token, agent } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId: 1, userId, editable: true });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - listId must be string');
+  });
+
+  it('gives a 400 error for missing userId', async () => {
+    const { listId, token, agent } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, editable: true });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - userId is required');
+  });
+
+  it('gives a 400 error for invalid userId type', async () => {
+    const { listId, token, agent } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId: 1, editable: true });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - userId must be string');
+  });
+
+  it('gives a 400 error for missing editable value', async () => {
+    const { listId, userId, token, agent } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - editable is required');
+  });
+
+  it('gives a 400 error for invalid editable type', async () => {
+    const { listId, userId, token, agent } = await signUpAndGetListShareData();
+
+    const res = await agent.post('/list-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ listId, userId, editable: 'true' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - editable must be boolean');
+  });
+
 });
