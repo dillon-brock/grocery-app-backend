@@ -8,7 +8,7 @@ import { ErrorWithStatus } from '../types/error.js';
 import { User } from '../models/User.js';
 import authorizeListShare from '../middleware/authorization/list-shares/list-share.js';
 import authorizeGetSharedUsers from '../middleware/authorization/list-shares/get-shared-users.js';
-import authorizeDeleteListShare from '../middleware/authorization/list-shares/delete-list-share.js';
+import authorizeModifyListShare from '../middleware/authorization/list-shares/edit-list-share.js';
 import validateNewListShare from '../middleware/validation/list-shares/create.js';
 
 export default Router()
@@ -28,7 +28,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate], async (
+  .put('/:id', [authenticate, authorizeModifyListShare], async (
     req: TypedAuthenticatedRequest<ListShareUpdateData, { id: string }>,
     res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {
@@ -67,7 +67,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', [authenticate, authorizeDeleteListShare], async (
+  .delete('/:id', [authenticate, authorizeModifyListShare], async (
     req: AuthenticatedReqParams<{id: string}>, 
     res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {
