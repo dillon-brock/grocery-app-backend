@@ -9,9 +9,10 @@ import { User } from '../models/User.js';
 import authorizeListShare from '../middleware/authorization/list-shares/list-share.js';
 import authorizeGetSharedUsers from '../middleware/authorization/list-shares/get-shared-users.js';
 import authorizeDeleteListShare from '../middleware/authorization/list-shares/delete-list-share.js';
+import validateNewListShare from '../middleware/validation/list-shares/create.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeListShare], async (
+  .post('/', [authenticate, validateNewListShare, authorizeListShare], async (
     req: AuthenticatedReqBody<NewListShareData>, 
     res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {
