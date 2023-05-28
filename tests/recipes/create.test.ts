@@ -34,4 +34,26 @@ describe('POST /recipes tests', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toBe('You must be signed in to continue');
   });
+
+  it('gives a 400 error for missing name', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.post('/recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+    
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name is required');
+  });
+
+  it('gives a 400 error for invalid name type', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.post('/recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 1 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name must be string');
+  });
 });
