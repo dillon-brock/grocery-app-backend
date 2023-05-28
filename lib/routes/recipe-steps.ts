@@ -8,6 +8,7 @@ import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/mo
 import authorizeEditStep from '../middleware/authorization/recipe-steps/edit-step.js';
 import authorizeViewRecipe from '../middleware/authorization/recipes/view-from-query.js';
 import validateNewRecipeStep from '../middleware/validation/recipe-steps/create.js';
+import validateStepUpdate from '../middleware/validation/recipe-steps/update.js';
 
 export default Router()
   .post('/', [authenticate, validateNewRecipeStep, authorizeModifyRecipeDetails], async (
@@ -35,7 +36,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeEditStep], async (
+  .put('/:id', [authenticate, validateStepUpdate, authorizeEditStep], async (
     req: TypedAuthenticatedRequest<StepUpdateData, { id: string }>,
     res: TypedResponse<RecipeStepRes>, next: NextFunction) => {
     try {
