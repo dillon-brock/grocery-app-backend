@@ -7,9 +7,10 @@ import { RecipeStep } from '../models/RecipeStep.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
 import authorizeEditStep from '../middleware/authorization/recipe-steps/edit-step.js';
 import authorizeViewRecipe from '../middleware/authorization/recipes/view-from-query.js';
+import validateNewRecipeStep from '../middleware/validation/recipe-steps/create.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeModifyRecipeDetails], async (
+  .post('/', [authenticate, validateNewRecipeStep, authorizeModifyRecipeDetails], async (
     req: AuthReqBodyAndQuery<NewStepReqBody, { recipeId: string }>,
     res: TypedResponse<RecipeStepRes>, next: NextFunction) => {
     try {

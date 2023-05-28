@@ -68,7 +68,7 @@ describe('POST /recipe-steps', () => {
       .send(testStep);
 
     expect(res.status).toBe(400);
-    expect(res.body.message).toEqual('Missing recipeId query parameter');
+    expect(res.body.message).toEqual('Invalid query - recipeId is required');
   });
 
   it('gives a 404 error for nonexistent recipe', async () => {
