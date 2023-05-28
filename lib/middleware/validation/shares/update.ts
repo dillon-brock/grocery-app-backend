@@ -2,8 +2,9 @@ import { NextFunction, Response } from 'express-serve-static-core';
 import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
 import { ListShareUpdateData } from '../../../types/listShare.js';
 import { ErrorWithStatus } from '../../../types/error.js';
+import { RecipeShareUpdateData } from '../../../types/recipeShare.js';
 
-export default async (req: AuthenticatedReqBody<ListShareUpdateData>, res: Response, next: NextFunction) => {
+export default async (req: AuthenticatedReqBody<ListShareUpdateData | RecipeShareUpdateData>, res: Response, next: NextFunction) => {
   try {
     const { editable } = req.body;
     if (editable == undefined) {

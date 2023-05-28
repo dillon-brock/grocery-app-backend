@@ -34,4 +34,26 @@ describe('PUT /recipe-shares/:id tests', () => {
       'You are not authorized to make changes to this information'
     );
   });
+
+  it('gives a 400 error missing editable argument', async () => {
+    const { agent, token, shareId } = await signUpAndShareRecipe(false);
+
+    const res = await agent.put(`/recipe-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - editable is required');
+  });
+
+  it('gives a 400 for invalid editable type', async () => {
+    const { agent, token, shareId } = await signUpAndShareRecipe(false);
+
+    const res = await agent.put(`/recipe-shares/${shareId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ editable: 'true' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - editable must be boolean');
+  });
 });

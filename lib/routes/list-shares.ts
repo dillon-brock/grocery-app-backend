@@ -10,7 +10,7 @@ import authorizeListShare from '../middleware/authorization/list-shares/list-sha
 import authorizeGetSharedUsers from '../middleware/authorization/list-shares/get-shared-users.js';
 import authorizeModifyListShare from '../middleware/authorization/list-shares/edit-list-share.js';
 import validateNewListShare from '../middleware/validation/list-shares/create.js';
-import validateListShareUpdate from '../middleware/validation/list-shares/update.js';
+import validateListShareUpdate from '../middleware/validation/shares/update.js';
 
 export default Router()
   .post('/', [authenticate, validateNewListShare, authorizeListShare], async (
