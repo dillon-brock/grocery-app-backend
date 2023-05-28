@@ -83,4 +83,28 @@ describe('PUT /recipes/:id tests', () => {
     expect(res.status).toBe(401);
     expect(res.body.message).toEqual('You must be signed in to continue');
   });
+
+  it('gives a 400 error for invalid name type', async () => {
+    const { agent, token } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.put(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name must be string');
+  });
+
+  it('gives a 400 error for empty string name argument', async () => {
+    const { agent, token } = await signUp();
+    const recipeId = await createRecipe(agent, token);
+
+    const res = await agent.put(`/recipes/${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - name cannot be empty string');
+  });
 });
