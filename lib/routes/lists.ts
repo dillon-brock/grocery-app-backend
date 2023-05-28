@@ -8,12 +8,14 @@ import { ListRes, ListUpdateData, MultipleListsRes, NewListData } from '../types
 import { NextFunction } from 'express-serve-static-core';
 import { Category } from '../models/Category.js';
 import { ErrorWithStatus } from '../types/error.js';
+import validateNewList from '../middleware/validation/lists/create.js';
+import validateUpdateData from '../middleware/validation/lists/update.js';
 
 const defaultCategories: string[] = ['Fruit', 'Vegetables', 'Dry Goods', 
   'Canned Goods', 'Protein', 'Dairy', 'Beverages', 'Snacks'];
 
 export default Router()
-  .post('/', authenticate, async (
+  .post('/', [authenticate, validateNewList], async (
     req: AuthenticatedReqBody<NewListData>, 
     res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
@@ -56,7 +58,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeUpdateList], async (req: TypedAuthenticatedRequest<ListUpdateData, { id: string}>,
+  .put('/:id', [authenticate, validateUpdateData, authorizeUpdateList], async (req: TypedAuthenticatedRequest<ListUpdateData, { id: string}>,
     res: TypedResponse<ListRes>, next: NextFunction) => {
     try {
       const updatedList = await List.updateById(req.params.id, req.body);

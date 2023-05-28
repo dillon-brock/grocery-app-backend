@@ -6,9 +6,6 @@ import { ErrorWithStatus } from '../../../types/error.js';
 export default async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const recipeId = req.query.recipeId;
-    if (!recipeId) {
-      throw new ErrorWithStatus('Missing recipeId query parameter', 400);
-    }
     const recipe = await Recipe.findById(recipeId as string);
     if (!recipe) {
       throw new ErrorWithStatus('Recipe not found', 404);

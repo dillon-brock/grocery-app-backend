@@ -17,6 +17,10 @@ export type NewListShareData = {
   editable: boolean;
 }
 
+export type ListShareUpdateData = {
+  editable: boolean;
+}
+
 interface ListShare {
   id: string;
   userId: string;

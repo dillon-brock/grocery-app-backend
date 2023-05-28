@@ -14,7 +14,7 @@ export type ListItemFromDB = {
 };
 
 export interface NewListItemBody {
-  quantity: string;
+  quantity: string | null;
   item: string;
   categoryId: string;
 }
@@ -34,7 +34,7 @@ export type CoalescedListItem = {
 export type ListItemUpdateData = {
   item?: string;
   bought?: boolean;
-  quantity?: string;
+  quantity?: string | null;
   category_id?: string;
 }
 

@@ -5,9 +5,11 @@ import { MultipleRecipesRes, NewRecipeBody, RecipeRes } from '../types/recipe.js
 import { NextFunction } from 'express-serve-static-core';
 import { Recipe, RecipeWithDetail } from '../models/Recipe.js';
 import authorizeRecipeAccess from '../middleware/authorization/recipes/recipe-access.js';
+import validateNewRecipe from '../middleware/validation/recipes/create.js';
+import validateRecipeUpdate from '../middleware/validation/recipes/update.js';
 
 export default Router()
-  .post('/', authenticate, async (req: AuthenticatedReqBody<NewRecipeBody>, 
+  .post('/', [authenticate, validateNewRecipe], async (req: AuthenticatedReqBody<NewRecipeBody>, 
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {
       const newRecipe = await Recipe.create({ ...req.body, ownerId: req.user.id });
@@ -43,7 +45,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeRecipeAccess], async (
+  .put('/:id', [authenticate, validateRecipeUpdate, authorizeRecipeAccess], async (
     req: TypedAuthenticatedRequest<{}, {id: string}>,
     res: TypedResponse<RecipeRes>, next: NextFunction) => {
     try {

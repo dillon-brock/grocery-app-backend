@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedResponse } from '../types/extendedExpress.js';
-import { ListShareRes, NewListShareData, SharedListsRes, SharedUsersRes } from '../types/listShare.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { ListShareRes, ListShareUpdateData, NewListShareData, SharedListsRes, SharedUsersRes } from '../types/listShare.js';
 import { NextFunction } from 'express-serve-static-core';
 import { ListShare } from '../models/ListShare.js';
 import authenticate from '../middleware/authenticate.js';
@@ -8,10 +8,12 @@ import { ErrorWithStatus } from '../types/error.js';
 import { User } from '../models/User.js';
 import authorizeListShare from '../middleware/authorization/list-shares/list-share.js';
 import authorizeGetSharedUsers from '../middleware/authorization/list-shares/get-shared-users.js';
-import authorizeDeleteListShare from '../middleware/authorization/list-shares/delete-list-share.js';
+import authorizeModifyListShare from '../middleware/authorization/list-shares/edit-list-share.js';
+import validateNewListShare from '../middleware/validation/list-shares/create.js';
+import validateListShareUpdate from '../middleware/validation/shares/update.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeListShare], async (
+  .post('/', [authenticate, validateNewListShare, authorizeListShare], async (
     req: AuthenticatedReqBody<NewListShareData>, 
     res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {
@@ -24,6 +26,19 @@ export default Router()
       });
     } 
     catch (e) {
+      next(e);
+    }
+  })
+  .put('/:id', [authenticate, authorizeModifyListShare, validateListShareUpdate], async (
+    req: TypedAuthenticatedRequest<ListShareUpdateData, { id: string }>,
+    res: TypedResponse<ListShareRes>, next: NextFunction) => {
+    try {
+      const updatedShare = await ListShare.updateById(req.params.id, req.body);
+      res.json({
+        message: 'List share updated successfully',
+        shareData: updatedShare
+      });
+    } catch (e) {
       next(e);
     }
   })
@@ -53,7 +68,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', [authenticate, authorizeDeleteListShare], async (
+  .delete('/:id', [authenticate, authorizeModifyListShare], async (
     req: AuthenticatedReqParams<{id: string}>, 
     res: TypedResponse<ListShareRes>, next: NextFunction) => {
     try {

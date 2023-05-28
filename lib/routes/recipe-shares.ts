@@ -9,9 +9,11 @@ import authorizeRecipeShare from '../middleware/authorization/recipe-shares/shar
 import { MultipleUserRes } from '../types/user.js';
 import authorizeGetSharedUsers from '../middleware/authorization/recipe-shares/get-users-with-recipe-access.js';
 import authorizeUpdateRecipeShare from '../middleware/authorization/recipe-shares/update-recipe-share.js';
+import validateNewRecipeShare from '../middleware/validation/recipe-shares/create.js';
+import validateUpdateRecipeShare from '../middleware/validation/shares/update.js';
 
 export default Router()
-  .post('/', [authenticate, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
+  .post('/', [authenticate, validateNewRecipeShare, authorizeRecipeShare], async (req: AuthenticatedReqBody<NewRecipeShareData>, 
     res: TypedResponse<RecipeShareRes>, next: NextFunction) => {
     try {
       const newShare = await RecipeShare.create(req.body);
@@ -47,7 +49,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', [authenticate, authorizeUpdateRecipeShare], async (
+  .put('/:id', [authenticate, validateUpdateRecipeShare, authorizeUpdateRecipeShare], async (
     req: TypedAuthenticatedRequest<RecipeShareUpdateData, { id: string }>,
     res: TypedResponse<RecipeShareRes>, next: NextFunction) => {
     try {

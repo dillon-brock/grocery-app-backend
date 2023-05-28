@@ -37,7 +37,7 @@ export class ListItem {
     if (!items[0]) return [];
 
     let query = 'INSERT INTO list_items (list_id, quantity, item, category_id) VALUES ';
-    const values: string[] = [];
+    const values: (string | null)[] = [];
 
     for (let i = 0; i < items.length; i++) {
       const item: NewListItemBody | undefined = items[i];
@@ -76,6 +76,7 @@ export class ListItem {
       if (typeof v == 'string') {
         newVal = `'${v}'`;
       }
+      else if (v == null) newVal = 'NULL';
       return `${k} = ` + newVal;
     }).join(', ')}
     WHERE id = $1

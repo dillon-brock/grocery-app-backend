@@ -1,8 +1,8 @@
 import pool from '../../sql/pool.js';
-import { DeletionError, InsertionError } from '../types/error.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { ListRows } from '../types/list.js';
 import { UserRows } from '../types/user.js';
-import { ListShareFromDB, ListShareRows, NewListShareData } from '../types/listShare.js';
+import { ListShareFromDB, ListShareRows, ListShareUpdateData, NewListShareData } from '../types/listShare.js';
 import { List } from './List.js';
 import { User } from './User.js';
 
@@ -41,6 +41,20 @@ export class ListShare {
     );
 
     if (!rows[0]) return null;
+    return new ListShare(rows[0]);
+  }
+
+  static async updateById(id: string, data: ListShareUpdateData): Promise<ListShare> {
+
+    const { rows }: ListShareRows = await pool.query(
+      `UPDATE list_shares
+      SET editable = $1
+      WHERE id = $2
+      RETURNING *`,
+      [data.editable, id]
+    );
+
+    if (!rows[0]) throw new UpdateError('list-shares');
     return new ListShare(rows[0]);
   }
 

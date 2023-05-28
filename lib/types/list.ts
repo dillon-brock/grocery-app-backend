@@ -31,7 +31,7 @@ export interface ListWithItemsFromDB extends ListFromDB {
 }
 
 export interface NewListData {
-  title: string
+  title: string | null;
 }
 
 export interface CreateListParams extends NewListData {
@@ -47,5 +47,5 @@ export interface MultipleListsRes extends SuccessResponse {
 }
 
 export type ListUpdateData = {
-  title?: string
+  title: string
 }
