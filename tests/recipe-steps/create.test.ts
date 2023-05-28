@@ -81,4 +81,48 @@ describe('POST /recipe-steps', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Recipe not found');
   });
+
+  it('gives a 400 error for missing num argument', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ detail: testStep.detail });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - num is required');
+  });
+
+  it('gives a 400 error for invalid num type', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ num: testStep.num.toString(), detail: testStep.detail });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - num must be number');
+  });
+
+  it('gives a 400 error for missing detail argument', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ num: testStep.num });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - detail is required');
+  });
+
+  it('gives a 400 error for invalid detail type', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post(`/recipe-steps?recipeId=${recipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ num: testStep.num, detail: {} });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - detail must be string');
+  });
 });
