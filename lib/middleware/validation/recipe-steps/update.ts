@@ -18,6 +18,7 @@ export default async (req: AuthenticatedReqBody<StepUpdateData>, res: Response, 
     if (detail === '') {
       throw new ErrorWithStatus('Invalid payload - detail cannot be empty string', 400);
     }
+    next();
   } catch (e) {
     next(e);
   }

@@ -65,4 +65,40 @@ describe('PUT /recipe-steps/:id', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Step not found');
   });
+
+  it('gives a 400 error for invalid num type', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.put(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ num: '1' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - num must be number or omitted');
+  });
+
+  it('gives a 400 error for invalid detail type', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.put(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ detail: 5 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - detail must be string or omitted');
+  });
+
+  it('gives a 400 error for empty string detail', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+    const stepId = await createRecipeStep(agent, token, recipeId);
+
+    const res = await agent.put(`/recipe-steps/${stepId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ detail: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - detail cannot be empty string');
+  });
 });
