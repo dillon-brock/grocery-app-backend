@@ -22,6 +22,17 @@ export class PublicUser {
 
     return rows.map(row => new PublicUser(row));
   }
+
+  static async checkForExisting(username: string): Promise<PublicUser | null> {
+    const { rows }: PublicUserRows = await pool.query(
+      `SELECT id, username FROM users
+      WHERE users.username = $1`,
+      [username]
+    );
+
+    if (!rows[0]) return null;
+    return new PublicUser(rows[0]);
+  }
 }
 
 export class User {

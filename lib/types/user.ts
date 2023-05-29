@@ -53,6 +53,10 @@ export type PublicUserFromDB = {
 
 export type PublicUserRows = Rows<PublicUserFromDB>;
 
+export interface PublicUserRes extends SuccessResponse {
+  user: PublicUser | null;
+}
+
 export interface PublicUsersRes extends SuccessResponse {
   users: PublicUser[];
 }

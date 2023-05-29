@@ -3,7 +3,7 @@ import { UserService } from '../services/UserService.js';
 import authenticate from '../middleware/authenticate.js';
 import { PublicUser, User } from '../models/User.js';
 import { AuthenticatedReqQuery, AuthenticatedRequest, RequestWithBody, TypedResponse } from '../types/extendedExpress.js';
-import { PublicUsersRes, TokenRes, UserRes, UserSignInData, UserSignUpData } from '../types/user.js';
+import { PublicUserRes, PublicUsersRes, TokenRes, UserRes, UserSignInData, UserSignUpData } from '../types/user.js';
 import { NextFunction } from 'express-serve-static-core';
 
 export default Router()
@@ -42,6 +42,18 @@ export default Router()
         const user = await User.findByEmail(req.user.email);
         res.json({ user, message: 'Current user found' });
       }
+    } catch (e) {
+      next(e);
+    }
+  })
+  .get('/find', authenticate, async (req: AuthenticatedReqQuery<{username: string}>,
+    res: TypedResponse<PublicUserRes>, next: NextFunction) => {
+    try {
+      const user = await PublicUser.checkForExisting(req.query.username);
+      res.json({
+        message: user ? 'User found' : 'No user found',
+        user
+      });
     } catch (e) {
       next(e);
     }
