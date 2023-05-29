@@ -30,4 +30,11 @@ describe('GET /users/find', () => {
       user: null
     });
   });
+
+  it('gives a 400 error for missing username query', async () => {
+    const res = await request(app).get('/users/find');
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid query - username is required');
+  });
 });

@@ -5,6 +5,7 @@ import { PublicUser, User } from '../models/User.js';
 import { AuthenticatedReqQuery, AuthenticatedRequest, RequestWithBody, RequestWithQuery, TypedResponse } from '../types/extendedExpress.js';
 import { PublicUserRes, PublicUsersRes, TokenRes, UserRes, UserSignInData, UserSignUpData } from '../types/user.js';
 import { NextFunction } from 'express-serve-static-core';
+import validateCheckForExistingUsername from '../middleware/validation/users/find.js';
 
 export default Router()
   .post('/', async (req: RequestWithBody<UserSignUpData>, 
@@ -46,7 +47,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/find', async (req: RequestWithQuery<{ username: string }>,
+  .get('/find', validateCheckForExistingUsername, async (req: RequestWithQuery<{ username: string }>,
     res: TypedResponse<PublicUserRes>, next: NextFunction) => {
     try {
       const user = await PublicUser.checkForExisting(req.query.username);
