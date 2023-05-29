@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { UserService } from '../services/UserService.js';
 import authenticate from '../middleware/authenticate.js';
 import { PublicUser, User } from '../models/User.js';
-import { AuthenticatedReqQuery, AuthenticatedRequest, RequestWithBody, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqQuery, AuthenticatedRequest, RequestWithBody, RequestWithQuery, TypedResponse } from '../types/extendedExpress.js';
 import { PublicUserRes, PublicUsersRes, TokenRes, UserRes, UserSignInData, UserSignUpData } from '../types/user.js';
 import { NextFunction } from 'express-serve-static-core';
 
@@ -46,7 +46,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/find', authenticate, async (req: AuthenticatedReqQuery<{username: string}>,
+  .get('/find', async (req: RequestWithQuery<{ username: string }>,
     res: TypedResponse<PublicUserRes>, next: NextFunction) => {
     try {
       const user = await PublicUser.checkForExisting(req.query.username);

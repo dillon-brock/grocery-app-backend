@@ -35,6 +35,10 @@ export interface RequestWithParams<T extends ParamsDictionary> extends Request {
   params: T
 }
 
+export interface RequestWithQuery<T extends Query> extends Request {
+  query: T
+}
+
 export interface TypedRequest<T, U extends ParamsDictionary> extends Request {
   body: T,
   params: U
