@@ -1,3 +1,6 @@
+import { MealPlan } from '../models/MealPlan.js';
+import { SuccessResponse } from './global.js';
+
 export interface MealPlanFromDB {
   id: string;
   owner_id: string;
@@ -12,4 +15,8 @@ export interface NewMealPlanData {
 
 export interface CreateMealPlanParams extends NewMealPlanData {
   ownerId: string;
+}
+
+export interface MealPlanRes extends SuccessResponse {
+  mealPlan: MealPlan
 }
