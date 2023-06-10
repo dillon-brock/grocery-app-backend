@@ -90,3 +90,29 @@ CREATE TABLE recipe_shares (
   FOREIGN KEY (recipe_id) REFERENCES recipes(id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE meal_plans (
+  id BIGINT GENERATED ALWAYS AS IDENTITY,
+  date DATE NOT NULL,
+  owner_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (owner_id) REFERENCES users(id)
+);
+
+CREATE TABLE recipes_plans (
+  id BIGINT GENERATED ALWAYS AS IDENTITY,
+  recipe_id BIGINT NOT NULL,
+  plan_id BIGINT NOT NULL,
+  FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+  FOREIGN KEY (plan_id) REFERENCES meal_plans(id)
+);
+
+CREATE TABLE plan_shares (
+  id BIGINT GENERATED ALWAYS AS IDENTITY,
+  plan_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  editable BOOLEAN NOT NULL DEFAULT FALSE,
+  FOREIGN KEY (plan_id) REFERENCES meal_plans(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
