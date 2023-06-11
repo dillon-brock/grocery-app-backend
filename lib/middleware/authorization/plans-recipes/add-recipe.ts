@@ -23,6 +23,12 @@ export default async (req: AuthenticatedReqBody<NewPlanRecipeData>, res: Respons
     if (!mealPlan) {
       throw new ErrorWithStatus('Meal plan not found', 404);
     }
+    if (mealPlan.ownerId != req.user.id) {
+      const userPermissions = await mealPlan.checkPermissions(req.user.id);
+      if (!userPermissions.edit) {
+        throw new ErrorWithStatus('You are not authorized to edit this meal plan', 403);
+      }
+    }
 
     next();
   } catch (e) {

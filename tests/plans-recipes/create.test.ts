@@ -1,4 +1,4 @@
-import { createRecipe, createSecondaryUser, setupDb, signUp, signUpAndCreateRecipe } from '../utils.js';
+import { createRecipe, createSecondaryUser, setupDb, signUp, signUpAndCreateRecipe, signUpAndShareRecipe } from '../utils.js';
 // import request from 'supertest';
 // import app from '../../lib/app.js';
 
@@ -85,5 +85,60 @@ describe('POST /plans-recipes', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You do not have access to this recipe');
+  });
+
+  it('gives a 403 error for user not authorized to edit meal plan', async () => {
+    const { agent, token, token2, recipeId } = await signUpAndShareRecipe(true);
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-10' });
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({
+        planId: mealPlanRes.body.mealPlan.id,
+        recipeId,
+        meal: 'Dinner'
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to edit this meal plan');
+  });
+
+  it('adds recipe to meal plan for user with edit access', async () => {
+    const { agent, token, token2, recipeId, sharedUserId } = await signUpAndShareRecipe(false);
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-10' });
+    const mealPlanId = mealPlanRes.body.mealPlan.id;
+
+    await agent.post('/plan-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        planId: mealPlanId,
+        userId: sharedUserId,
+        editable: true
+      });
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({
+        planId: mealPlanId,
+        recipeId,
+        meal: 'Lunch'
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Plan recipe created successfully',
+      planRecipe: {
+        id: expect.any(String),
+        planId: mealPlanId,
+        recipeId,
+        meal: 'Lunch'
+      }
+    });
   });
 });
