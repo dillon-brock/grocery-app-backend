@@ -30,4 +30,15 @@ export class MealPlan {
     if (!rows[0]) throw new InsertionError('meal_plans');
     return new MealPlan(rows[0]);
   }
+
+  static async findById(id: string): Promise<MealPlan | null> {
+
+    const { rows }: Rows<MealPlanFromDB> = await pool.query(
+      `SELECT * FROM meal_plans
+      WHERE id = $1`,
+      [id]
+    );
+
+    return rows[0] ? new MealPlan(rows[0]) : null;
+  }
 }
