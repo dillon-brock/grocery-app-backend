@@ -107,6 +107,7 @@ CREATE TABLE plans_recipes (
   id BIGINT GENERATED ALWAYS AS IDENTITY,
   recipe_id BIGINT NOT NULL,
   plan_id BIGINT NOT NULL,
+  meal VARCHAR(32) NOT NULL,
   FOREIGN KEY (recipe_id) REFERENCES recipes(id),
   FOREIGN KEY (plan_id) REFERENCES meal_plans(id)
 );

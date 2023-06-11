@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express-serve-static-core';
 import { AuthenticatedReqBody } from '../../../types/extendedExpress.js';
-import { NewStepReqBody } from '../../../types/recipe-step.js';
+import { NewStepReqBody } from '../../../types/recipeStep.js';
 import { ErrorWithStatus } from '../../../types/error.js';
 
 export default async (req: AuthenticatedReqBody<NewStepReqBody>, res: Response, next: NextFunction) => {

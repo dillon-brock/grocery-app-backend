@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
 import { AuthReqBodyAndQuery, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { MultipleStepRes, NewStepReqBody, RecipeStepRes, StepUpdateData } from '../types/recipe-step.js';
+import { MultipleStepRes, NewStepReqBody, RecipeStepRes, StepUpdateData } from '../types/recipeStep.js';
 import { NextFunction } from 'express-serve-static-core';
 import { RecipeStep } from '../models/RecipeStep.js';
 import authorizeModifyRecipeDetails from '../middleware/authorization/recipes/modify-recipe-details.js';
