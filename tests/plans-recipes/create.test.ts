@@ -141,4 +141,90 @@ describe('POST /plans-recipes', () => {
       }
     });
   });
+
+  it('gives a 400 error for missing planId', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, meal: 'Dinner' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - planId is required');
+  });
+
+  it('gives a 400 error for missing recipeId', async () => {
+    const { agent, token } = await signUp();
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-10' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ planId, meal: 'Dinner' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - recipeId is required');
+  });
+
+  it('gives a 400 error for missing meal', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-10' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, planId });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - meal is required');
+  });
+
+  it('gives a 400 error for invalid planId type', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, planId: 1, meal: 'Dinner' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - planId must be string');
+  });
+
+  it('gives a 400 error for invalid recipeId type', async () => {
+    const { agent, token } = await signUp();
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-10' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId: {}, planId, meal: 'Dinner' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - recipeId must be string');
+  });
+
+  it('gives a 400 error for invalid meal type', async () => {
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-10' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.post('/plans-recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ planId, recipeId, meal: 41 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - meal must be string');
+  });
 });
