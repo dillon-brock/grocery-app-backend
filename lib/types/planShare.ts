@@ -1,3 +1,6 @@
+import { PlanShare } from '../models/PlanShare.js';
+import { SuccessResponse } from './global.js';
+
 export type PlanShareFromDB = {
   id: string;
   user_id: string;
@@ -10,3 +13,7 @@ export type NewPlanShareData = {
   userId: string;
   editable: boolean;
 };
+
+export interface PlanShareRes extends SuccessResponse {
+  planShare: PlanShare
+}
