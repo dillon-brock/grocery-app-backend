@@ -1,7 +1,7 @@
 import pool from '../../sql/pool.js';
 import { InsertionError, UpdateError } from '../types/error.js';
 import { Permissions, Rows } from '../types/global.js';
-import { CreateMealPlanParams, MealPlanFromDB, MealPlanUpdateData } from '../types/mealPlan.js';
+import { CoalescedRecipe, CreateMealPlanParams, MealPlanFromDB, MealPlanUpdateData, MealPlanWithRecipesFromDB } from '../types/mealPlan.js';
 import { PlanShareFromDB } from '../types/planShare.js';
 import { buildUpdateQuery } from '../utils.js';
 
@@ -68,5 +68,36 @@ export class MealPlan {
     }
 
     return new MealPlan(rows[0]);
+  }
+}
+
+export class MealPlanWithRecipes extends MealPlan {
+  recipes: CoalescedRecipe[];
+
+  constructor(row: MealPlanWithRecipesFromDB) {
+    super(row);
+    this.recipes = row.recipes;
+  }
+
+  static async findByDate(date: string): Promise<MealPlanWithRecipes | null> {
+
+    const { rows }: Rows<MealPlanWithRecipesFromDB> = await pool.query(
+      `SELECT meal_plans.*,
+      COALESCE(
+        json_agg(json_build_object(
+          'id', recipes.id::text,
+          'name', recipes.name
+        ))
+        FILTER (WHERE recipes.id IS NOT NULL), '[]'
+      ) as recipes FROM meal_plans
+      LEFT JOIN plans_recipes ON plans_recipes.plan_id = meal_plans.id
+      LEFT JOIN recipes ON recipes.id = plans_recipes.recipe_id
+      WHERE meal_plans.date = $1
+      GROUP BY meal_plans.id`,
+      [date]
+    );
+
+    if (!rows[0]) return null;
+    return new MealPlanWithRecipes(rows[0]);
   }
 }

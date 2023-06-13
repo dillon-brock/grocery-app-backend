@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { MealPlanRes, MealPlanUpdateData } from '../types/mealPlan.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { MealPlanRes, MealPlanUpdateData, MealPlanWithRecipesRes } from '../types/mealPlan.js';
 import { NextFunction } from 'express-serve-static-core';
-import { MealPlan } from '../models/MealPlan.js';
+import { MealPlan, MealPlanWithRecipes } from '../models/MealPlan.js';
 import validateCreateMealPlan from '../middleware/validation/meal-plans/create.js';
 import authorizeUpdateMealPlan from '../middleware/authorization/meal-plans/update.js';
 import validateUpdateMealPlan from '../middleware/validation/meal-plans/update.js';
@@ -32,4 +32,16 @@ export default Router()
       } catch (e) {
         next(e);
       }
-    });
+    })
+  .get('/:date', authenticate, async (req: AuthenticatedReqParams<{ date: string }>, 
+    res: TypedResponse<MealPlanWithRecipesRes>, next: NextFunction) => {
+    try {
+      const planWithRecipes = await MealPlanWithRecipes.findByDate(req.params.date);
+      res.json({
+        message: 'Meal plan found successfully',
+        mealPlan: planWithRecipes
+      });
+    } catch (e) {
+      next(e);
+    }
+  });

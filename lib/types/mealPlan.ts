@@ -1,4 +1,4 @@
-import { MealPlan } from '../models/MealPlan.js';
+import { MealPlan, MealPlanWithRecipes } from '../models/MealPlan.js';
 import { SuccessResponse } from './global.js';
 
 export interface MealPlanFromDB {
@@ -23,4 +23,17 @@ export interface MealPlanRes extends SuccessResponse {
 
 export type MealPlanUpdateData = {
   date: string;
+}
+
+export type CoalescedRecipe = {
+  id: string;
+  name: string;
+}
+
+export interface MealPlanWithRecipesFromDB extends MealPlanFromDB {
+  recipes: CoalescedRecipe[];
+}
+
+export interface MealPlanWithRecipesRes extends SuccessResponse {
+  mealPlan: MealPlanWithRecipes | null;
 }
