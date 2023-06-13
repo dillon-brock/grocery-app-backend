@@ -1,4 +1,4 @@
-import { setupDb, signUpAndGetInfo } from '../utils.js';
+import { setupDb, signUp, signUpAndGetInfo, testUser2 } from '../utils.js';
 
 describe('PUT /meal-plans/:id', () => {
   beforeEach(setupDb);
@@ -25,5 +25,40 @@ describe('PUT /meal-plans/:id', () => {
         updatedAt: expect.any(String)
       }
     });
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token } = await signUp();
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-13' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.put(`/meal-plans/${planId}`)
+      .send({ date: '2023-06-14' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, token } = await signUp();
+
+    const secondUserRes = await agent.post('/users')
+      .send(testUser2);
+    const { token: token2 } = secondUserRes.body;
+
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-13' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.put(`/meal-plans/${planId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ date: '2023-06-14' });
+    
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to update this meal plan');
   });
 });
