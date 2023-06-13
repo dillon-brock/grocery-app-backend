@@ -1,8 +1,9 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/error.js';
+import { InsertionError, UpdateError } from '../types/error.js';
 import { Permissions, Rows } from '../types/global.js';
-import { CreateMealPlanParams, MealPlanFromDB } from '../types/mealPlan.js';
+import { CreateMealPlanParams, MealPlanFromDB, MealPlanUpdateData } from '../types/mealPlan.js';
 import { PlanShareFromDB } from '../types/planShare.js';
+import { buildUpdateQuery } from '../utils.js';
 
 export class MealPlan {
   id: string;
@@ -56,5 +57,16 @@ export class MealPlan {
       view: !!rows[0],
       edit: rows[0] ? rows[0].editable : false
     };
+  }
+
+  static async updateById(id: string, data: MealPlanUpdateData): Promise<MealPlan> {
+    const query: string = buildUpdateQuery('meal_plans', data);
+
+    const { rows }: Rows<MealPlanFromDB> = await pool.query(query, [id]);
+    if (!rows[0]) {
+      throw new UpdateError('meal_plans');
+    }
+
+    return new MealPlan(rows[0]);
   }
 }

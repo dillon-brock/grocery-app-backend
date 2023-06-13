@@ -20,3 +20,7 @@ export interface CreateMealPlanParams extends NewMealPlanData {
 export interface MealPlanRes extends SuccessResponse {
   mealPlan: MealPlan
 }
+
+export type MealPlanUpdateData = {
+  date: string;
+}
