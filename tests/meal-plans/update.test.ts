@@ -61,4 +61,34 @@ describe('PUT /meal-plans/:id', () => {
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You are not authorized to update this meal plan');
   });
+
+  it('gives a 400 error for missing date', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-13' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.put(`/meal-plans/${planId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - date is required');
+  });
+
+  it('gives a 400 error for invalid date type', async () => {
+    const { agent, token } = await signUpAndGetInfo();
+    const mealPlanRes = await agent.post('/meal-plans')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2023-06-13' });
+    const planId = mealPlanRes.body.mealPlan.id;
+
+    const res = await agent.put(`/meal-plans/${planId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: 2023 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - date must be string');
+  });
 });
