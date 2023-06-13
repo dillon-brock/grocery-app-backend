@@ -86,7 +86,8 @@ export class MealPlanWithRecipes extends MealPlan {
       COALESCE(
         json_agg(json_build_object(
           'id', recipes.id::text,
-          'name', recipes.name
+          'name', recipes.name,
+          'meal', plans_recipes.meal
         ))
         FILTER (WHERE recipes.id IS NOT NULL), '[]'
       ) as recipes FROM meal_plans
