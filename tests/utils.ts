@@ -336,3 +336,29 @@ export async function signUpAndShareList(): Promise<PostListData> {
 
   return { agent, sharedUserId: userId, token, listId, shareId };
 }
+
+
+// meal plans helper functions
+
+export async function createMealPlan(agent: request.SuperAgentTest, token: string, date: string): Promise<string> {
+  const newMealPlanRes = await agent.post('/meal-plans')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ date });
+
+  return newMealPlanRes.body.mealPlan.id;
+}
+
+type MealPlanAgentData = {
+  agent: request.SuperAgentTest;
+  token: string;
+  date: string;
+  planId: string;
+  userId: string;
+}
+
+export async function signUpAndCreateMealPlan(date: string): Promise<MealPlanAgentData> {
+  const { agent, token, user } = await signUpAndGetInfo();
+  const planId = await createMealPlan(agent, token, date);
+
+  return { agent, token, planId, date, userId: user.id };
+}

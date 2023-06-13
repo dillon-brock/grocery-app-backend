@@ -1,20 +1,16 @@
-import { createSecondaryUser, setupDb, signUp, testUser3 } from '../utils.js';
+import { createSecondaryUser, setupDb, signUp, signUpAndCreateMealPlan, testUser3 } from '../utils.js';
 
 describe('POST /plan-shares', () => {
   beforeEach(setupDb);
 
   it('shares a meal plan at POST /plan-shares', async () => {
-    const { agent, token } = await signUp();
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
     const { secondUserId } = await createSecondaryUser(agent);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-08-11' });
 
     const res = await agent.post('/plan-shares')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         userId: secondUserId,
         editable: false
       });
@@ -24,7 +20,7 @@ describe('POST /plan-shares', () => {
       message: 'Meal plan shared successfully',
       planShare: {
         id: expect.any(String),
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         userId: secondUserId,
         editable: false
       }
@@ -32,13 +28,8 @@ describe('POST /plan-shares', () => {
   });
 
   it('gives a 401 error for unauthenticated user', async () => {
-    const { agent, token } = await signUp();
+    const { agent, planId } = await signUpAndCreateMealPlan('2023-06-13');
     const { secondUserId } = await createSecondaryUser(agent);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-08-11' });
-    const planId = mealPlanRes.body.mealPlan.id;
 
     const res = await agent.post('/plan-shares')
       .send({
@@ -68,13 +59,8 @@ describe('POST /plan-shares', () => {
   });
 
   it('gives a 403 error for unauthorized user', async () => {
-    const { agent, token } = await signUp();
+    const { agent, planId } = await signUpAndCreateMealPlan('2023-06-13');
     const { secondUserId } = await createSecondaryUser(agent);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-11' });
-    const planId = mealPlanRes.body.mealPlan.id;
 
     const thirdUserRes = await agent.post('/users')
       .send(testUser3);
@@ -108,12 +94,7 @@ describe('POST /plan-shares', () => {
   });
 
   it('gives a 400 error for missing userId', async () => {
-    const { agent, token } = await signUp();
-    
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-11' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.post('/plan-shares')
       .set('Authorization', `Bearer ${token}`)
@@ -127,13 +108,8 @@ describe('POST /plan-shares', () => {
   });
 
   it('gives a 400 error for missing editable argument', async () => {
-    const { agent, token } = await signUp();
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
     const { secondUserId } = await createSecondaryUser(agent);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-11' });
-    const planId = mealPlanRes.body.mealPlan.id;
 
     const res = await agent.post('/plan-shares')
       .set('Authorization', `Bearer ${token}`)
@@ -160,12 +136,7 @@ describe('POST /plan-shares', () => {
   });
 
   it('gives a 400 error for invalid userId type', async () => {
-    const { agent, token } = await signUp();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-11' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.post('/plan-shares')
       .set('Authorization', `Bearer ${token}`)
@@ -180,13 +151,8 @@ describe('POST /plan-shares', () => {
   });
 
   it('gives a 400 error for invalid editable type', async () => {
-    const { agent, token } = await signUp();
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
     const { secondUserId } = await createSecondaryUser(agent);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-11' });
-    const planId = mealPlanRes.body.mealPlan.id;
 
     const res = await agent.post('/plan-shares')
       .set('Authorization', `Bearer ${token}`)

@@ -1,21 +1,16 @@
-import { createRecipe, createSecondaryUser, setupDb, signUp, signUpAndCreateRecipe, signUpAndShareRecipe } from '../utils.js';
-// import request from 'supertest';
-// import app from '../../lib/app.js';
+import { createMealPlan, createSecondaryUser, setupDb, signUpAndCreateMealPlan, signUpAndCreateRecipe, signUpAndShareRecipe } from '../utils.js';
 
 describe('POST /plans-recipes', () => {
   beforeEach(setupDb);
 
   it('adds a recipe to a meal plan at POST /plans-recipes', async () => {
     const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-07-11' });
+    const planId = await createMealPlan(agent, token, '2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
       .send({ 
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         recipeId,
         meal: 'Dinner'
       });
@@ -26,23 +21,19 @@ describe('POST /plans-recipes', () => {
       planRecipe: {
         id: expect.any(String),
         recipeId,
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         meal: 'Dinner'
       }
     });
   });
 
   it('gives a 404 error for nonexistent recipe', async () => {
-    const { agent, token } = await signUp();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-07-11' });
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
       .send({ 
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         recipeId: '101',
         meal: 'Breakfast'
       });
@@ -52,8 +43,7 @@ describe('POST /plans-recipes', () => {
   });
 
   it('gives a 404 error for nonexistent meal plan', async () => {
-    const { agent, token } = await signUp();
-    const recipeId = await createRecipe(agent, token);
+    const { agent, token, recipeId } = await signUpAndCreateRecipe();
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
@@ -70,15 +60,12 @@ describe('POST /plans-recipes', () => {
   it('gives a 403 error for user not authorized to access recipe', async () => {
     const { agent, recipeId } = await signUpAndCreateRecipe();
     const { token2 } = await createSecondaryUser(agent);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token2}`)
-      .send({ date: '2023-08-12' });
+    const planId = await createMealPlan(agent, token2, '2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token2}`)
       .send({ 
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         recipeId,
         meal: 'Dinner'
       });
@@ -89,15 +76,12 @@ describe('POST /plans-recipes', () => {
 
   it('gives a 403 error for user not authorized to edit meal plan', async () => {
     const { agent, token, token2, recipeId } = await signUpAndShareRecipe(true);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-10' });
+    const planId = await createMealPlan(agent, token, '2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token2}`)
       .send({
-        planId: mealPlanRes.body.mealPlan.id,
+        planId,
         recipeId,
         meal: 'Dinner'
       });
@@ -108,16 +92,12 @@ describe('POST /plans-recipes', () => {
 
   it('adds recipe to meal plan for user with edit access', async () => {
     const { agent, token, token2, recipeId, sharedUserId } = await signUpAndShareRecipe(false);
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-10' });
-    const mealPlanId = mealPlanRes.body.mealPlan.id;
+    const planId = await createMealPlan(agent, token, '2023-06-13');
 
     await agent.post('/plan-shares')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        planId: mealPlanId,
+        planId,
         userId: sharedUserId,
         editable: true
       });
@@ -125,7 +105,7 @@ describe('POST /plans-recipes', () => {
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token2}`)
       .send({
-        planId: mealPlanId,
+        planId,
         recipeId,
         meal: 'Lunch'
       });
@@ -135,7 +115,7 @@ describe('POST /plans-recipes', () => {
       message: 'Plan recipe created successfully',
       planRecipe: {
         id: expect.any(String),
-        planId: mealPlanId,
+        planId,
         recipeId,
         meal: 'Lunch'
       }
@@ -154,12 +134,7 @@ describe('POST /plans-recipes', () => {
   });
 
   it('gives a 400 error for missing recipeId', async () => {
-    const { agent, token } = await signUp();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-10' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
@@ -171,11 +146,7 @@ describe('POST /plans-recipes', () => {
 
   it('gives a 400 error for missing meal', async () => {
     const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-10' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const planId = await createMealPlan(agent, token, '2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
@@ -197,12 +168,7 @@ describe('POST /plans-recipes', () => {
   });
 
   it('gives a 400 error for invalid recipeId type', async () => {
-    const { agent, token } = await signUp();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-10' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
@@ -214,11 +180,7 @@ describe('POST /plans-recipes', () => {
 
   it('gives a 400 error for invalid meal type', async () => {
     const { agent, token, recipeId } = await signUpAndCreateRecipe();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-10' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const planId = await createMealPlan(agent, token, '2023-06-13');
 
     const res = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)

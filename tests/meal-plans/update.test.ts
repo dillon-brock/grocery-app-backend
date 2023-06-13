@@ -1,14 +1,11 @@
-import { setupDb, signUp, signUpAndGetInfo, testUser2 } from '../utils.js';
+import { createMealPlan, createSecondaryUser, setupDb, signUp, signUpAndCreateMealPlan } from '../utils.js';
 
 describe('PUT /meal-plans/:id', () => {
   beforeEach(setupDb);
 
   it('updates a meal plan at PUT /meal-plans/:id', async () => {
-    const { agent, token, user } = await signUpAndGetInfo();
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-13' });
-    const planId = mealPlanRes.body.mealPlan.id;
+
+    const { agent, token, planId, userId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.put(`/meal-plans/${planId}`)
       .set('Authorization', `Bearer ${token}`)
@@ -19,7 +16,7 @@ describe('PUT /meal-plans/:id', () => {
       message: 'Meal plan updated successfully',
       mealPlan: {
         id: planId,
-        ownerId: user.id,
+        ownerId: userId,
         date: expect.any(String),
         createdAt: expect.any(String),
         updatedAt: expect.any(String)
@@ -28,12 +25,7 @@ describe('PUT /meal-plans/:id', () => {
   });
 
   it('gives a 401 error for unauthenticated user', async () => {
-    const { agent, token } = await signUp();
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-13' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.put(`/meal-plans/${planId}`)
       .send({ date: '2023-06-14' });
@@ -44,15 +36,8 @@ describe('PUT /meal-plans/:id', () => {
 
   it('gives a 403 error for unauthorized user', async () => {
     const { agent, token } = await signUp();
-
-    const secondUserRes = await agent.post('/users')
-      .send(testUser2);
-    const { token: token2 } = secondUserRes.body;
-
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-13' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { token2 } = await createSecondaryUser(agent);
+    const planId = await createMealPlan(agent, token, '2023-06-13');
 
     const res = await agent.put(`/meal-plans/${planId}`)
       .set('Authorization', `Bearer ${token2}`)
@@ -63,11 +48,7 @@ describe('PUT /meal-plans/:id', () => {
   });
 
   it('gives a 400 error for missing date', async () => {
-    const { agent, token } = await signUpAndGetInfo();
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-13' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.put(`/meal-plans/${planId}`)
       .set('Authorization', `Bearer ${token}`)
@@ -78,11 +59,7 @@ describe('PUT /meal-plans/:id', () => {
   });
 
   it('gives a 400 error for invalid date type', async () => {
-    const { agent, token } = await signUpAndGetInfo();
-    const mealPlanRes = await agent.post('/meal-plans')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2023-06-13' });
-    const planId = mealPlanRes.body.mealPlan.id;
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-13');
 
     const res = await agent.put(`/meal-plans/${planId}`)
       .set('Authorization', `Bearer ${token}`)
