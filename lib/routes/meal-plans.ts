@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { MealPlanRes, MealPlanUpdateData, MealPlanWithRecipesRes } from '../types/mealPlan.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { MealPlanRes, MealPlanUpdateData, MealPlanWithRecipesRes, MultipleMealPlanWithRecipesRes } from '../types/mealPlan.js';
 import { NextFunction } from 'express-serve-static-core';
 import { MealPlan, MealPlanWithRecipes } from '../models/MealPlan.js';
 import validateCreateMealPlan from '../middleware/validation/meal-plans/create.js';
@@ -33,6 +33,18 @@ export default Router()
         next(e);
       }
     })
+  .get('/', authenticate, async (req: AuthenticatedReqQuery<{ startDate: string, endDate: string}>,
+    res: TypedResponse<MultipleMealPlanWithRecipesRes>, next: NextFunction) => {
+    try {
+      const mealPlans = await MealPlanWithRecipes.findByDateRange(req.query.startDate, req.query.endDate, req.user.id);
+      res.json({
+        message: 'Meal plans found successfully',
+        mealPlans
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
   .get('/:date', authenticate, async (req: AuthenticatedReqParams<{ date: string }>, 
     res: TypedResponse<MealPlanWithRecipesRes>, next: NextFunction) => {
     try {

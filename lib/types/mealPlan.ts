@@ -39,5 +39,5 @@ export interface MealPlanWithRecipesRes extends SuccessResponse {
 }
 
 export interface MultipleMealPlanWithRecipesRes extends SuccessResponse {
-  mealPlans: Array<MealPlanWithRecipes | null>;
+  mealPlans: Array<MealPlanWithRecipes>;
 }

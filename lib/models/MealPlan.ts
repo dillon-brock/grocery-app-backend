@@ -101,4 +101,26 @@ export class MealPlanWithRecipes extends MealPlan {
     if (!rows[0]) return null;
     return new MealPlanWithRecipes(rows[0]);
   }
+
+  static async findByDateRange(startDate: string, endDate: string, userId: string): Promise<Array<MealPlanWithRecipes>> {
+    
+    const { rows }: Rows<MealPlanWithRecipesFromDB> = await pool.query(
+      `SELECT meal_plans.*,
+      COALESCE(
+        json_agg(json_build_object(
+          'id', recipes.id::text,
+          'name', recipes.name,
+          'meal', plans_recipes.meal
+        ))
+        FILTER (WHERE recipes.id IS NOT NULL), '[]'
+      ) as recipes FROM meal_plans
+      LEFT JOIN plans_recipes ON plans_recipes.plan_id = meal_plans.id
+      LEFT JOIN recipes ON recipes.id = plans_recipes.recipe_id
+      WHERE meal_plans.owner_id = $1 AND meal_plans.date between $2 AND $3
+      GROUP BY meal_plans.id`,
+      [userId, startDate, endDate]
+    );
+
+    return rows.map(row => new MealPlanWithRecipes(row));
+  }
 }
