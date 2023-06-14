@@ -19,6 +19,7 @@ import validateCreateMealPlan from '../middleware/validation/meal-plans/create.j
 import authorizeUpdateMealPlan from '../middleware/authorization/meal-plans/update.js';
 import validateUpdateMealPlan from '../middleware/validation/meal-plans/update.js';
 import validateGetMultipleMealPlans from '../middleware/validation/meal-plans/get-multiple.js';
+import authorizeDeleteMealPlan from '../middleware/authorization/meal-plans/delete.js';
 
 export default Router()
   .post('/', [authenticate, validateCreateMealPlan], async (req: AuthenticatedReqBody<{ date: string }>, res: TypedResponse<MealPlanRes>, next: NextFunction) => {
@@ -69,7 +70,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>, res: TypedResponse<MealPlanRes>, next: NextFunction) => {
+  .delete('/:id', [authenticate, authorizeDeleteMealPlan], async (req: AuthenticatedReqParams<{ id: string }>, res: TypedResponse<MealPlanRes>, next: NextFunction) => {
     try {
       const mealPlan = await MealPlan.deleteById(req.params.id);
       res.json({

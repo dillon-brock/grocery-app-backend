@@ -1,4 +1,4 @@
-import { createRecipe, setupDb, signUpAndCreateMealPlan } from '../utils.js';
+import { createRecipe, createSecondaryUser, setupDb, signUp, signUpAndCreateMealPlan } from '../utils.js';
 
 describe('DELETE /meal-plans/:id', () => {
   beforeEach(setupDb);
@@ -29,5 +29,26 @@ describe('DELETE /meal-plans/:id', () => {
         ownerId: userId
       }
     });
+  });
+
+  it('gives a 404 error for nonexistent meal plan', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.delete('/meal-plans/583')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Meal plan not found');
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, planId } = await signUpAndCreateMealPlan('2023-06-13');
+    const { token2 } = await createSecondaryUser(agent);
+
+    const res = await agent.delete(`/meal-plans/${planId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to delete this meal plan');
   });
 });
