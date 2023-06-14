@@ -1,7 +1,8 @@
 import pool from '../../sql/pool.js';
-import { InsertionError } from '../types/error.js';
+import { InsertionError, UpdateError } from '../types/error.js';
 import { Rows } from '../types/global.js';
-import { NewPlanRecipeData, PlanRecipeFromDB } from '../types/planRecipe.js';
+import { NewPlanRecipeData, PlanRecipeFromDB, PlanRecipeUpdateData } from '../types/planRecipe.js';
+import { buildUpdateQuery } from '../utils.js';
 
 export class PlanRecipe {
   id: string;
@@ -26,6 +27,17 @@ export class PlanRecipe {
     );
 
     if (!rows[0]) throw new InsertionError('plans_recipes');
+    return new PlanRecipe(rows[0]);
+  }
+
+  static async updateById(id: string, data: PlanRecipeUpdateData): Promise<PlanRecipe> {
+    const query: string = buildUpdateQuery('plans_recipes', data);
+
+    const { rows }: Rows<PlanRecipeFromDB> = await pool.query(query, [id]);
+    if (!rows[0]) {
+      throw new UpdateError('plans_recipes');
+    }
+
     return new PlanRecipe(rows[0]);
   }
 }

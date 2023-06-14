@@ -18,4 +18,9 @@ export interface PlanRecipeRes extends SuccessResponse {
   planRecipe: PlanRecipe
 }
 
+export type PlanRecipeUpdateData = {
+  recipe_id?: string;
+  meal?: string;
+}
+
 

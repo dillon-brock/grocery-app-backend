@@ -107,7 +107,8 @@ export class MealPlanWithRecipes extends MealPlan {
         json_agg(json_build_object(
           'id', recipes.id::text,
           'name', recipes.name,
-          'meal', plans_recipes.meal
+          'meal', plans_recipes.meal,
+          'planRecipeId', plans_recipes.id::text
         ))
         FILTER (WHERE recipes.id IS NOT NULL), '[]'
       ) as recipes FROM meal_plans
@@ -130,13 +131,14 @@ export class MealPlanWithRecipes extends MealPlan {
         json_agg(json_build_object(
           'id', recipes.id::text,
           'name', recipes.name,
-          'meal', plans_recipes.meal
+          'meal', plans_recipes.meal,
+          'planRecipeId', plans_recipes.id::text
         ))
         FILTER (WHERE recipes.id IS NOT NULL), '[]'
       ) as recipes FROM meal_plans
       LEFT JOIN plans_recipes ON plans_recipes.plan_id = meal_plans.id
       LEFT JOIN recipes ON recipes.id = plans_recipes.recipe_id
-      WHERE meal_plans.owner_id = $1 AND meal_plans.date between $2 AND $3
+      WHERE meal_plans.owner_id = $1 AND meal_plans.date BETWEEN $2 AND $3
       GROUP BY meal_plans.id`,
       [userId, startDate, endDate]
     );

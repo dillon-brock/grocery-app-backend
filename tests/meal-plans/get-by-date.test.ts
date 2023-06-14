@@ -8,13 +8,14 @@ describe('GET /meal-plans/:date', () => {
     const { agent, token, userId, planId } = await signUpAndCreateMealPlan(date);
     const recipeId = await createRecipe(agent, token);
 
-    await agent.post('/plans-recipes')
+    const addRecipeRes = await agent.post('/plans-recipes')
       .set('Authorization', `Bearer ${token}`)
       .send({
         planId,
         recipeId,
         meal: 'Dinner'
       });
+    const planRecipeId = addRecipeRes.body.planRecipe.id;
 
     const res = await agent.get(`/meal-plans/${date}`)
       .set('Authorization', `Bearer ${token}`);
@@ -31,7 +32,8 @@ describe('GET /meal-plans/:date', () => {
         recipes: [{
           id: recipeId,
           name: testRecipe.name,
-          meal: 'Dinner'
+          meal: 'Dinner',
+          planRecipeId
         }]
       }
     });

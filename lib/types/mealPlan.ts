@@ -28,6 +28,8 @@ export type MealPlanUpdateData = {
 export type CoalescedRecipe = {
   id: string;
   name: string;
+  meal: string;
+  planRecipeId: string;
 }
 
 export interface MealPlanWithRecipesFromDB extends MealPlanFromDB {
