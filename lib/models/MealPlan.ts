@@ -79,7 +79,7 @@ export class MealPlanWithRecipes extends MealPlan {
     this.recipes = row.recipes;
   }
 
-  static async findByDate(date: string): Promise<MealPlanWithRecipes | null> {
+  static async findByDate(date: string, userId: string): Promise<MealPlanWithRecipes | null> {
 
     const { rows }: Rows<MealPlanWithRecipesFromDB> = await pool.query(
       `SELECT meal_plans.*,
@@ -93,9 +93,9 @@ export class MealPlanWithRecipes extends MealPlan {
       ) as recipes FROM meal_plans
       LEFT JOIN plans_recipes ON plans_recipes.plan_id = meal_plans.id
       LEFT JOIN recipes ON recipes.id = plans_recipes.recipe_id
-      WHERE meal_plans.date = $1
+      WHERE meal_plans.date = $1 AND meal_plans.owner_id = $2
       GROUP BY meal_plans.id`,
-      [date]
+      [date, userId]
     );
 
     if (!rows[0]) return null;

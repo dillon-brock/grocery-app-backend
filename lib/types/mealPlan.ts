@@ -37,3 +37,7 @@ export interface MealPlanWithRecipesFromDB extends MealPlanFromDB {
 export interface MealPlanWithRecipesRes extends SuccessResponse {
   mealPlan: MealPlanWithRecipes | null;
 }
+
+export interface MultipleMealPlanWithRecipesRes extends SuccessResponse {
+  mealPlans: Array<MealPlanWithRecipes | null>;
+}

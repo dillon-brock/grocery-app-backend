@@ -36,7 +36,7 @@ export default Router()
   .get('/:date', authenticate, async (req: AuthenticatedReqParams<{ date: string }>, 
     res: TypedResponse<MealPlanWithRecipesRes>, next: NextFunction) => {
     try {
-      const planWithRecipes = await MealPlanWithRecipes.findByDate(req.params.date);
+      const planWithRecipes = await MealPlanWithRecipes.findByDate(req.params.date, req.user.id);
       res.json({
         message: 'Meal plan found successfully',
         mealPlan: planWithRecipes

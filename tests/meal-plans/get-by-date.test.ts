@@ -1,4 +1,4 @@
-import { createRecipe, setupDb, signUpAndCreateMealPlan, testRecipe } from '../utils.js';
+import { createMealPlan, createRecipe, createSecondaryUser, setupDb, signUpAndCreateMealPlan, testRecipe } from '../utils.js';
 
 describe('GET /meal-plans/:date', () => {
   beforeEach(setupDb);
@@ -34,6 +34,33 @@ describe('GET /meal-plans/:date', () => {
           meal: 'Dinner'
         }]
       }
+    });
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const date = '2023-06-13';
+    const { agent } = await signUpAndCreateMealPlan(date);
+
+    const res = await agent.get(`/meal-plans/${date}`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('only returns meal plans belonging to current user', async () => {
+    const date = '2023-06-13';
+    const { agent, token, planId } = await signUpAndCreateMealPlan(date);
+    const { token2 } = await createSecondaryUser(agent);
+    await createMealPlan(agent, token2, date);
+
+    const res = await agent.get(`/meal-plans/${date}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Meal plan found successfully',
+      mealPlan: expect.objectContaining({
+        id: planId
+      })
     });
   });
 });
