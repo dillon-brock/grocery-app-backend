@@ -1,7 +1,18 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { MealPlanRes, MealPlanUpdateData, MealPlanWithRecipesRes, MultipleMealPlanWithRecipesRes } from '../types/mealPlan.js';
+import { 
+  AuthenticatedReqBody, 
+  AuthenticatedReqParams, 
+  AuthenticatedReqQuery, 
+  TypedAuthenticatedRequest, 
+  TypedResponse 
+} from '../types/extendedExpress.js';
+import { 
+  MealPlanRes, 
+  MealPlanUpdateData, 
+  MealPlanWithRecipesRes, 
+  MultipleMealPlanWithRecipesRes 
+} from '../types/mealPlan.js';
 import { NextFunction } from 'express-serve-static-core';
 import { MealPlan, MealPlanWithRecipes } from '../models/MealPlan.js';
 import validateCreateMealPlan from '../middleware/validation/meal-plans/create.js';
@@ -53,6 +64,17 @@ export default Router()
       res.json({
         message: 'Meal plan found successfully',
         mealPlan: planWithRecipes
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>, res: TypedResponse<MealPlanRes>, next: NextFunction) => {
+    try {
+      const mealPlan = await MealPlan.deleteById(req.params.id);
+      res.json({
+        message: 'Meal plan deleted successfully',
+        mealPlan
       });
     } catch (e) {
       next(e);

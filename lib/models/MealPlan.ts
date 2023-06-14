@@ -1,5 +1,5 @@
 import pool from '../../sql/pool.js';
-import { InsertionError, UpdateError } from '../types/error.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { Permissions, Rows } from '../types/global.js';
 import { CoalescedRecipe, CreateMealPlanParams, MealPlanFromDB, MealPlanUpdateData, MealPlanWithRecipesFromDB } from '../types/mealPlan.js';
 import { PlanShareFromDB } from '../types/planShare.js';
@@ -67,6 +67,26 @@ export class MealPlan {
       throw new UpdateError('meal_plans');
     }
 
+    return new MealPlan(rows[0]);
+  }
+
+  static async deleteById(id: string): Promise<MealPlan> {
+
+    await pool.query(
+      `DELETE FROM plans_recipes
+      WHERE plans_recipes.plan_id = $1`,
+      [id]
+    );
+
+    const { rows }: Rows<MealPlanFromDB> = await pool.query(
+      `DELETE FROM meal_plans
+      WHERE id = $1
+      RETURNING *`,
+      [id]
+    );
+    if (!rows[0]) {
+      throw new DeletionError('meal_plans');
+    }
     return new MealPlan(rows[0]);
   }
 }
