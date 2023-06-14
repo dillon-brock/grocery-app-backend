@@ -7,6 +7,7 @@ import { MealPlan, MealPlanWithRecipes } from '../models/MealPlan.js';
 import validateCreateMealPlan from '../middleware/validation/meal-plans/create.js';
 import authorizeUpdateMealPlan from '../middleware/authorization/meal-plans/update.js';
 import validateUpdateMealPlan from '../middleware/validation/meal-plans/update.js';
+import validateGetMultipleMealPlans from '../middleware/validation/meal-plans/get-multiple.js';
 
 export default Router()
   .post('/', [authenticate, validateCreateMealPlan], async (req: AuthenticatedReqBody<{ date: string }>, res: TypedResponse<MealPlanRes>, next: NextFunction) => {
@@ -33,7 +34,7 @@ export default Router()
         next(e);
       }
     })
-  .get('/', authenticate, async (req: AuthenticatedReqQuery<{ startDate: string, endDate: string}>,
+  .get('/', [authenticate, validateGetMultipleMealPlans], async (req: AuthenticatedReqQuery<{ startDate: string, endDate: string}>,
     res: TypedResponse<MultipleMealPlanWithRecipesRes>, next: NextFunction) => {
     try {
       const mealPlans = await MealPlanWithRecipes.findByDateRange(req.query.startDate, req.query.endDate, req.user.id);
