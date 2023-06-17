@@ -35,7 +35,7 @@ export default Router()
         next(e);
       }
     })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string}>, res: TypedResponse<PlanRecipeRes>, next: NextFunction) => {
+  .delete('/:id', [authenticate, authorizeEditMealPlan], async (req: AuthenticatedReqParams<{ id: string}>, res: TypedResponse<PlanRecipeRes>, next: NextFunction) => {
     try {
       const planRecipe = await PlanRecipe.deleteById(req.params.id);
       res.json({
