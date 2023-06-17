@@ -1,5 +1,5 @@
 import pool from '../../sql/pool.js';
-import { InsertionError, UpdateError } from '../types/error.js';
+import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { Permissions, Rows } from '../types/global.js';
 import { NewPlanRecipeData, PlanRecipeFromDB, PlanRecipeUpdateData } from '../types/planRecipe.js';
 import { buildUpdateQuery } from '../utils.js';
@@ -44,10 +44,10 @@ export class PlanRecipe {
   static async checkPermissionsById(id: string, userId: string): Promise<Permissions> {
 
     const { rows } = await pool.query(
-      `SELECT plan_shares.editable FROM plan_recipes
-      INNER JOIN meal_plans ON meal_plans.id = plan_reicpes.plan_id
+      `SELECT plan_shares.editable FROM plans_recipes
+      INNER JOIN meal_plans ON meal_plans.id = plans_reicpes.plan_id
       INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
-      WHERE plan_recipes.id = $1 AND plan_recipes.user_id = $2`,
+      WHERE plans_recipes.id = $1 AND plans_recipes.user_id = $2`,
       [id, userId]
     );
 
@@ -55,5 +55,17 @@ export class PlanRecipe {
       view: !!rows[0],
       edit: rows[0].editable
     };
+  }
+
+  static async deleteById(id: string): Promise<PlanRecipe> {
+
+    const { rows }: Rows<PlanRecipeFromDB> = await pool.query(
+      `DELETE FROM plans_recipes
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (!rows[0]) throw new DeletionError('plans_recipes');
+    return new PlanRecipe(rows[0]);
   }
 }

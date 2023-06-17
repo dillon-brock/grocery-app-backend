@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { NewPlanRecipeData, PlanRecipeRes, PlanRecipeUpdateData } from '../types/planRecipe.js';
 import { NextFunction } from 'express-serve-static-core';
 import { PlanRecipe } from '../models/PlanRecipe.js';
@@ -31,5 +31,16 @@ export default Router()
       });
     } catch (e) {
       next(e);
+    }
+  })
+  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string}>, res: TypedResponse<PlanRecipeRes>, next: NextFunction) => {
+    try {
+      const planRecipe = await PlanRecipe.deleteById(req.params.id);
+      res.json({
+        message: 'Plan recipe deleted successfully',
+        planRecipe
+      });
+    } catch (e) {
+      next();
     }
   });
