@@ -17,3 +17,7 @@ export type NewPlanShareData = {
 export interface PlanShareRes extends SuccessResponse {
   planShare: PlanShare
 }
+
+export type PlanShareUpdateData = {
+  editable?: boolean;
+}
