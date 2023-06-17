@@ -43,38 +43,26 @@ export class PlanRecipe {
 
   static async updateById(id: string, data: PlanRecipeUpdateData): Promise<PlanRecipe> {
     const query: string = buildUpdateQuery('plans_recipes', data);
-    try {
-      const { rows }: Rows<PlanRecipeFromDB> = await pool.query(query, [id]);
-      if (!rows[0]) {
-        throw new UpdateError('plans_recipes');
-      }
-  
-      return new PlanRecipe(rows[0]);
-    } catch (e) {
-      console.error(e);
+    const { rows }: Rows<PlanRecipeFromDB> = await pool.query(query, [id]);
+    if (!rows[0]) {
+      throw new UpdateError('plans_recipes');
     }
 
-    throw new Error('made it through');
+    return new PlanRecipe(rows[0]);
   }
 
   static async checkPermissionsById(id: string, userId: string): Promise<Permissions> {
-    let defaultRows = [];
-    try {
-      const { rows } = await pool.query(
-        `SELECT plan_shares.* FROM plans_recipes
-        INNER JOIN meal_plans ON meal_plans.id = plans_recipes.plan_id
-        INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
-        WHERE plans_recipes.id = $1 AND plan_shares.user_id = $2`,
-        [id, userId]
-      );
-      defaultRows = rows;
-    } catch (e) {
-      console.error(e);
-    }
+    const { rows } = await pool.query(
+      `SELECT plan_shares.* FROM plans_recipes
+      INNER JOIN meal_plans ON meal_plans.id = plans_recipes.plan_id
+      INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
+      WHERE plans_recipes.id = $1 AND plan_shares.user_id = $2`,
+      [id, userId]
+    );
 
     return {
-      view: !!defaultRows[0],
-      edit: defaultRows[0] ? defaultRows[0].editable : false
+      view: !!rows[0],
+      edit: rows[0] ? rows[0].editable : false
     };
   }
 

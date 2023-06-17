@@ -48,20 +48,14 @@ export class Recipe {
   }
 
   static async findById(id: string): Promise<Recipe | null> {
-    let defaultRows = [];
-    try {
-      const { rows } = await pool.query(
-        `SELECT * FROM recipes
-        WHERE id = $1`,
-        [id]
-      );
-      defaultRows = rows;
-    } catch (e) {
-      console.error(e);
-    }
+    const { rows } = await pool.query(
+      `SELECT * FROM recipes
+      WHERE id = $1`,
+      [id]
+    );
 
-    if (!defaultRows[0]) return null;
-    return new Recipe(defaultRows[0]);
+    if (!rows[0]) return null;
+    return new Recipe(rows[0]);
   }
 
   static async updateById(id: string, data: UpdateRecipeData): Promise<Recipe> {
@@ -98,24 +92,17 @@ export class Recipe {
   }
 
   async checkUserPermissions(userId: string): Promise<Permissions> {
+    const { rows }: RecipeShareRows = await pool.query(
+      `SELECT recipe_shares.* FROM recipes
+      INNER JOIN recipe_shares ON recipe_shares.recipe_id = recipes.id
+      WHERE recipes.id = $1 AND recipe_shares.user_id = $2`,
+      [this.id, userId]
+    );
 
-    try {
-      const { rows }: RecipeShareRows = await pool.query(
-        `SELECT recipe_shares.* FROM recipes
-        INNER JOIN recipe_shares ON recipe_shares.recipe_id = recipes.id
-        WHERE recipes.id = $1 AND recipe_shares.user_id = $2`,
-        [this.id, userId]
-      );
-  
-      return {
-        view: !!rows[0],
-        edit: rows[0] ? rows[0].editable : false
-      };
-    } catch (e) {
-      console.error(e);
-    }
-
-    return {} as Permissions;
+    return {
+      view: !!rows[0],
+      edit: rows[0] ? rows[0].editable : false
+    };
   }
 }
 
