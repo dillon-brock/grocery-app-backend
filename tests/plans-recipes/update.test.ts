@@ -1,5 +1,6 @@
 import { createPlanRecipe, createRecipe, createSecondaryUser, setupDb, signUpAndCreateMealPlan } from '../utils.js';
 
+
 describe('PUT /plans-recipes/:id', () => {
   beforeEach(setupDb);
 
@@ -142,13 +143,13 @@ describe('PUT /plans-recipes/:id', () => {
 
     const res = await agent.put(`/plan-recipes/${planRecipeId}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId: '101' });
+      .send({ recipe_id: '101784' });
 
     expect(res.status).toBe(404);
     expect(res.body.message).toEqual('Recipe not found');
   });
 
-  it('gives a 404 error for invalid recipe_id', async () => {
+  it('gives a 403 error for user without recipe access', async () => {
     const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
     const recipeId = await createRecipe(agent, token);
     const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
@@ -161,7 +162,7 @@ describe('PUT /plans-recipes/:id', () => {
 
     const res = await agent.put(`/plan-recipes/${planRecipeId}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId: secondRecipeId });
+      .send({ recipe_id: secondRecipeId });
 
     expect(res.status).toBe(403);
     expect(res.body.message).toEqual('You do not have access to this recipe');
@@ -179,7 +180,7 @@ describe('PUT /plans-recipes/:id', () => {
 
     await agent.post('/recipe-shares')
       .set('Authorization', `Bearer ${token}`)
-      .send({ recipeId, userId: secondUserId, editable: false });
+      .send({ recipe_id: recipeId, userId: secondUserId, editable: false });
 
     const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
 

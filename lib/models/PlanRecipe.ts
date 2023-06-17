@@ -30,30 +30,51 @@ export class PlanRecipe {
     return new PlanRecipe(rows[0]);
   }
 
+  static async findById(id: string): Promise<PlanRecipe | null> {
+
+    const { rows }: Rows<PlanRecipeFromDB> = await pool.query(
+      `SELECT * FROM plans_recipes
+      WHERE id = $1`,
+      [id]
+    );
+
+    return rows[0] ? new PlanRecipe(rows[0]) : null;
+  }
+
   static async updateById(id: string, data: PlanRecipeUpdateData): Promise<PlanRecipe> {
     const query: string = buildUpdateQuery('plans_recipes', data);
-
-    const { rows }: Rows<PlanRecipeFromDB> = await pool.query(query, [id]);
-    if (!rows[0]) {
-      throw new UpdateError('plans_recipes');
+    try {
+      const { rows }: Rows<PlanRecipeFromDB> = await pool.query(query, [id]);
+      if (!rows[0]) {
+        throw new UpdateError('plans_recipes');
+      }
+  
+      return new PlanRecipe(rows[0]);
+    } catch (e) {
+      console.error(e);
     }
 
-    return new PlanRecipe(rows[0]);
+    throw new Error('made it through');
   }
 
   static async checkPermissionsById(id: string, userId: string): Promise<Permissions> {
-
-    const { rows } = await pool.query(
-      `SELECT plan_shares.editable FROM plans_recipes
-      INNER JOIN meal_plans ON meal_plans.id = plans_reicpes.plan_id
-      INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
-      WHERE plans_recipes.id = $1 AND plans_recipes.user_id = $2`,
-      [id, userId]
-    );
+    let defaultRows = [];
+    try {
+      const { rows } = await pool.query(
+        `SELECT plan_shares.* FROM plans_recipes
+        INNER JOIN meal_plans ON meal_plans.id = plans_recipes.plan_id
+        INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
+        WHERE plans_recipes.id = $1 AND plan_shares.user_id = $2`,
+        [id, userId]
+      );
+      defaultRows = rows;
+    } catch (e) {
+      console.error(e);
+    }
 
     return {
-      view: !!rows[0],
-      edit: rows[0].editable
+      view: !!defaultRows[0],
+      edit: defaultRows[0] ? defaultRows[0].editable : false
     };
   }
 
@@ -61,10 +82,10 @@ export class PlanRecipe {
 
     const { rows }: Rows<PlanRecipeFromDB> = await pool.query(
       `DELETE FROM plans_recipes
-      WHERE id = $1`,
+      WHERE id = $1
+      RETURNING *`,
       [id]
     );
-
     if (!rows[0]) throw new DeletionError('plans_recipes');
     return new PlanRecipe(rows[0]);
   }
