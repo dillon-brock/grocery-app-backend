@@ -1,4 +1,4 @@
-import { createPlanRecipe, createRecipe, setupDb, signUpAndCreateMealPlan } from '../utils.js';
+import { createPlanRecipe, createRecipe, createSecondaryUser, setupDb, signUpAndCreateMealPlan } from '../utils.js';
 
 describe('PUT /plans-recipes/:id', () => {
   beforeEach(setupDb);
@@ -99,5 +99,103 @@ describe('PUT /plans-recipes/:id', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.message).toEqual('Invalid payload - meal must be string');
+  });
+
+  it('gives a 403 error for user not authorized to view meal plan', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const { token2 } = await createSecondaryUser(agent);
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ meal: 'Breakfast' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to access this meal plan');
+  });
+
+  it('gives a 403 error for user not authorized to edit meal plan', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+
+    await agent.post('/plan-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ planId, userId: secondUserId, editable: false });
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ meal: 'Breakfast' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to edit this meal plan');
+  });
+
+  it('gives a 404 error for invalid recipe_id', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const res = await agent.put(`/plan-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId: '101' });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Recipe not found');
+  });
+
+  it('gives a 404 error for invalid recipe_id', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const secondRecipeRes = await agent.post('/recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'fried chicken' });
+    const secondRecipeId = secondRecipeRes.body.recipe.id;
+
+
+    const res = await agent.put(`/plan-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId: secondRecipeId });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You do not have access to this recipe');
+  });
+
+  it('updates recipeId for user with access to recipe', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+
+    const secondRecipeRes = await agent.post('/recipes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'fried chicken' });
+    const recipeId2 = secondRecipeRes.body.recipe.id;
+
+    await agent.post('/recipe-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId, userId: secondUserId, editable: false });
+
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token2}`)
+      .send({ recipe_id: recipeId2 });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'Plan recipe updated successfully',
+      planRecipe: {
+        id: planRecipeId,
+        planId,
+        recipeId: recipeId2,
+        meal: 'Dinner'
+      }
+    });
   });
 });
