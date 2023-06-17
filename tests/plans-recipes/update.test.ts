@@ -1,4 +1,4 @@
-import { createRecipe, setupDb, signUpAndCreateMealPlan } from '../utils.js';
+import { createPlanRecipe, createRecipe, setupDb, signUpAndCreateMealPlan } from '../utils.js';
 
 describe('PUT /plans-recipes/:id', () => {
   beforeEach(setupDb);
@@ -6,15 +6,7 @@ describe('PUT /plans-recipes/:id', () => {
   it('updates meal at PUT /plans-recipes/:id', async () => {
     const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
     const recipeId = await createRecipe(agent, token);
-
-    const addRecipeRes = await agent.post('/plans-recipes')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        planId,
-        recipeId,
-        meal: 'Dinner'
-      });
-    const planRecipeId = addRecipeRes.body.planRecipe.id;
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
 
     const res = await agent.put(`/plans-recipes/${planRecipeId}`)
       .set('Authorization', `Bearer ${token}`)
@@ -40,14 +32,7 @@ describe('PUT /plans-recipes/:id', () => {
       .send({ name: 'fried chicken' });
     const recipeId2 = secondRecipeRes.body.recipe.id;
 
-    const addRecipeRes = await agent.post('/plans-recipes')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        planId,
-        recipeId,
-        meal: 'Dinner'
-      });
-    const planRecipeId = addRecipeRes.body.planRecipe.id;
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
 
     const res = await agent.put(`/plans-recipes/${planRecipeId}`)
       .set('Authorization', `Bearer ${token}`)
@@ -63,5 +48,56 @@ describe('PUT /plans-recipes/:id', () => {
         meal: 'Dinner'
       }
     });
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .send({ meal: 'Breakfast' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 400 error for misspelling recipe_id key', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ recipeId: '2' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - unexpected argument recipeId (did you mean recipe_id?)');
+  });
+
+  it('gives a 400 error for unexpected argument', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ badData: '' });
+
+    expect(res.status).toBe(400);
+    expect('Invalid payload - unexpected argument badData');
+  });
+
+  it('gives a 400 error for invalid argument type', async () => {
+    const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
+    const recipeId = await createRecipe(agent, token);
+    const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ meal: true });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid payload - meal must be string');
   });
 });

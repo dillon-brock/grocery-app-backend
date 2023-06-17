@@ -6,6 +6,7 @@ import { NextFunction } from 'express-serve-static-core';
 import { PlanRecipe } from '../models/PlanRecipe.js';
 import authorizeAddRecipe from '../middleware/authorization/plans-recipes/add-recipe.js';
 import validateCreatePlanRecipe from '../middleware/validation/plans-recipes/create.js';
+import validateUpdatePlanRecipe from '../middleware/validation/plans-recipes/update.js';
 
 export default Router()
   .post('/', [authenticate, validateCreatePlanRecipe, authorizeAddRecipe], async (req: AuthenticatedReqBody<NewPlanRecipeData>, res: TypedResponse<PlanRecipeRes>, next: NextFunction) => {
@@ -19,7 +20,7 @@ export default Router()
       next(e);
     }
   })
-  .put('/:id', authenticate, async (req: TypedAuthenticatedRequest<PlanRecipeUpdateData, { id: string }>, 
+  .put('/:id', [authenticate, validateUpdatePlanRecipe], async (req: TypedAuthenticatedRequest<PlanRecipeUpdateData, { id: string }>, 
     res: TypedResponse<PlanRecipeRes>, next: NextFunction) => {
     try {
       const planRecipe = await PlanRecipe.updateById(req.params.id, req.body);

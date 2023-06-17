@@ -362,3 +362,14 @@ export async function signUpAndCreateMealPlan(date: string): Promise<MealPlanAge
 
   return { agent, token, planId, date, userId: user.id };
 }
+
+
+// plan recipe helper functions
+
+export async function createPlanRecipe(agent: request.SuperAgentTest, token: string, planId: string, recipeId: string): Promise<string> {
+  const res = await agent.post('/plans-recipes')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ planId, recipeId, meal: 'Dinner' });
+
+  return res.body.planRecipe.id;
+}
