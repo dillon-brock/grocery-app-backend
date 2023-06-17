@@ -141,7 +141,7 @@ describe('PUT /plans-recipes/:id', () => {
     const recipeId = await createRecipe(agent, token);
     const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
 
-    const res = await agent.put(`/plan-recipes/${planRecipeId}`)
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ recipe_id: '101784' });
 
@@ -153,6 +153,11 @@ describe('PUT /plans-recipes/:id', () => {
     const { agent, token, planId } = await signUpAndCreateMealPlan('2023-06-14');
     const recipeId = await createRecipe(agent, token);
     const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
+    const { token2, secondUserId } = await createSecondaryUser(agent);
+
+    await agent.post('/plan-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ planId, userId: secondUserId, editable: true });
 
     const secondRecipeRes = await agent.post('/recipes')
       .set('Authorization', `Bearer ${token}`)
@@ -160,8 +165,8 @@ describe('PUT /plans-recipes/:id', () => {
     const secondRecipeId = secondRecipeRes.body.recipe.id;
 
 
-    const res = await agent.put(`/plan-recipes/${planRecipeId}`)
-      .set('Authorization', `Bearer ${token}`)
+    const res = await agent.put(`/plans-recipes/${planRecipeId}`)
+      .set('Authorization', `Bearer ${token2}`)
       .send({ recipe_id: secondRecipeId });
 
     expect(res.status).toBe(403);
@@ -173,6 +178,10 @@ describe('PUT /plans-recipes/:id', () => {
     const recipeId = await createRecipe(agent, token);
     const { token2, secondUserId } = await createSecondaryUser(agent);
 
+    await agent.post('/plan-shares')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ planId, userId: secondUserId, editable: true });
+
     const secondRecipeRes = await agent.post('/recipes')
       .set('Authorization', `Bearer ${token}`)
       .send({ name: 'fried chicken' });
@@ -180,7 +189,7 @@ describe('PUT /plans-recipes/:id', () => {
 
     await agent.post('/recipe-shares')
       .set('Authorization', `Bearer ${token}`)
-      .send({ recipe_id: recipeId, userId: secondUserId, editable: false });
+      .send({ recipeId: recipeId2, userId: secondUserId, editable: true });
 
     const planRecipeId = await createPlanRecipe(agent, token, planId, recipeId);
 
