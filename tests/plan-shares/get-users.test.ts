@@ -60,4 +60,25 @@ describe('GET /plan-shares/users', () => {
     expect(res.status).toBe(400);
     expect(res.body.message).toEqual('Invalid query - invalid planId format');
   });
+
+  it('gives a 404 error for nonexistent meal plan', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.get('/plan-shares/users?planId=101')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toEqual('Meal plan not found');
+  });
+
+  it('gives a 403 error for unauthorized user', async () => {
+    const { agent, planId } = await signUpAndCreateMealPlan('2023-06-18');
+    const { token2 } = await createSecondaryUser(agent);
+
+    const res = await agent.get(`/plan-shares/users?planId=${planId}`)
+      .set('Authorization', `Bearer ${token2}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toEqual('You are not authorized to view this information');
+  });
 });

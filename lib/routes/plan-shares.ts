@@ -11,6 +11,7 @@ import validateUpdateShare from '../middleware/validation/shares/update.js';
 import { MultipleMealPlanWithRecipesRes } from '../types/mealPlan.js';
 import { MealPlanWithRecipes } from '../models/MealPlan.js';
 import validateGetUsers from '../middleware/validation/plan-shares/get-users.js';
+import authorizeGetUsers from '../middleware/authorization/plan-shares/get-users.js';
 
 export default Router()
   .post('/', [authenticate, validateSharePlan, authorizeSharePlan], 
@@ -51,7 +52,7 @@ export default Router()
       next(e);
     }
   })
-  .get('/users', [authenticate, validateGetUsers], async (req: AuthenticatedReqQuery<{ planId: string }>,
+  .get('/users', [authenticate, validateGetUsers, authorizeGetUsers], async (req: AuthenticatedReqQuery<{ planId: string }>,
     res: TypedResponse<MultiplePublicUsersRes>, next: NextFunction) => {
     try {
       const users = await PlanShare.getUsersByPlanId(req.query.planId);
