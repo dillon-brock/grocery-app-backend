@@ -1,5 +1,5 @@
 import { UserService } from '../../lib/services/UserService.js';
-import { createSecondaryUser, setupDb, signUpAndCreateMealPlan, testUser3 } from '../utils.js';
+import { createSecondaryUser, setupDb, signUp, signUpAndCreateMealPlan, testUser3 } from '../utils.js';
 
 describe('GET /plan-shares/users', () => {
   beforeEach(setupDb);
@@ -31,5 +31,33 @@ describe('GET /plan-shares/users', () => {
       }])
     });
     expect(res.body.users.length).toBe(2);
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const { agent, planId } = await signUpAndCreateMealPlan('2023-06-18');
+
+    const res = await agent.get(`/plan-shares/users?planId=${planId}`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
+  });
+
+  it('gives a 400 error for missing planId query', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.get('/plan-shares/users')
+      .set('Authorization', `Bearer ${token}`);
+    
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid query - planId is required');
+  });
+
+  it('gives a 400 error for invalid planId format', async () => {
+    const { agent, token } = await signUp();
+
+    const res = await agent.get('/plan-shares/users?planId=badId')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toEqual('Invalid query - invalid planId format');
   });
 });
