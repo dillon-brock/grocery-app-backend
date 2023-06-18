@@ -1,4 +1,6 @@
 import { createMealPlan, createSecondaryUser, setupDb, signUpAndCreateMealPlan } from '../utils.js';
+import request from 'supertest';
+import app from '../../lib/app.js';
 
 describe('GET /plan-shares/plans', () => {
   beforeEach(setupDb);
@@ -30,5 +32,12 @@ describe('GET /plan-shares/plans', () => {
       ])
     });
     expect(res.body.mealPlans.length).toBe(2);
+  });
+
+  it('gives a 401 error for unauthenticated user', async () => {
+    const res = await request(app).get('/plan-shares/plans');
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toEqual('You must be signed in to continue');
   });
 });

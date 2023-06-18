@@ -1,4 +1,5 @@
 import { PlanShare } from '../models/PlanShare.js';
+import { PublicUser } from '../models/User.js';
 import { SuccessResponse } from './global.js';
 
 export type PlanShareFromDB = {
@@ -20,4 +21,8 @@ export interface PlanShareRes extends SuccessResponse {
 
 export type PlanShareUpdateData = {
   editable?: boolean;
+}
+
+export interface MultiplePublicUsersRes extends SuccessResponse {
+  users: PublicUser[]
 }

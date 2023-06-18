@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
-import { NewPlanShareData, PlanShareRes, PlanShareUpdateData } from '../types/planShare.js';
+import { AuthenticatedReqBody, AuthenticatedReqQuery, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { MultiplePublicUsersRes, NewPlanShareData, PlanShareRes, PlanShareUpdateData } from '../types/planShare.js';
 import { NextFunction } from 'express-serve-static-core';
 import { PlanShare } from '../models/PlanShare.js';
 import validateSharePlan from '../middleware/validation/plan-shares/create.js';
@@ -45,6 +45,18 @@ export default Router()
       res.json({
         message: 'Shared meal plans found successfully',
         mealPlans
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .get('/users', authenticate, async (req: AuthenticatedReqQuery<{ planId: string }>,
+    res: TypedResponse<MultiplePublicUsersRes>, next: NextFunction) => {
+    try {
+      const users = await PlanShare.getUsersByPlanId(req.query.planId);
+      res.json({
+        message: 'Users found successfully',
+        users
       });
     } catch (e) {
       next(e);

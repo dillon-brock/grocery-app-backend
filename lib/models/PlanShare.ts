@@ -2,7 +2,9 @@ import pool from '../../sql/pool.js';
 import { InsertionError, UpdateError } from '../types/error.js';
 import { Rows } from '../types/global.js';
 import { NewPlanShareData, PlanShareFromDB, PlanShareUpdateData } from '../types/planShare.js';
+import { UserRows } from '../types/user.js';
 import { buildUpdateQuery } from '../utils.js';
+import { PublicUser } from './User.js';
 
 export class PlanShare {
   id: string;
@@ -40,5 +42,16 @@ export class PlanShare {
       throw new UpdateError('plan_shares');
     }
     return new PlanShare(rows[0]);
+  }
+
+  static async getUsersByPlanId(planId: string): Promise<PublicUser[]> {
+    const { rows }: UserRows = await pool.query(
+      `SELECT users.id, users.username FROM plan_shares
+      INNER JOIN users ON users.id = plan_shares.user_id
+      WHERE plan_shares.plan_id = $1`,
+      [planId]
+    );
+
+    return rows.map(row => new PublicUser(row));
   }
 }
