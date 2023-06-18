@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { NewPlanShareData, PlanShareRes, PlanShareUpdateData } from '../types/planShare.js';
 import { NextFunction } from 'express-serve-static-core';
 import { PlanShare } from '../models/PlanShare.js';
@@ -8,6 +8,8 @@ import validateSharePlan from '../middleware/validation/plan-shares/create.js';
 import authorizeSharePlan from '../middleware/authorization/plan-shares/create.js';
 import authorizeUpdatePlanShare from '../middleware/authorization/plan-shares/update.js';
 import validateUpdateShare from '../middleware/validation/shares/update.js';
+import { MultipleMealPlanWithRecipesRes } from '../types/mealPlan.js';
+import { MealPlanWithRecipes } from '../models/MealPlan.js';
 
 export default Router()
   .post('/', [authenticate, validateSharePlan, authorizeSharePlan], 
@@ -35,4 +37,16 @@ export default Router()
       } catch (e) {
         next(e);
       }
-    });
+    })
+  .get('/plans', authenticate, async (req: AuthenticatedRequest, 
+    res: TypedResponse<MultipleMealPlanWithRecipesRes>, next: NextFunction) => {
+    try {
+      const mealPlans = await MealPlanWithRecipes.findSharedByUserId(req.user.id);
+      res.json({
+        message: 'Shared meal plans found successfully',
+        mealPlans
+      });
+    } catch (e) {
+      next(e);
+    }
+  });

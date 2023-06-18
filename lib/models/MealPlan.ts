@@ -145,4 +145,16 @@ export class MealPlanWithRecipes extends MealPlan {
 
     return rows.map(row => new MealPlanWithRecipes(row));
   }
+
+  static async findSharedByUserId(userId: string): Promise<MealPlanWithRecipes[]> {
+    
+    const { rows }: Rows<MealPlanWithRecipesFromDB> = await pool.query(
+      `SELECT meal_plans.* FROM meal_plans
+      INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
+      WHERE plan_shares.user_id = $1`,
+      [userId]
+    );
+
+    return rows.map(row => new MealPlanWithRecipes(row));
+  }
 }
