@@ -7,6 +7,7 @@ import { PlanShare } from '../models/PlanShare.js';
 import validateSharePlan from '../middleware/validation/plan-shares/create.js';
 import authorizeSharePlan from '../middleware/authorization/plan-shares/create.js';
 import authorizeUpdatePlanShare from '../middleware/authorization/plan-shares/update.js';
+import validateUpdateShare from '../middleware/validation/shares/update.js';
 
 export default Router()
   .post('/', [authenticate, validateSharePlan, authorizeSharePlan], 
@@ -22,7 +23,7 @@ export default Router()
         next(e);
       }
     })
-  .put('/:id', [authenticate, authorizeUpdatePlanShare],
+  .put('/:id', [authenticate, authorizeUpdatePlanShare, validateUpdateShare],
     async (req: TypedAuthenticatedRequest<PlanShareUpdateData, { id: string }>, 
       res: TypedResponse<PlanShareRes>, next: NextFunction) => {
       try {
