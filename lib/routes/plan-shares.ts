@@ -6,6 +6,7 @@ import { NextFunction } from 'express-serve-static-core';
 import { PlanShare } from '../models/PlanShare.js';
 import validateSharePlan from '../middleware/validation/plan-shares/create.js';
 import authorizeSharePlan from '../middleware/authorization/plan-shares/create.js';
+import authorizeUpdatePlanShare from '../middleware/authorization/plan-shares/update.js';
 
 export default Router()
   .post('/', [authenticate, validateSharePlan, authorizeSharePlan], 
@@ -21,7 +22,7 @@ export default Router()
         next(e);
       }
     })
-  .put('/:id', authenticate, 
+  .put('/:id', [authenticate, authorizeUpdatePlanShare],
     async (req: TypedAuthenticatedRequest<PlanShareUpdateData, { id: string }>, 
       res: TypedResponse<PlanShareRes>, next: NextFunction) => {
       try {
