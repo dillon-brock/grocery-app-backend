@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate.js';
-import { AuthenticatedReqBody, AuthenticatedReqQuery, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
+import { AuthenticatedReqBody, AuthenticatedReqParams, AuthenticatedReqQuery, AuthenticatedRequest, TypedAuthenticatedRequest, TypedResponse } from '../types/extendedExpress.js';
 import { MultiplePublicUsersRes, NewPlanShareData, PlanShareRes, PlanShareUpdateData } from '../types/planShare.js';
 import { NextFunction } from 'express-serve-static-core';
 import { PlanShare } from '../models/PlanShare.js';
@@ -59,6 +59,18 @@ export default Router()
       res.json({
         message: 'Users found successfully',
         users
+      });
+    } catch (e) {
+      next(e);
+    }
+  })
+  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>,
+    res: TypedResponse<PlanShareRes>, next: NextFunction) => {
+    try {
+      const planShare = await PlanShare.deleteById(req.params.id);
+      res.json({
+        message: 'Plan share deleted successfully',
+        planShare
       });
     } catch (e) {
       next(e);
