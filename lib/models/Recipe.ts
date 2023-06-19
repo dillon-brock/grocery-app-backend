@@ -48,8 +48,7 @@ export class Recipe {
   }
 
   static async findById(id: string): Promise<Recipe | null> {
-
-    const { rows }: RecipeRows = await pool.query(
+    const { rows } = await pool.query(
       `SELECT * FROM recipes
       WHERE id = $1`,
       [id]
@@ -93,7 +92,6 @@ export class Recipe {
   }
 
   async checkUserPermissions(userId: string): Promise<Permissions> {
-
     const { rows }: RecipeShareRows = await pool.query(
       `SELECT recipe_shares.* FROM recipes
       INNER JOIN recipe_shares ON recipe_shares.recipe_id = recipes.id

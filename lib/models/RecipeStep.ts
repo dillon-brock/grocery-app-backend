@@ -1,6 +1,6 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError } from '../types/error.js';
-import { NewRecipeStepData, RecipeStepFromDB, RecipeStepRows, StepUpdateData } from '../types/recipe-step.js';
+import { NewRecipeStepData, RecipeStepFromDB, RecipeStepRows, StepUpdateData } from '../types/recipeStep.js';
 import { buildUpdateQuery } from '../utils.js';
 
 export class RecipeStep {

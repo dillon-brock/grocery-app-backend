@@ -4,6 +4,7 @@ import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
 import { User } from '../lib/models/User.js';
+import { NewPlanShareData } from '../lib/types/planShare.js';
 const sql = readFileSync('./sql/setup.sql', 'utf-8');
 
 export function setupDb() {
@@ -335,4 +336,52 @@ export async function signUpAndShareList(): Promise<PostListData> {
   const shareId = shareRes.body.shareData.id;
 
   return { agent, sharedUserId: userId, token, listId, shareId };
+}
+
+
+// meal plans helper functions
+
+export async function createMealPlan(agent: request.SuperAgentTest, token: string, date: string): Promise<string> {
+  const newMealPlanRes = await agent.post('/meal-plans')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ date });
+
+  return newMealPlanRes.body.mealPlan.id;
+}
+
+type MealPlanAgentData = {
+  agent: request.SuperAgentTest;
+  token: string;
+  date: string;
+  planId: string;
+  userId: string;
+}
+
+export async function signUpAndCreateMealPlan(date: string): Promise<MealPlanAgentData> {
+  const { agent, token, user } = await signUpAndGetInfo();
+  const planId = await createMealPlan(agent, token, date);
+
+  return { agent, token, planId, date, userId: user.id };
+}
+
+
+// plan recipe helper functions
+
+export async function createPlanRecipe(agent: request.SuperAgentTest, token: string, planId: string, recipeId: string): Promise<string> {
+  const res = await agent.post('/plans-recipes')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ planId, recipeId, meal: 'Dinner' });
+
+  return res.body.planRecipe.id;
+}
+
+
+// plan share helper functions
+
+export async function shareMealPlan(agent: request.SuperAgentTest, token: string, body: NewPlanShareData): Promise<string> {
+  const res = await agent.post('/plan-shares')
+    .set('Authorization', `Bearer ${token}`)
+    .send(body);
+
+  return res.body.planShare.id;
 }
