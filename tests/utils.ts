@@ -4,6 +4,7 @@ import request from 'supertest';
 import app from '../lib/app.js';
 import { UserService } from '../lib/services/UserService.js';
 import { User } from '../lib/models/User.js';
+import { NewPlanShareData } from '../lib/types/planShare.js';
 const sql = readFileSync('./sql/setup.sql', 'utf-8');
 
 export function setupDb() {
@@ -372,4 +373,15 @@ export async function createPlanRecipe(agent: request.SuperAgentTest, token: str
     .send({ planId, recipeId, meal: 'Dinner' });
 
   return res.body.planRecipe.id;
+}
+
+
+// plan share helper functions
+
+export async function shareMealPlan(agent: request.SuperAgentTest, token: string, body: NewPlanShareData): Promise<string> {
+  const res = await agent.post('/plan-shares')
+    .set('Authorization', `Bearer ${token}`)
+    .send(body);
+
+  return res.body.planShare.id;
 }

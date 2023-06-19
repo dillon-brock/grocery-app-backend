@@ -12,6 +12,7 @@ import { MultipleMealPlanWithRecipesRes } from '../types/mealPlan.js';
 import { MealPlanWithRecipes } from '../models/MealPlan.js';
 import validateGetUsers from '../middleware/validation/plan-shares/get-users.js';
 import authorizeGetUsers from '../middleware/authorization/plan-shares/get-users.js';
+import authorizeDeletePlanShare from '../middleware/authorization/plan-shares/delete.js';
 
 export default Router()
   .post('/', [authenticate, validateSharePlan, authorizeSharePlan], 
@@ -64,7 +65,7 @@ export default Router()
       next(e);
     }
   })
-  .delete('/:id', authenticate, async (req: AuthenticatedReqParams<{ id: string }>,
+  .delete('/:id', [authenticate, authorizeDeletePlanShare], async (req: AuthenticatedReqParams<{ id: string }>,
     res: TypedResponse<PlanShareRes>, next: NextFunction) => {
     try {
       const planShare = await PlanShare.deleteById(req.params.id);

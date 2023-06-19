@@ -34,6 +34,17 @@ export class PlanShare {
     return new PlanShare(rows[0]);
   }
 
+  static async findById(id: string): Promise<PlanShare | null> {
+
+    const { rows }: Rows<PlanShareFromDB> = await pool.query(
+      `SELECT * FROM plan_shares
+      WHERE id = $1`,
+      [id]
+    );
+
+    return rows[0] ? new PlanShare(rows[0]) : null;
+  }
+
   static async updateById(id: string, data: PlanShareUpdateData): Promise<PlanShare> {
     const query = buildUpdateQuery('plan_shares', data);
     const { rows }: Rows<PlanShareFromDB> = await pool.query(query, [id]);
