@@ -21,6 +21,10 @@ export interface MealPlanRes extends SuccessResponse {
   mealPlan: MealPlan
 }
 
+export interface MultipleMealPlanRes extends SuccessResponse {
+  mealPlans: MealPlan[]
+}
+
 export type MealPlanUpdateData = {
   date: string;
 }

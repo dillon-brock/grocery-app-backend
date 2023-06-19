@@ -1,9 +1,11 @@
 import pool from '../../sql/pool.js';
 import { DeletionError, InsertionError, UpdateError } from '../types/error.js';
 import { Rows } from '../types/global.js';
+import { MealPlanWithRecipesFromDB } from '../types/mealPlan.js';
 import { NewPlanShareData, PlanShareFromDB, PlanShareUpdateData } from '../types/planShare.js';
 import { UserRows } from '../types/user.js';
 import { buildUpdateQuery } from '../utils.js';
+import { MealPlan } from './MealPlan.js';
 import { PublicUser } from './User.js';
 
 export class PlanShare {
@@ -64,6 +66,17 @@ export class PlanShare {
     );
 
     return rows.map(row => new PublicUser(row));
+  }
+
+  static async getPlansByUserId(userId: string): Promise<MealPlan[]> {
+    const { rows }: Rows<MealPlanWithRecipesFromDB> = await pool.query(
+      `SELECT meal_plans.* FROM meal_plans
+      INNER JOIN plan_shares ON plan_shares.plan_id = meal_plans.id
+      WHERE plan_shares.user_id = $1`,
+      [userId]
+    );
+
+    return rows.map(row => new MealPlan(row));
   }
 
   static async deleteById(id: string): Promise<PlanShare> {

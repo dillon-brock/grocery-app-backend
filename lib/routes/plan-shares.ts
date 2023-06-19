@@ -8,8 +8,7 @@ import validateSharePlan from '../middleware/validation/plan-shares/create.js';
 import authorizeSharePlan from '../middleware/authorization/plan-shares/create.js';
 import authorizeUpdatePlanShare from '../middleware/authorization/plan-shares/update.js';
 import validateUpdateShare from '../middleware/validation/shares/update.js';
-import { MultipleMealPlanWithRecipesRes } from '../types/mealPlan.js';
-import { MealPlanWithRecipes } from '../models/MealPlan.js';
+import { MultipleMealPlanRes } from '../types/mealPlan.js';
 import validateGetUsers from '../middleware/validation/plan-shares/get-users.js';
 import authorizeGetUsers from '../middleware/authorization/plan-shares/get-users.js';
 import authorizeDeletePlanShare from '../middleware/authorization/plan-shares/delete.js';
@@ -42,9 +41,9 @@ export default Router()
       }
     })
   .get('/plans', authenticate, async (req: AuthenticatedRequest, 
-    res: TypedResponse<MultipleMealPlanWithRecipesRes>, next: NextFunction) => {
+    res: TypedResponse<MultipleMealPlanRes>, next: NextFunction) => {
     try {
-      const mealPlans = await MealPlanWithRecipes.findSharedByUserId(req.user.id);
+      const mealPlans = await PlanShare.getPlansByUserId(req.user.id);
       res.json({
         message: 'Shared meal plans found successfully',
         mealPlans
